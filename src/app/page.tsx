@@ -1,14 +1,18 @@
 "use client";
 
+import LanguageSwitcher from "@/components/language-switcher";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  const t = useTranslations("HomePage");
 
   return (
     <main className="flex items-center justify-center h-screen bg-neutral-950 text-white">
       <div>
-        <h2 className=" text-2xl">Hello From Myanmar (မင်္ဂလာပါ)</h2>
+        <LanguageSwitcher />
+        <h2 className=" text-2xl">{t("title")}</h2>
         <div className="flex gap-4 mt-5 justify-center">
           <button
             onClick={() => router.push("/sign-up")}
