@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { ThemeProvider } from "@/components/theme-provider";
+import MainHeader from "@/components/layout/main-header";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -40,10 +42,19 @@ export default async function RootLayout({
         "font-sans",
         figtree.variable,
       )}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <MainHeader />
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

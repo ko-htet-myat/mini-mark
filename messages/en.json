@@ -1,5 +1,9 @@
 {
   "HomePage": {
     "title": "Mini Market Myanmar"
+  },
+  "Auth": {
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up"
   }
 }
