@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
 export default function SignInPage() {
   const router = useRouter();
+  const t = useTranslations("Auth");
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -50,7 +52,7 @@ export default function SignInPage() {
           type="submit"
           className="w-full bg-white text-black font-medium rounded-md px-4 py-2 hover:bg-gray-200"
         >
-          Sign In
+          {t("sign_in")}
         </button>{" "}
       </form>{" "}
     </main>
