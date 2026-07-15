@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import MainHeader from "@/components/layout/main-header";
+import QueryProvider from "@/lib/query";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -45,17 +46,19 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <MainHeader />
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <MainHeader />
+              {children}
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );
