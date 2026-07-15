@@ -7,11 +7,101 @@
       "skillPath": "skills/use-ai-sdk/SKILL.md",
       "computedHash": "dfce60b0f2749991e000123526e298d5ede1c8353d837e71886fb3c8e5f8b730"
     },
+    "better-auth-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/best-practices/SKILL.md",
+      "computedHash": "e8b46af23c6b1bc7aefdae3cf816368058c05e46eadb9bdca4f744b17d05a866"
+    },
+    "better-auth-security-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "security/SKILL.md",
+      "computedHash": "087c1094fa5f1834af4785c058dcc8c9abe4c1321b853883c76ea46c93a21cfe"
+    },
+    "create-auth": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/create-auth/SKILL.md",
+      "computedHash": "cf5d2c852c66269dc350dec0db8cfb07634a2310aee5be1bfd7e643dca72f22e"
+    },
+    "email-and-password-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/emailAndPassword/SKILL.md",
+      "computedHash": "7786d722fa682b3d6a99793e73a9d51b59becefa595676134a993020633e068f"
+    },
     "migrate-ai-sdk-v6-to-v7": {
       "source": "vercel/ai",
       "sourceType": "github",
       "skillPath": "skills/migrate-ai-sdk-v6-to-v7/SKILL.md",
       "computedHash": "e5ce0d999481d4b30a25d579554ef5bbf53321963f7a23b5f22b8c92ea3954fb"
+    },
+    "organization-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/organization/SKILL.md",
+      "computedHash": "f8ea75816a22992c1601c21c0ee3ff8209798065072d76aec3e31eea8295af57"
+    },
+    "safe-action-advanced": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-advanced/SKILL.md",
+      "computedHash": "a5f47b9bf259a72c0317571b9cfc19d709d65909ecbffa10808e79308315be78"
+    },
+    "safe-action-better-auth": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-better-auth/SKILL.md",
+      "computedHash": "9ef37dcbe72fa8888e3da6a20561fc19997dda3707525f5a2aab6f5ca0c54818"
+    },
+    "safe-action-client": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-client/SKILL.md",
+      "computedHash": "532be9233d89721d10f0a73287c241bd4d7c3e4bb031d88c3cf455b34d41e8b1"
+    },
+    "safe-action-forms": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-forms/SKILL.md",
+      "computedHash": "91a9e56a4e1b219fecd314e007e6ddb15953e73e6fc976837229c15a9f13d81a"
+    },
+    "safe-action-hooks": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-hooks/SKILL.md",
+      "computedHash": "fb18ff5bed6516b245dec3512affde50c6dcbb69e6d14d0eb75846cde9c160cd"
+    },
+    "safe-action-middleware": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-middleware/SKILL.md",
+      "computedHash": "8696a435b4d8065817b0a458c89b916d866764ab3b8f87079baf60110c6d7f70"
+    },
+    "safe-action-tanstack-query": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-tanstack-query/SKILL.md",
+      "computedHash": "910a60821a8ad902bed352cf28dbda835dd852f3bfc410bcc1d00611da39a9fa"
+    },
+    "safe-action-testing": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-testing/SKILL.md",
+      "computedHash": "74fc9ce9138b705a1dcbf919d0d4a34f2209aaf276d8b6ff3962f4a377c867dc"
+    },
+    "safe-action-validation-errors": {
+      "source": "next-safe-action/skills",
+      "sourceType": "github",
+      "skillPath": "skills/safe-action-validation-errors/SKILL.md",
+      "computedHash": "454d3d9961035d851d6b112f96693b11310ebb2d0f09f2cbf7af8173391c3896"
+    },
+    "two-factor-authentication-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/twoFactor/SKILL.md",
+      "computedHash": "cfe69aad10d4d7b397fbc101630afd9361b385b5f6f83056f33f36ab3b736fcb"
     }
   }
 }
