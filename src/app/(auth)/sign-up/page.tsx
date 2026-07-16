@@ -1,68 +1,104 @@
 "use client";
 
-import { useState } from "react";
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/auth-client";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signupAction } from "@/features/auth/actions";
+import { signupSchema } from "@/features/auth/validations";
+import { GoogleButton } from "@/features/auth/components/google-btn";
 
-export default function SignUpPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const t = useTranslations("Auth");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-
-    const formData = new FormData(e.currentTarget);
-
-    const res = await signUp.email({
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-    });
-
-    if (res.error) {
-      setError(res.error.message || "Something went wrong.");
-    } else {
-      router.push("/dashboard");
-    }
-  }
+  const { form, action, handleSubmitWithAction } = useHookFormAction(
+    signupAction,
+    zodResolver(signupSchema),
+    {
+      formProps: {
+        defaultValues: { name: "", email: "", password: "" },
+      },
+      actionProps: {
+        onSuccess: () => {
+          router.push("/onboarding/create-shop");
+        },
+      },
+    },
+  );
 
   return (
-    <main className="max-w-md mx-auto p-6 space-y-4 text-white">
-      <h1 className="text-2xl font-bold">Sign Up</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {" "}
-        <input
-          name="name"
-          placeholder="Full Name"
-          required
-          className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2"
-        />{" "}
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2"
-        />{" "}
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          minLength={8}
-          className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2"
-        />{" "}
-        <button
-          type="submit"
-          className="w-full bg-white text-black font-medium rounded-md px-4 py-2 hover:bg-gray-200"
-        >
-          {t("sign_up")}
-        </button>{" "}
-      </form>{" "}
-    </main>
+    <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 px-4">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold">Create your account</h1>
+        <p className="text-sm text-muted-foreground">
+          Start selling in minutes with your own shop.
+        </p>
+      </div>
+
+      <GoogleButton />
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">OR</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="name">Full name</Label>
+          <Input id="name" placeholder="Jane Doe" {...form.register("name")} />
+          {form.formState.errors.name && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.name.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            {...form.register("email")}
+          />
+          {form.formState.errors.email && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.email.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" {...form.register("password")} />
+          {form.formState.errors.password && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.password.message}
+            </p>
+          )}
+        </div>
+
+        {action.result.serverError && (
+          <p className="text-sm text-destructive">
+            {action.result.serverError}
+          </p>
+        )}
+
+        <Button type="submit" disabled={action.isPending} className="w-full">
+          {action.isPending ? "Creating account..." : "Create account"}
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link href="/login" className="font-medium text-foreground underline">
+          Log in
+        </Link>
+      </p>
+    </div>
   );
 }
