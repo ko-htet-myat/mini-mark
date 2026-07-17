@@ -2,9 +2,10 @@ import { redirect, notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { LogoutButton } from "@/features/auth/components/logout-btn";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import { getSession } from "@/lib/get-session";
 
-export default async function DashboardLayout({
+export default async function ShopDashboardLayout({
   params,
   children,
 }: {
@@ -13,7 +14,7 @@ export default async function DashboardLayout({
 }) {
   const { shop: slug } = await params;
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) {
     redirect(`/login?redirect=/${slug}/dashboard`);
   }
@@ -29,11 +30,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen">
-      <header className="flex items-center justify-between border-b p-4">
-        <h2 className="font-medium">{shop.name}</h2>
-        <LogoutButton />
-      </header>
-      <main className="p-8">{children}</main>
+      <DashboardLayout>{children}</DashboardLayout>
     </div>
   );
 }

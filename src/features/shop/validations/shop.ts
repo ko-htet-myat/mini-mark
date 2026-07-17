@@ -1,4 +1,3 @@
-// lib/validations/shop.ts
 import { z } from "zod";
 
 export const RESERVED_SLUGS = [

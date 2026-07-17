@@ -77,11 +77,16 @@ model Verification {
 }
 
 model Shop {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  ownerId   String   @unique // one shop per user for MVP
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  logoUrl     String?
+  bannerUrl   String?
+  contactEmail String?
+  contactPhones String[] @default([])
+  ownerId     String   @unique
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

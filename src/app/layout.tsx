@@ -7,6 +7,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import MainHeader from "@/components/layout/main-header";
 import QueryProvider from "@/lib/query";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -54,8 +55,7 @@ export default async function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <MainHeader />
-              {children}
+              <TooltipProvider>{children}</TooltipProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </QueryProvider>
