@@ -25,6 +25,7 @@ import {
   NotificationIcon,
   LogoutIcon,
 } from "@hugeicons/core-free-icons";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 export function NavUser({
   user,
@@ -36,6 +37,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { handleLogout } = useLogout();
 
   return (
     <SidebarMenu>
@@ -102,7 +104,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <HugeiconsIcon icon={LogoutIcon} strokeWidth={2} />
               Log out
             </DropdownMenuItem>

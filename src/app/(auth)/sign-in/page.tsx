@@ -104,7 +104,7 @@ export default function LoginPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         <span>{" Don't have an account?"}</span>
-        <Link href="/signup" className="font-medium text-foreground underline">
+        <Link href="/sign-up" className="font-medium text-foreground underline">
           Sign up
         </Link>
       </p>

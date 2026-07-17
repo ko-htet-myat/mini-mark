@@ -13,7 +13,7 @@ export function GoogleButton() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: "/social-check-auth",
       });
     } catch {
       setLoading(false);
