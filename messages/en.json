@@ -5,5 +5,8 @@
   "Auth": {
     "sign_in": "Sign In",
     "sign_up": "Sign Up"
+  },
+  "Shop": {
+    "mini_mark": "Mini Mark"
   }
 }

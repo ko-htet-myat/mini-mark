@@ -18,16 +18,16 @@ export function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size={"icon-sm"}>
           <HugeiconsIcon
             icon={Sun}
-            className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+            className=" scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
             color="black"
           />
 
           <HugeiconsIcon
             icon={Moon}
-            className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+            className="absolute  scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
           />
           <span className="sr-only">Toggle theme</span>
         </Button>

@@ -1,9 +1,8 @@
 import { redirect, notFound } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { getSession } from "@/lib/get-session";
+import { ShopProvider } from "@/store/shop-context";
 
 export default async function ShopDashboardLayout({
   params,
@@ -29,8 +28,10 @@ export default async function ShopDashboardLayout({
   }
 
   return (
-    <div className="min-h-screen">
-      <DashboardLayout>{children}</DashboardLayout>
-    </div>
+    <ShopProvider shop={shop}>
+      <div className="min-h-screen">
+        <DashboardLayout>{children}</DashboardLayout>
+      </div>
+    </ShopProvider>
   );
 }

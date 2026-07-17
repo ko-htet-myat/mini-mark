@@ -31,12 +31,12 @@ type NavItem = {
   }[];
 };
 
-export function NavMain({ items }: { items: NavItem[] }) {
+export function SystemNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>System</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) =>
           item.items && item.items.length > 0 ? (
