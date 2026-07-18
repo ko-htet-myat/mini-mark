@@ -1,20 +1,16 @@
 "use server";
 
-import { headers } from "next/headers";
-import { actionClient } from "@/lib/safe-action";
-import { auth } from "@/lib/auth";
+import { authClient } from "@/lib/safe-action";
 import { returnValidationErrors } from "next-safe-action";
 import prisma from "@/lib/prisma";
 import { createShopSchema } from "../validations/shop";
 
-export const createShopAction = actionClient
+export const createShopAction = authClient
   .inputSchema(createShopSchema)
-  .action(async ({ parsedInput }) => {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session) throw new Error("Not authenticated");
-
+  .action(async ({ parsedInput, ctx }) => {
+    const user = ctx.auth.user;
     const existing = await prisma.shop.findUnique({
-      where: { ownerId: session.user.id },
+      where: { ownerId: user.id },
     });
     if (existing) throw new Error("You already have a shop");
 
@@ -33,7 +29,7 @@ export const createShopAction = actionClient
       data: {
         name: parsedInput.name,
         slug: parsedInput.slug,
-        ownerId: session.user.id,
+        ownerId: user.id,
       },
     });
 

@@ -1,5 +1,4 @@
-import prisma from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function ShopLayout({
   params,
@@ -9,9 +8,6 @@ export default async function ShopLayout({
   children: React.ReactNode;
 }) {
   const { shop: slug } = await params;
-  const shop = await prisma.shop.findUnique({ where: { slug } });
-
-  if (!shop) notFound();
-
+  await getShopBySlug(slug);
   return <>{children}</>;
 }
