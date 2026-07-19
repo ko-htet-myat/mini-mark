@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import {
@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { brandColumns, BrandRow } from "./brand-columns";
+import { BrandRow, getBrandColumns } from "./brand-columns";
 
 interface BrandDataTableProps {
   data: BrandRow[];
@@ -62,9 +62,14 @@ export function BrandDataTable({
     [pathname, router, searchParams],
   );
 
+  const columns = useMemo(
+    () => getBrandColumns({ page, pageSize }),
+    [page, pageSize],
+  );
+
   const table = useReactTable({
     data,
-    columns: brandColumns,
+    columns,
     manualPagination: true,
     manualFiltering: true,
     pageCount,
@@ -130,7 +135,7 @@ export function BrandDataTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={brandColumns.length}
+                  colSpan={columns.length}
                   className="h-24 text-center"
                 >
                   No brands found.
