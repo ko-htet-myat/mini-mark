@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
+    "disposable-email-domains": "^1.0.62",
     "dotenv": "^17.4.2",
     "next": "16.2.10",
     "next-cloudinary": "^6.17.5",
