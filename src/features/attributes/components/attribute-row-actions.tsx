@@ -16,16 +16,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteAction } from "@/hooks/use-delete-action";
-import { deleteBrand } from "@/features/brands/actions";
+import { deleteAttribute } from "@/features/attributes/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
 
-interface BrandRowActionsProps {
-  brandId: string;
-  brandName: string;
+interface AttributeRowActionsProps {
+  attributeId: string;
+  attributeName: string;
 }
 
-export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
+export function AttributeRowActions({
+  attributeId,
+  attributeName,
+}: AttributeRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
 
@@ -36,9 +39,9 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
     confirmDelete,
     openConfirm,
   } = useDeleteAction({
-    action: deleteBrand.bind(null, { shop: slug }),
-    successMessage: "Brand deleted",
-    errorMessage: "Failed to delete brand.",
+    action: deleteAttribute.bind(null, { shop: slug }),
+    successMessage: "Attribute deleted",
+    errorMessage: "Failed to delete attribute.",
   });
 
   return (
@@ -51,7 +54,7 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`brands/${brandId}/edit`}>
+            <Link href={`attributes/${attributeId}/edit`}>
               {" "}
               <HugeiconsIcon
                 icon={Edit03Icon}
@@ -77,9 +80,9 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={`Delete "${brandName}"?`}
-        description="This will permanently delete the brand and remove it from your catalog."
-        onConfirm={() => confirmDelete(brandId)}
+        title={`Delete "${attributeName}"?`}
+        description="This will permanently delete the attribute and remove it from your catalog."
+        onConfirm={() => confirmDelete(attributeId)}
         isPending={isExecuting}
       />
     </>
