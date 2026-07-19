@@ -64,6 +64,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Attributes",
       url: `${base}/attributes`,
       icon: <HugeiconsIcon icon={GoldIngotsIcon} strokeWidth={2} />,
+      items: [
+        {
+          title: "All Attributes",
+          url: `${base}/attributes`,
+        },
+        {
+          title: "Create Attribute",
+          url: `${base}/attributes/create`,
+        },
+      ],
     },
     {
       title: "Brands",
