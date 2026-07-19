@@ -18,5 +18,5 @@ export default async function SocialCheckAuthPage() {
     redirect(`/${shop.slug}/dashboard`);
   }
 
-  redirect("/onboarding/create-shop");
+  redirect("/create-shop");
 }

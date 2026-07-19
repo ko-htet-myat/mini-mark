@@ -23,7 +23,7 @@ export default function SignupPage() {
       },
       actionProps: {
         onSuccess: () => {
-          router.push("/onboarding/create-shop");
+          router.push("/create-shop");
         },
       },
     },

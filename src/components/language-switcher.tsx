@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { setLocaleCookie } from "@/utils/language";
+import { setLocaleCookie } from "@/lib/language";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },

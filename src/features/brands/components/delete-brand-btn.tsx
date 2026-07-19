@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteBrand } from "@/features/brands/actions";
+import { useShop } from "@/context/shop-context";
 
 interface DeleteBrandButtonProps {
   brandId: string;
@@ -29,16 +30,20 @@ export function DeleteBrandButton({
   brandName,
 }: DeleteBrandButtonProps) {
   const [open, setOpen] = useState(false);
+  const { slug } = useShop();
 
-  const { execute, isExecuting } = useAction(deleteBrand, {
-    onSuccess: () => {
-      toast.success("Brand deleted");
-      setOpen(false);
+  const { execute, isExecuting } = useAction(
+    deleteBrand.bind(null, { shop: slug }),
+    {
+      onSuccess: () => {
+        toast.success("Brand deleted");
+        setOpen(false);
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError ?? "Failed to delete brand.");
+      },
     },
-    onError: ({ error }) => {
-      toast.error(error.serverError ?? "Failed to delete brand.");
-    },
-  });
+  );
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Shop } from "@hugeicons/core-free-icons";
-import { useShop } from "@/store/shop-context";
+import { useShop } from "@/context/shop-context";
 import { useTranslations } from "next-intl";
 
 export function TeamSwitcher() {

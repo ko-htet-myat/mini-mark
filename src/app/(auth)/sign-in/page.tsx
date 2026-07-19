@@ -33,7 +33,7 @@ export default function LoginPage() {
           if (data?.shopSlug) {
             router.push(`/${data.shopSlug}/dashboard`);
           } else {
-            router.push("/onboarding/create-shop");
+            router.push("/create-shop");
           }
         },
       },

@@ -2,6 +2,8 @@ import { createSafeActionClient } from "next-safe-action";
 import { betterAuth } from "@next-safe-action/adapter-better-auth";
 import { auth } from "./auth";
 import { redirect } from "next/navigation";
+import { getShopBySlug } from "@/features/shop/data/get-shop";
+import z from "zod";
 
 export const actionClient = createSafeActionClient();
 
@@ -15,3 +17,17 @@ export const authClient = actionClient.use(
     },
   }),
 );
+
+export const shopOwnerActionClient = authClient
+  .bindArgsSchemas([z.object({ shop: z.string() })])
+  .use(async ({ next, ctx, bindArgsClientInputs }) => {
+    const [{ shop: shopSlug }] = bindArgsClientInputs as [{ shop: string }];
+
+    const shop = await getShopBySlug(shopSlug);
+
+    if (!shop || shop.ownerId !== ctx.auth.user.id) {
+      throw new Error("Forbidden: you do not own this shop");
+    }
+
+    return next({ ctx: { ...ctx, shop } });
+  });

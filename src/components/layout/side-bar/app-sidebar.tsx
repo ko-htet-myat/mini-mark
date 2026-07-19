@@ -28,7 +28,7 @@ import {
   SaleTag02Icon,
 } from "@hugeicons/core-free-icons";
 import { SystemNav } from "./system-nav";
-import { useShop } from "@/store/shop-context";
+import { useShop } from "@/context/shop-context";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { slug } = useShop();

@@ -1,8 +1,8 @@
-import { redirect, notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
 import DashboardLayout from "@/components/layout/dashboard-layout";
+import { ShopProvider } from "@/context/shop-context";
+import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { getSession } from "@/lib/get-session";
-import { ShopProvider } from "@/store/shop-context";
+import { notFound, redirect } from "next/navigation";
 
 export default async function ShopDashboardLayout({
   params,
@@ -13,17 +13,15 @@ export default async function ShopDashboardLayout({
 }) {
   const { shop: slug } = await params;
 
-  const session = await getSession();
+  const [session, shop] = await Promise.all([
+    getSession(),
+    getShopBySlug(slug),
+  ]);
   if (!session) {
-    redirect(`/login?redirect=/${slug}/dashboard`);
+    redirect(`/sign-in?redirect=/${slug}/dashboard`);
   }
 
-  const shop = await prisma.shop.findUnique({ where: { slug } });
-  if (!shop) notFound();
-
   if (shop.ownerId !== session.user.id) {
-    // logged in, but doesn't own this shop — 404 rather than 403,
-    // so you don't leak which slugs exist to non-owners
     notFound();
   }
 

@@ -21,7 +21,7 @@ Powered by **Better Auth** with secure, type-safe session management.
 
 Smooth first-run experience for new users.
 
-- **Create Shop Wizard** — Guided onboarding flow at `/onboarding/create-shop` to set up a brand-new shop
+- **Create Shop Wizard** — Guided onboarding flow at `/(onboarding)/create-shop` to set up a brand-new shop
 - **Unique Shop Slug** — Each shop gets a unique, URL-friendly slug used as the dynamic route segment (`/[shop]/...`)
 - **One Shop per User** — Enforced at the database level; each owner can have at most one shop
 
@@ -132,7 +132,7 @@ Manage shop identity and contact details.
 /(auth)/sign-in                     → Sign-in page
 /(auth)/sign-up                     → Sign-up page
 /(auth)/social-check-auth           → OAuth callback handler
-/onboarding/create-shop             → New shop setup wizard
+/(onboarding)/create-shop           → New shop setup wizard
 /api/auth/[...]                     → Better Auth API handler
 /api/sign-cloudinary-params         → Signed Cloudinary upload
 

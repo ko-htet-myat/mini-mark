@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createBrandSchema } from "../validations";
 import { createBrand } from "../actions";
+import { useShop } from "@/context/shop-context";
 
 interface BrandFormProps {
   shopId: string;
@@ -17,9 +18,10 @@ interface BrandFormProps {
 
 export function CreateBrandForm({ shopId }: BrandFormProps) {
   const router = useRouter();
+  const { slug } = useShop();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    createBrand,
+    createBrand.bind(null, { shop: slug }),
     zodResolver(createBrandSchema),
     {
       formProps: {
