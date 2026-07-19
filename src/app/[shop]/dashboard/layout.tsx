@@ -4,6 +4,16 @@ import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { getSession } from "@/lib/get-session";
 import { notFound, redirect } from "next/navigation";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ shop: string }>;
+}) {
+  const { shop } = await params;
+  const shopData = await getShopBySlug(shop);
+  return { title: `${shopData.name} — Dashboard` };
+}
+
 export default async function ShopDashboardLayout({
   params,
   children,

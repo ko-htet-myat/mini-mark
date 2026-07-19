@@ -1,6 +1,7 @@
 import { BrandDataTable } from "@/features/brands/components/brand-data-table";
 import { getBrandsPage } from "@/features/brands/data/brand.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
+import { parsePagination } from "@/lib/parse-pagination";
 
 interface BrandsPageProps {
   params: Promise<{ shop: string }>;
@@ -15,8 +16,7 @@ export default async function BrandsPage({
   const searchParamKeys = await searchParams;
   const shop = await getShopBySlug(slug);
 
-  const page = Number(searchParamKeys.page ?? 0);
-  const pageSize = Number(searchParamKeys.pageSize ?? 10);
+  const { page, pageSize } = parsePagination(searchParamKeys);
   const nameFilter = searchParamKeys.name ?? "";
 
   const { data, total, pageCount } = await getBrandsPage({

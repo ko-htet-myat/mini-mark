@@ -54,9 +54,13 @@ export function BrandDataTable({
   const pushParams = useCallback(
     (updates: Record<string, string | number>) => {
       const params = new URLSearchParams(searchParams.toString());
-      Object.entries(updates).forEach(([key, value]) =>
-        params.set(key, String(value)),
-      );
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === "" || value === null || value === undefined) {
+          params.delete(key);
+        } else {
+          params.set(key, String(value));
+        }
+      });
       startTransition(() => router.push(`${pathname}?${params.toString()}`));
     },
     [pathname, router, searchParams],
