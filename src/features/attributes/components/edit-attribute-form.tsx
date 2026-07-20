@@ -44,7 +44,7 @@ export function EditAttributeForm({ attribute }: EditAttributeFormProps) {
       actionProps: {
         onSuccess: () => {
           toast.success("Attribute updated");
-          router.push("../../attributes");
+          router.push(`/${shopSlug}/dashboard/attributes`);
         },
       },
     },

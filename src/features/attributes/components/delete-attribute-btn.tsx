@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon } from "@hugeicons/core-free-icons";
@@ -23,14 +24,17 @@ import { useShop } from "@/context/shop-context";
 interface DeleteAttributeButtonProps {
   attributeId: string;
   attributeName: string;
+  redirectOnSuccess?: boolean;
 }
 
 export function DeleteAttributeButton({
   attributeId,
   attributeName,
+  redirectOnSuccess,
 }: DeleteAttributeButtonProps) {
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
+  const router = useRouter();
 
   const { execute, isExecuting } = useAction(
     deleteAttribute.bind(null, { shop: slug }),
@@ -38,6 +42,9 @@ export function DeleteAttributeButton({
       onSuccess: () => {
         toast.success("Attribute deleted");
         setOpen(false);
+        if (redirectOnSuccess) {
+          router.push(`/${slug}/dashboard/attributes`);
+        }
       },
       onError: ({ error }) => {
         toast.error(error.serverError ?? "Failed to delete attribute.");

@@ -36,7 +36,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       actionProps: {
         onSuccess: () => {
           toast.success("Brand updated");
-          router.push("../../brands");
+          router.push(`/${slug}/dashboard/brands`);
         },
       },
     },

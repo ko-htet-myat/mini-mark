@@ -36,7 +36,7 @@ export function CreateBrandForm({ shopId }: BrandFormProps) {
       actionProps: {
         onSuccess: () => {
           toast.success("Brand created");
-          router.push("../brands");
+          router.push(`/${slug}/dashboard/brands`);
         },
       },
     },

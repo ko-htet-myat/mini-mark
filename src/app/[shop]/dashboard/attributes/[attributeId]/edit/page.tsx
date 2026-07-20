@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAttributeById } from "@/features/attributes/data/attribute.queries";
 import { EditAttributeForm } from "@/features/attributes/components/edit-attribute-form";
+import { DeleteAttributeButton } from "@/features/attributes/components/delete-attribute-btn";
 
 export default async function EditAttributePage({
   params,
@@ -14,7 +15,14 @@ export default async function EditAttributePage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Edit attribute</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Edit attribute</h1>
+        <DeleteAttributeButton
+          attributeId={attribute.id}
+          attributeName={attribute.name}
+          redirectOnSuccess={true}
+        />
+      </div>
       <EditAttributeForm
         attribute={{
           id: attribute.id,

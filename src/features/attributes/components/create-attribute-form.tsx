@@ -36,7 +36,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       actionProps: {
         onSuccess: () => {
           toast.success("Attribute created");
-          router.push("../attributes");
+          router.push(`/${slug}/dashboard/attributes`);
         },
       },
     },

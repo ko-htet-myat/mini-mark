@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon } from "@hugeicons/core-free-icons";
@@ -23,14 +24,17 @@ import { useShop } from "@/context/shop-context";
 interface DeleteBrandButtonProps {
   brandId: string;
   brandName: string;
+  redirectOnSuccess?: boolean;
 }
 
 export function DeleteBrandButton({
   brandId,
   brandName,
+  redirectOnSuccess,
 }: DeleteBrandButtonProps) {
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
+  const router = useRouter();
 
   const { execute, isExecuting } = useAction(
     deleteBrand.bind(null, { shop: slug }),
@@ -38,6 +42,9 @@ export function DeleteBrandButton({
       onSuccess: () => {
         toast.success("Brand deleted");
         setOpen(false);
+        if (redirectOnSuccess) {
+          router.push(`/${slug}/dashboard/brands`);
+        }
       },
       onError: ({ error }) => {
         toast.error(error.serverError ?? "Failed to delete brand.");
