@@ -8,5 +8,13 @@
   },
   "Shop": {
     "mini_mark": "Mini Mark"
+  },
+  "Footer": {
+    "about": "About Us",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved.",
+    "description": "Your one-stop destination for all daily needs in Myanmar. Fresh, reliable, and always near you."
   }
 }
