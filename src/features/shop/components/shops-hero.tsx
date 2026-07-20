@@ -50,7 +50,8 @@ export function ShopsHero({ total }: { total: number }) {
         </h1>
 
         <p className="mt-5 text-base" style={{ color: "#5B564C" }}>
-          Every storefront on the platform, in one browsable directory.
+          Explore all {total} storefront{total === 1 ? "" : "s"} on the
+          platform, in one browsable directory.
         </p>
 
         {/* Search pill — overlaps the hero/section boundary */}

@@ -5,7 +5,14 @@ import { redirect } from "next/navigation";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import z from "zod";
 
-export const actionClient = createSafeActionClient();
+export const actionClient = createSafeActionClient({
+  handleServerError: (e) => {
+    if (e instanceof Error) {
+      return e.message;
+    }
+    return "Something went wrong while executing the operation.";
+  },
+});
 
 export const authClient = actionClient.use(
   betterAuth(auth, {
