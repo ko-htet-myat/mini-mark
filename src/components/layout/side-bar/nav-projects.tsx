@@ -23,6 +23,7 @@ import {
   ArrowRightIcon,
   Delete02Icon,
 } from "@hugeicons/core-free-icons";
+import { useTranslations } from "next-intl";
 
 export function NavProjects({
   projects,
@@ -34,10 +35,11 @@ export function NavProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const t = useTranslations("sidebar");
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("projects")}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -57,7 +59,7 @@ export function NavProjects({
                     icon={MoreHorizontalCircle01Icon}
                     strokeWidth={2}
                   />
-                  <span className="sr-only">More</span>
+                  <span className="sr-only">{t("more")}</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -67,16 +69,16 @@ export function NavProjects({
               >
                 <DropdownMenuItem>
                   <HugeiconsIcon icon={FolderIcon} strokeWidth={2} />
-                  <span>View Project</span>
+                  <span>{t("view_project")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <HugeiconsIcon icon={ArrowRightIcon} strokeWidth={2} />
-                  <span>Share Project</span>
+                  <span>{t("share_project")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive">
                   <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                  <span>Delete Project</span>
+                  <span>{t("delete_project")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -89,7 +91,7 @@ export function NavProjects({
               strokeWidth={2}
               className="text-sidebar-foreground/70"
             />
-            <span>More</span>
+            <span>{t("more")}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

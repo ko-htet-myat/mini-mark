@@ -29,104 +29,106 @@ import {
 } from "@hugeicons/core-free-icons";
 import { SystemNav } from "./system-nav";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { slug } = useShop();
+  const t = useTranslations("sidebar");
   const base = `/${slug}/dashboard`;
 
   const navMain = [
     {
-      title: "Dashboard",
+      title: t("dashboard"),
       url: base,
       icon: <HugeiconsIcon icon={DashboardSquare01Icon} strokeWidth={2} />,
     },
     {
-      title: "Orders",
+      title: t("orders"),
       url: `${base}/orders`,
       icon: <HugeiconsIcon icon={BorderFullIcon} strokeWidth={2} />,
     },
     {
-      title: "Products",
+      title: t("products"),
       url: `${base}/products`,
       icon: <HugeiconsIcon icon={ShoppingBag01Icon} strokeWidth={2} />,
       items: [
         {
-          title: "All Products",
+          title: t("all_products"),
           url: `${base}/products`,
         },
         {
-          title: "Create Product",
+          title: t("create_product"),
           url: `${base}/products/create`,
         },
       ],
     },
     {
-      title: "Attributes",
+      title: t("attributes"),
       url: `${base}/attributes`,
       icon: <HugeiconsIcon icon={GoldIngotsIcon} strokeWidth={2} />,
       items: [
         {
-          title: "All Attributes",
+          title: t("all_attributes"),
           url: `${base}/attributes`,
         },
         {
-          title: "Create Attribute",
+          title: t("create_attribute"),
           url: `${base}/attributes/create`,
         },
       ],
     },
     {
-      title: "Brands",
+      title: t("brands"),
       url: `${base}/brands`,
       icon: <HugeiconsIcon icon={CheckmarkSquare02Icon} strokeWidth={2} />,
       items: [
         {
-          title: "All Brands",
+          title: t("all_brands"),
           url: `${base}/brands`,
         },
         {
-          title: "Create Brand",
+          title: t("create_brand"),
           url: `${base}/brands/create`,
         },
       ],
     },
     {
-      title: "Categories",
+      title: t("categories"),
       url: `${base}/categories`,
       icon: <HugeiconsIcon icon={PackageIcon} strokeWidth={2} />,
       items: [
         {
-          title: "All Categories",
+          title: t("all_categories"),
           url: `${base}/categories`,
         },
         {
-          title: "Create Categories",
+          title: t("create_categories"),
           url: `${base}/categories/create`,
         },
       ],
     },
     {
-      title: "Promotions",
+      title: t("promotions"),
       url: `${base}/promotions`,
       icon: <HugeiconsIcon icon={SaleTag02Icon} strokeWidth={2} />,
       items: [
         {
-          title: "All Promotions",
+          title: t("all_promotions"),
           url: `${base}/promotions`,
         },
         {
-          title: "Create Promotion",
+          title: t("create_promotion"),
           url: `${base}/promotions/create`,
         },
       ],
     },
     {
-      title: "Invoices",
+      title: t("invoices"),
       url: `${base}/invoices`,
       icon: <HugeiconsIcon icon={Invoice01Icon} strokeWidth={2} />,
     },
     {
-      title: "Sales",
+      title: t("sales"),
       url: `${base}/sales`,
       icon: <HugeiconsIcon icon={Activity01Icon} strokeWidth={2} />,
     },
@@ -134,27 +136,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const systemMain = [
     {
-      title: "Calculator",
+      title: t("calculator"),
       url: `${base}/calculator`,
       icon: <HugeiconsIcon icon={Calculator01Icon} strokeWidth={2} />,
     },
     {
-      title: "Theme",
+      title: t("theme"),
       url: `${base}/theme`,
       icon: <HugeiconsIcon icon={ColorsIcon} strokeWidth={2} />,
       items: [
         {
-          title: "Shopfront Theme",
+          title: t("shopfront_theme"),
           url: `${base}/theme`,
         },
         {
-          title: "Invoice Theme",
+          title: t("invoice_theme"),
           url: `${base}/theme/invoice`,
         },
       ],
     },
     {
-      title: "Setting",
+      title: t("setting"),
       url: `${base}/settings`,
       icon: <HugeiconsIcon icon={Settings01Icon} strokeWidth={2} />,
     },

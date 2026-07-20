@@ -26,6 +26,7 @@ import {
   LogoutIcon,
 } from "@hugeicons/core-free-icons";
 import { useLogout } from "@/features/auth/hooks/use-logout";
+import { useTranslations } from "next-intl";
 
 export function NavUser({
   user,
@@ -38,6 +39,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const { handleLogout } = useLogout();
+  const t = useTranslations("sidebar");
 
   return (
     <SidebarMenu>
@@ -85,28 +87,28 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <HugeiconsIcon icon={SparklesIcon} strokeWidth={2} />
-                Upgrade to Pro
+                {t("upgrade_to_pro")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <HugeiconsIcon icon={CheckmarkBadgeIcon} strokeWidth={2} />
-                Account
+                {t("account")}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <HugeiconsIcon icon={CreditCardIcon} strokeWidth={2} />
-                Billing
+                {t("billing")}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <HugeiconsIcon icon={NotificationIcon} strokeWidth={2} />
-                Notifications
+                {t("notifications")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <HugeiconsIcon icon={LogoutIcon} strokeWidth={2} />
-              Log out
+              {t("log_out")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
