@@ -7,17 +7,27 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id            String    @id
   name          String
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
   shop          Shop?
+
+  reviewedRequests       SubscriptionRequest[] @relation("SubscriptionRequestReviewedBy")
+  recordedPayments       PaymentRecord[]       @relation("PaymentRecordRecordedBy")
+  activatedSubscriptions Subscription[]        @relation("SubscriptionActivatedBy")
 
   @@unique([email])
   @@map("user")
@@ -72,23 +82,25 @@ model Verification {
 }
 
 model Shop {
-  id            String      @id @default(cuid())
-  slug          String      @unique
-  name          String
-  description   String?
-  logoUrl       String?
-  bannerUrl     String?
-  contactEmail  String?
-  contactPhones String[]    @default([])
-  ownerId       String      @unique
-  owner         User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  categories    Category[]
-  brands        Brand[]
-  products      Product[]
-  attributes    Attribute[]
-  promotions    Promotion[]
+  id                   String                @id @default(cuid())
+  slug                 String                @unique
+  name                 String
+  description          String?
+  logoUrl              String?
+  bannerUrl            String?
+  contactEmail         String?
+  contactPhones        String[]              @default([])
+  ownerId              String                @unique
+  owner                User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  categories           Category[]
+  brands               Brand[]
+  products             Product[]
+  attributes           Attribute[]
+  promotions           Promotion[]
+  subscription         Subscription?
+  subscriptionRequests SubscriptionRequest[]
 }
 
 model Category {
@@ -252,4 +264,135 @@ model Promotion {
   @@unique([shopId, code])
   @@index([shopId])
   @@map("promotion")
+}
+
+// subscription
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+}
+
+model Plan {
+  id           String          @id @default(cuid())
+  name         String // "Starter", "Growth", "Pro"
+  slug         String          @unique
+  description  String?
+  interval     BillingInterval
+  price        Decimal         @db.Decimal(10, 2)
+  currency     String          @default("USD")
+  productLimit Int? // null = unlimited
+  orderLimit   Int? // null = unlimited, per billing period
+  isActive     Boolean         @default(true) // can hide old plans w/o deleting
+
+  subscriptions        Subscription[]
+  subscriptionRequests SubscriptionRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("plan")
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  EXPIRED
+  CANCELED
+  PENDING_ACTIVATION // request approved, awaiting payment confirmation
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  shopId String @unique
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
+
+  status           SubscriptionStatus @default(TRIALING)
+  trialEndsAt      DateTime?
+  currentPeriodEnd DateTime?
+  autoRenew        Boolean            @default(false)
+  notes            String?
+
+  activatedById String?
+  activatedBy   User?     @relation("SubscriptionActivatedBy", fields: [activatedById], references: [id])
+  activatedAt   DateTime?
+
+  payments PaymentRecord[]
+  requests SubscriptionRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscription")
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// A shop owner's "I want to upgrade" request — this is the manual-sales-contact step
+model SubscriptionRequest {
+  id     String @id @default(cuid())
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  status         RequestStatus @default(PENDING)
+  contactPhone   String?
+  contactMessage String?
+
+  reviewedById    String?
+  reviewedBy      User?     @relation("SubscriptionRequestReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shopId])
+  @@index([status])
+  @@map("subscription_request")
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CASH
+  MOBILE_MONEY
+  OTHER
+}
+
+// Manual bookkeeping — replaces what Stripe's invoice history would normally give you
+model PaymentRecord {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount     Decimal       @db.Decimal(10, 2)
+  currency   String        @default("USD")
+  method     PaymentMethod
+  reference  String?
+  receiptUrl String?
+
+  recordedById String
+  recordedBy   User   @relation("PaymentRecordRecordedBy", fields: [recordedById], references: [id])
+
+  periodStart DateTime
+  periodEnd   DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([subscriptionId])
+  @@map("payment_record")
 }
