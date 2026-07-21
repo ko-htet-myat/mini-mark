@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deletePromotion } from "@/features/promotions/actions";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 interface DeletePromotionButtonProps {
   promotionId: string;
@@ -35,19 +36,21 @@ export function DeletePromotionButton({
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
   const router = useRouter();
+  const tc = useTranslations("Common");
+  const tp = useTranslations("Promotions");
 
   const { execute, isExecuting } = useAction(
     deletePromotion.bind(null, { shop: slug }),
     {
       onSuccess: () => {
-        toast.success("Promotion deleted");
+        toast.success(tp("promotion_deleted"));
         setOpen(false);
         if (redirectOnSuccess) {
           router.push(`/${slug}/dashboard/promotions`);
         }
       },
       onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to delete promotion.");
+        toast.error(error.serverError ?? tp("failed_delete_promotion"));
       },
     },
   );
@@ -57,19 +60,22 @@ export function DeletePromotionButton({
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-destructive">
           <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-          Delete
+          {tc("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Delete "${promotionName}"?`}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {tc("confirm_delete_title", { name: promotionName })}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            promotion and remove it from your catalog.
+            {tp("delete_promotion_confirm_desc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isExecuting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isExecuting}>
+            {tc("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -78,7 +84,7 @@ export function DeletePromotionButton({
             disabled={isExecuting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isExecuting ? "Deleting..." : "Delete"}
+            {isExecuting ? tc("deleting") : tc("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

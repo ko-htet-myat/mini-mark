@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -29,6 +30,8 @@ export function AttributeRowActions({
   attributeId,
   attributeName,
 }: AttributeRowActionsProps) {
+  const tc = useTranslations("Common");
+  const ta = useTranslations("Attributes");
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
 
@@ -40,8 +43,8 @@ export function AttributeRowActions({
     openConfirm,
   } = useDeleteAction({
     action: deleteAttribute.bind(null, { shop: slug }),
-    successMessage: "Attribute deleted",
-    errorMessage: "Failed to delete attribute.",
+    successMessage: ta("attribute_deleted"),
+    errorMessage: ta("failed_delete_attribute"),
   });
 
   return (
@@ -61,7 +64,7 @@ export function AttributeRowActions({
                 size={16}
                 className="mr-1"
               />{" "}
-              Edit
+              {tc("edit")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -72,7 +75,7 @@ export function AttributeRowActions({
             }}
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-            Delete
+            {tc("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,8 +83,8 @@ export function AttributeRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={`Delete "${attributeName}"?`}
-        description="This will permanently delete the attribute and remove it from your catalog."
+        title={tc("confirm_delete_title", { name: attributeName })}
+        description={ta("delete_attribute_confirm_desc")}
         onConfirm={() => confirmDelete(attributeId)}
         isPending={isExecuting}
       />

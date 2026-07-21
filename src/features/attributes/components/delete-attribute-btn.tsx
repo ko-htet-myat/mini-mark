@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -32,6 +33,8 @@ export function DeleteAttributeButton({
   attributeName,
   redirectOnSuccess,
 }: DeleteAttributeButtonProps) {
+  const tc = useTranslations("Common");
+  const ta = useTranslations("Attributes");
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
   const router = useRouter();
@@ -40,14 +43,14 @@ export function DeleteAttributeButton({
     deleteAttribute.bind(null, { shop: slug }),
     {
       onSuccess: () => {
-        toast.success("Attribute deleted");
+        toast.success(ta("attribute_deleted"));
         setOpen(false);
         if (redirectOnSuccess) {
           router.push(`/${slug}/dashboard/attributes`);
         }
       },
       onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to delete attribute.");
+        toast.error(error.serverError ?? ta("failed_delete_attribute"));
       },
     },
   );
@@ -57,19 +60,22 @@ export function DeleteAttributeButton({
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-destructive">
           <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-          Delete
+          {tc("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Delete "${attributeName}"?`}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {tc("confirm_delete_title", { name: attributeName })}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            attribute and remove it from your catalog.
+            {ta("delete_attribute_confirm_desc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isExecuting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isExecuting}>
+            {tc("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault(); // stop the dialog auto-closing before the action resolves
@@ -78,7 +84,7 @@ export function DeleteAttributeButton({
             disabled={isExecuting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isExecuting ? "Deleting..." : "Delete"}
+            {isExecuting ? tc("deleting") : tc("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

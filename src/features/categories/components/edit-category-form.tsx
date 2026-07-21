@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 import { CategoryFormValues, updateCategorySchema } from "../validations";
 import { updateCategory } from "../actions";
 import { useShop } from "@/context/shop-context";
@@ -38,6 +39,8 @@ export function UpdateCategoryForm({
 }: UpdateCategoryFormProps) {
   const router = useRouter();
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tcat = useTranslations("Categories");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
     updateCategory.bind(null, { shop: slug }),
@@ -55,7 +58,7 @@ export function UpdateCategoryForm({
       },
       actionProps: {
         onSuccess: () => {
-          toast.success("Category updated");
+          toast.success(tcat("category_updated"));
           const parentId = form.getValues("parentId");
           router.push(
             `/${slug}/dashboard/categories${parentId ? `?parentId=${parentId}` : ""}`,
@@ -72,7 +75,7 @@ export function UpdateCategoryForm({
     >
       {parentOptions.length > 0 && (
         <div className="flex flex-col gap-2">
-          <Label htmlFor="parentId">Parent Category (Optional)</Label>
+          <Label htmlFor="parentId">{tcat("parent_category")}</Label>
           <Select
             value={form.watch("parentId") || "none"}
             onValueChange={(v) =>
@@ -80,10 +83,10 @@ export function UpdateCategoryForm({
             }
           >
             <SelectTrigger id="parentId">
-              <SelectValue placeholder="Select a parent…" />
+              <SelectValue placeholder={tcat("select_parent")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None (Root Category)</SelectItem>
+              <SelectItem value="none">{tcat("none_root_category")}</SelectItem>
               {parentOptions.map((opt) => (
                 <SelectItem key={opt.id} value={opt.id}>
                   {opt.parent ? `${opt.parent.name} → ${opt.name}` : opt.name}
@@ -100,7 +103,7 @@ export function UpdateCategoryForm({
       )}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{tc("name")}</Label>
         <Input id="name" {...form.register("name")} />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
@@ -110,7 +113,7 @@ export function UpdateCategoryForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{tc("slug")}</Label>
         <Input id="slug" {...form.register("slug")} />
         {form.formState.errors.slug && (
           <p className="text-sm text-destructive">
@@ -120,7 +123,7 @@ export function UpdateCategoryForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{tc("description")}</Label>
         <Textarea id="description" rows={3} {...form.register("description")} />
         {form.formState.errors.description && (
           <p className="text-sm text-destructive">
@@ -130,7 +133,7 @@ export function UpdateCategoryForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="imageUrl">Image URL</Label>
+        <Label htmlFor="imageUrl">{tcat("image_url")}</Label>
         <Input
           id="imageUrl"
           placeholder="https://..."
@@ -148,7 +151,7 @@ export function UpdateCategoryForm({
       )}
 
       <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? "Saving..." : "Save changes"}
+        {action.isPending ? tc("saving") : tc("save")}
       </Button>
     </form>
   );

@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { PromotionRowActions } from "./promotion-row-actions";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 export type PromotionRow = {
   id: string;
@@ -17,16 +18,27 @@ export type PromotionRow = {
 interface GetPromotionColumnsParams {
   page: number;
   pageSize: number;
+  tc: {
+    serial: string;
+    name: string;
+    slug: string;
+    discount: string;
+    status: string;
+    created: string;
+  };
+  tp: { active: string; inactive: string };
 }
 
 export function getPromotionColumns({
   page,
   pageSize,
+  tc,
+  tp,
 }: GetPromotionColumnsParams): ColumnDef<PromotionRow>[] {
   return [
     {
       id: "serial",
-      header: "#",
+      header: tc.serial,
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {page * pageSize + row.index + 1}
@@ -34,17 +46,17 @@ export function getPromotionColumns({
       ),
       size: 48,
     },
-    { accessorKey: "name", header: "Name" },
+    { accessorKey: "name", header: tc.name },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: tc.slug,
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
     },
     {
       id: "discount",
-      header: "Discount",
+      header: tc.discount,
       cell: ({ row }) => (
         <span>
           {row.original.discountType === "PERCENTAGE"
@@ -55,16 +67,16 @@ export function getPromotionColumns({
     },
     {
       accessorKey: "isActive",
-      header: "Status",
+      header: tc.status,
       cell: ({ row }) => (
         <Badge variant={row.original.isActive ? "default" : "secondary"}>
-          {row.original.isActive ? "Active" : "Inactive"}
+          {row.original.isActive ? tp.active : tp.inactive}
         </Badge>
       ),
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
+      header: tc.created,
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {

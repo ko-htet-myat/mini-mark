@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { createPromotionSchema } from "../validations";
 import { createPromotion } from "../actions";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 interface PromotionFormProps {
   shopId: string;
@@ -27,6 +28,8 @@ interface PromotionFormProps {
 export function CreatePromotionForm({ shopId }: PromotionFormProps) {
   const router = useRouter();
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tp = useTranslations("Promotions");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
     createPromotion.bind(null, { shop: slug }),
@@ -46,7 +49,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       },
       actionProps: {
         onSuccess: () => {
-          toast.success("Promotion created");
+          toast.success(tp("promotion_created"));
           router.push(`/${slug}/dashboard/promotions`);
         },
       },
@@ -71,7 +74,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       className="flex flex-col gap-5 max-w-lg"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{tc("name")}</Label>
         <Input
           id="name"
           {...form.register("name", { onChange: handleNameChange })}
@@ -84,7 +87,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{tc("slug")}</Label>
         <Input id="slug" {...form.register("slug")} />
         {form.formState.errors.slug && (
           <p className="text-sm text-destructive">
@@ -94,7 +97,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{tc("description")}</Label>
         <Textarea id="description" rows={3} {...form.register("description")} />
         {form.formState.errors.description && (
           <p className="text-sm text-destructive">
@@ -105,7 +108,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="discountType">Discount Type</Label>
+          <Label htmlFor="discountType">{tp("discount_type")}</Label>
           <Select
             onValueChange={(v) =>
               form.setValue("discountType", v as "PERCENTAGE" | "FIXED_AMOUNT")
@@ -113,17 +116,17 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
             defaultValue={form.getValues("discountType")}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select type" />
+              <SelectValue placeholder={tp("select_type")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-              <SelectItem value="FIXED_AMOUNT">Fixed Amount</SelectItem>
+              <SelectItem value="PERCENTAGE">{tp("percentage")}</SelectItem>
+              <SelectItem value="FIXED_AMOUNT">{tp("fixed_amount")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="discountValue">Discount Value</Label>
+          <Label htmlFor="discountValue">{tp("discount_value")}</Label>
           <Input
             id="discountValue"
             type="number"
@@ -139,7 +142,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="code">Promo Code (Optional)</Label>
+        <Label htmlFor="code">{tp("promo_code")}</Label>
         <Input id="code" {...form.register("code")} />
         {form.formState.errors.code && (
           <p className="text-sm text-destructive">
@@ -154,7 +157,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
           checked={form.watch("isActive")}
           onCheckedChange={(checked) => form.setValue("isActive", checked)}
         />
-        <Label htmlFor="isActive">Active</Label>
+        <Label htmlFor="isActive">{tp("active")}</Label>
       </div>
 
       {action.result.serverError && (
@@ -162,7 +165,7 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
       )}
 
       <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? "Saving..." : "Create promotion"}
+        {action.isPending ? tc("saving") : tp("create_promotion")}
       </Button>
     </form>
   );

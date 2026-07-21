@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 import { createShopAction } from "@/features/shop/actions/shop";
 import { createShopSchema } from "@/features/shop/validations/shop";
 
 export default function CreateShopPage() {
+  const t = useTranslations("Onboarding");
+  const tc = useTranslations("Common");
   const router = useRouter();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
@@ -32,18 +35,16 @@ export default function CreateShopPage() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 px-4">
       <div>
-        <h1 className="text-2xl font-semibold">Create your shop</h1>
-        <p className="text-sm text-muted-foreground">
-          Pick a name and URL for your storefront.
-        </p>
+        <h1 className="text-2xl font-semibold">{t("create_shop")}</h1>
+        <p className="text-sm text-muted-foreground">{t("pick_name_url")}</p>
       </div>
 
       <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="name">Shop name</Label>
+          <Label htmlFor="name">{t("shop_name")}</Label>
           <Input
             id="name"
-            placeholder="Jane's Pottery"
+            placeholder={t("shop_name_placeholder")}
             {...form.register("name")}
           />
           {form.formState.errors.name && (
@@ -54,12 +55,12 @@ export default function CreateShopPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="slug">Shop URL</Label>
+          <Label htmlFor="slug">{t("shop_url")}</Label>
           <div className="flex items-center rounded-md border px-3 text-sm text-muted-foreground">
             <span className="shrink-0">marketplace.com/</span>
             <Input
               id="slug"
-              placeholder="janes-pottery"
+              placeholder={t("shop_url_placeholder")}
               className="border-0 px-1 shadow-none focus-visible:ring-0"
               {...form.register("slug")}
             />
@@ -84,7 +85,7 @@ export default function CreateShopPage() {
         )}
 
         <Button type="submit" disabled={action.isPending} className="w-full">
-          {action.isPending ? "Creating shop..." : "Create shop"}
+          {action.isPending ? t("creating_shop") : t("create_shop_btn")}
         </Button>
       </form>
     </div>

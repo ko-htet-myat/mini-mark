@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Delete02Icon,
@@ -28,6 +29,8 @@ interface BrandRowActionsProps {
 export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tb = useTranslations("Brands");
 
   const {
     confirmOpen,
@@ -37,8 +40,8 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
     openConfirm,
   } = useDeleteAction({
     action: deleteBrand.bind(null, { shop: slug }),
-    successMessage: "Brand deleted",
-    errorMessage: "Failed to delete brand.",
+    successMessage: tb("brand_deleted"),
+    errorMessage: tb("failed_delete_brand"),
   });
 
   return (
@@ -58,7 +61,7 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
                 size={16}
                 className="mr-1"
               />{" "}
-              Edit
+              {tc("edit")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -69,7 +72,7 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
             }}
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-            Delete
+            {tc("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -77,8 +80,8 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={`Delete "${brandName}"?`}
-        description="This will permanently delete the brand and remove it from your catalog."
+        title={tc("confirm_delete_title", { name: brandName })}
+        description={tb("delete_brand_confirm_desc")}
         onConfirm={() => confirmDelete(brandId)}
         isPending={isExecuting}
       />

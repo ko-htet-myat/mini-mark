@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ const FOREST = "#123D2E";
 const GOLD = "#D9A441";
 
 export function ShopsHero({ total }: { total: number }) {
+  const t = useTranslations("Shops");
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -33,7 +35,7 @@ export function ShopsHero({ total }: { total: number }) {
             className="h-1.5 w-1.5 rounded-full"
             style={{ backgroundColor: GOLD }}
           />
-          MARKETPLACE DIRECTORY
+          {t("marketplace_directory")}
         </span>
 
         <h1
@@ -44,17 +46,13 @@ export function ShopsHero({ total }: { total: number }) {
             fontWeight: 600,
           }}
         >
-          Find shops worth
-          <br />
-          <span style={{ color: FOREST }}>bookmarking.</span>
+          {t("hero_title")}
         </h1>
 
         <p className="mt-5 text-base" style={{ color: "#5B564C" }}>
-          Explore all {total} storefront{total === 1 ? "" : "s"} on the
-          platform, in one browsable directory.
+          {t("hero_description", { count: total, s: total === 1 ? "" : "s" })}
         </p>
 
-        {/* Search pill — overlaps the hero/section boundary */}
         <form
           onSubmit={handleSearch}
           className="mx-auto mt-10 flex max-w-xl items-center gap-2 rounded-full border bg-white p-2 shadow-sm"
@@ -63,7 +61,7 @@ export function ShopsHero({ total }: { total: number }) {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search shops by name..."
+            placeholder={t("search_shops_placeholder")}
             className="border-0 shadow-none focus-visible:ring-0 h-11 pl-4"
           />
           <Button
@@ -71,12 +69,11 @@ export function ShopsHero({ total }: { total: number }) {
             className="rounded-full h-11 px-6"
             style={{ backgroundColor: INK, color: "#F7F4EC" }}
           >
-            Search
+            {t("search_btn")}
           </Button>
         </form>
       </div>
 
-      {/* Signature element: awning-stripe divider */}
       <div
         aria-hidden
         className="h-2 w-full"

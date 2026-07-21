@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { AttributeRowActions } from "./attribute-row-actions";
 
@@ -14,16 +15,24 @@ export type AttributeRow = {
 interface GetAttributeColumnsParams {
   page: number;
   pageSize: number;
+  tc: {
+    serial: string;
+    name: string;
+    slug: string;
+    values: string;
+    created: string;
+  };
 }
 
 export function getAttributeColumns({
   page,
   pageSize,
+  tc,
 }: GetAttributeColumnsParams): ColumnDef<AttributeRow>[] {
   return [
     {
       id: "serial",
-      header: "#",
+      header: tc.serial,
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {page * pageSize + row.index + 1}
@@ -31,17 +40,17 @@ export function getAttributeColumns({
       ),
       size: 48,
     },
-    { accessorKey: "name", header: "Name" },
+    { accessorKey: "name", header: tc.name },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: tc.slug,
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
     },
     {
       id: "values",
-      header: "Values",
+      header: tc.values,
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {row.original.values.map((v) => v.value).join(", ")}
@@ -50,7 +59,7 @@ export function getAttributeColumns({
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
+      header: tc.created,
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {

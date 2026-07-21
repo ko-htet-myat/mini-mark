@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { BrandRow, getBrandColumns } from "./brand-columns";
 
 interface BrandDataTableProps {
@@ -50,6 +51,8 @@ export function BrandDataTable({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [nameInput, setNameInput] = useState(nameFilter);
+  const tc = useTranslations("Common");
+  const tb = useTranslations("Brands");
 
   const pushParams = useCallback(
     (updates: Record<string, string | number>) => {
@@ -67,8 +70,18 @@ export function BrandDataTable({
   );
 
   const columns = useMemo(
-    () => getBrandColumns({ page, pageSize }),
-    [page, pageSize],
+    () =>
+      getBrandColumns({
+        page,
+        pageSize,
+        tc: {
+          serial: tc("serial"),
+          name: tc("name"),
+          slug: tc("slug"),
+          created: tc("created"),
+        },
+      }),
+    [page, pageSize, tc],
   );
 
   const table = useReactTable({
@@ -93,13 +106,13 @@ export function BrandDataTable({
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <Input
-          placeholder="Filter by name..."
+          placeholder={tc("filter_by_name")}
           value={nameInput}
           onChange={(e) => handleNameFilterChange(e.target.value)}
           className="max-w-sm"
         />
         <Button asChild>
-          <Link href="brands/create">Add brand</Link>
+          <Link href="brands/create">{tb("add_brand")}</Link>
         </Button>
       </div>
 
@@ -142,7 +155,7 @@ export function BrandDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No brands found.
+                  {tb("no_brands")}
                 </TableCell>
               </TableRow>
             )}
@@ -152,9 +165,9 @@ export function BrandDataTable({
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{total} total</span>
+          <span>{tc("total_count", { count: total })}</span>
           <div className="flex items-center gap-2">
-            <span>Rows per page</span>
+            <span>{tc("rows_per_page")}</span>
             <Select
               value={String(pageSize)}
               onValueChange={(v) => pushParams({ pageSize: v, page: 0 })}
@@ -175,7 +188,7 @@ export function BrandDataTable({
 
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
-            Page {page + 1} of {pageCount || 1}
+            {tc("page_of", { page: page + 1, total: pageCount || 1 })}
           </span>
           <div className="flex gap-2">
             <Button
@@ -184,7 +197,7 @@ export function BrandDataTable({
               onClick={() => pushParams({ page: page - 1 })}
               disabled={page === 0 || isPending}
             >
-              Previous
+              {tc("previous")}
             </Button>
             <Button
               variant="outline"
@@ -192,7 +205,7 @@ export function BrandDataTable({
               onClick={() => pushParams({ page: page + 1 })}
               disabled={page + 1 >= pageCount || isPending}
             >
-              Next
+              {tc("next")}
             </Button>
           </div>
         </div>

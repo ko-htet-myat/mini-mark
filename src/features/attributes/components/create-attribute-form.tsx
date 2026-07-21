@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,8 @@ interface AttributeFormProps {
 }
 
 export function CreateAttributeForm({ shopId }: AttributeFormProps) {
+  const tc = useTranslations("Common");
+  const ta = useTranslations("Attributes");
   const router = useRouter();
   const { slug } = useShop();
 
@@ -35,7 +38,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       },
       actionProps: {
         onSuccess: () => {
-          toast.success("Attribute created");
+          toast.success(ta("attribute_created"));
           router.push(`/${slug}/dashboard/attributes`);
         },
       },
@@ -79,7 +82,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       className="flex flex-col gap-5 max-w-lg"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{tc("name")}</Label>
         <Input
           id="name"
           {...form.register("name", { onChange: handleNameChange })}
@@ -92,7 +95,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{tc("slug")}</Label>
         <Input id="slug" {...form.register("slug")} />
         {form.formState.errors.slug && (
           <p className="text-sm text-destructive">
@@ -102,14 +105,14 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Values</Label>
+        <Label>{ta("values")}</Label>
         {values.map((val, index) => (
           <div key={index} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Input
                 value={val}
                 onChange={(e) => updateValue(index, e.target.value)}
-                placeholder="e.g. Red, XL, Cotton..."
+                placeholder={ta("value_placeholder")}
               />
               {values.length > 1 && (
                 <Button
@@ -145,7 +148,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
             onClick={addValue}
           >
             <HugeiconsIcon icon={Add01Icon} size={16} className="mr-1" />
-            Add value
+            {ta("add_value")}
           </Button>
         )}
       </div>
@@ -155,7 +158,7 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
       )}
 
       <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? "Saving..." : "Create attribute"}
+        {action.isPending ? tc("saving") : ta("create_attribute")}
       </Button>
     </form>
   );

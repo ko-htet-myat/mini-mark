@@ -4,6 +4,7 @@ import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hoo
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { signupSchema } from "@/features/auth/validations";
 import { GoogleButton } from "@/features/auth/components/google-btn";
 
 export default function SignupPage() {
+  const t = useTranslations("Auth");
   const router = useRouter();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
@@ -32,24 +34,26 @@ export default function SignupPage() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 px-4">
       <div className="text-center">
-        <h1 className="text-2xl font-semibold">Create your account</h1>
-        <p className="text-sm text-muted-foreground">
-          Start selling in minutes with your own shop.
-        </p>
+        <h1 className="text-2xl font-semibold">{t("create_account")}</h1>
+        <p className="text-sm text-muted-foreground">{t("signup_subtitle")}</p>
       </div>
 
       <GoogleButton />
 
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">OR</span>
+        <span className="text-xs text-muted-foreground">{t("or_divider")}</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
       <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="name">Full name</Label>
-          <Input id="name" placeholder="Jane Doe" {...form.register("name")} />
+          <Label htmlFor="name">{t("full_name")}</Label>
+          <Input
+            id="name"
+            placeholder={t("name_placeholder")}
+            {...form.register("name")}
+          />
           {form.formState.errors.name && (
             <p className="text-sm text-destructive">
               {form.formState.errors.name.message}
@@ -58,11 +62,11 @@ export default function SignupPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("email_placeholder")}
             {...form.register("email")}
           />
           {form.formState.errors.email && (
@@ -73,7 +77,7 @@ export default function SignupPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input id="password" type="password" {...form.register("password")} />
           {form.formState.errors.password && (
             <p className="text-sm text-destructive">
@@ -89,14 +93,14 @@ export default function SignupPage() {
         )}
 
         <Button type="submit" disabled={action.isPending} className="w-full">
-          {action.isPending ? "Creating account..." : "Create account"}
+          {action.isPending ? t("creating_account") : t("create_account_btn")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("already_account")}{" "}
         <Link href="/sign-in" className="font-medium text-foreground underline">
-          Log in
+          {t("log_in_link")}
         </Link>
       </p>
     </div>

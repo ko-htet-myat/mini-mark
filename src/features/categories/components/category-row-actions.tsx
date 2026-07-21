@@ -19,6 +19,7 @@ import { useDeleteAction } from "@/hooks/use-delete-action";
 import { deleteCategory } from "@/features/categories/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 interface CategoryRowActionsProps {
   categoryId: string;
@@ -34,6 +35,8 @@ export function CategoryRowActions({
 }: CategoryRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tcat = useTranslations("Categories");
 
   const {
     confirmOpen,
@@ -43,12 +46,9 @@ export function CategoryRowActions({
     openConfirm,
   } = useDeleteAction({
     action: deleteCategory.bind(null, { shop: slug }),
-    successMessage: "Category deleted",
-    errorMessage: "Failed to delete category.",
+    successMessage: tcat("category_deleted"),
+    errorMessage: tcat("failed_delete_category"),
   });
-
-  const levelLabel =
-    level === 1 ? "" : level === 2 ? " subcategory" : " sub-subcategory";
 
   return (
     <>
@@ -67,7 +67,7 @@ export function CategoryRowActions({
                 size={16}
                 className="mr-1"
               />{" "}
-              Edit
+              {tc("edit")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -78,7 +78,7 @@ export function CategoryRowActions({
             }}
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-            Delete
+            {tc("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -86,8 +86,8 @@ export function CategoryRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={`Delete "${categoryName}"?`}
-        description={`This will permanently delete the${levelLabel} and all its subcategories.`}
+        title={tc("confirm_delete_title", { name: categoryName })}
+        description={tcat("delete_category_confirm_desc")}
         onConfirm={() => confirmDelete(categoryId)}
         isPending={isExecuting}
       />

@@ -19,6 +19,7 @@ import { useDeleteAction } from "@/hooks/use-delete-action";
 import { deletePromotion } from "@/features/promotions/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 interface PromotionRowActionsProps {
   promotionId: string;
@@ -31,6 +32,8 @@ export function PromotionRowActions({
 }: PromotionRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tp = useTranslations("Promotions");
 
   const {
     confirmOpen,
@@ -40,8 +43,8 @@ export function PromotionRowActions({
     openConfirm,
   } = useDeleteAction({
     action: deletePromotion.bind(null, { shop: slug }),
-    successMessage: "Promotion deleted",
-    errorMessage: "Failed to delete promotion.",
+    successMessage: tp("promotion_deleted"),
+    errorMessage: tp("failed_delete_promotion"),
   });
 
   return (
@@ -56,7 +59,7 @@ export function PromotionRowActions({
           <DropdownMenuItem asChild>
             <Link href={`promotions/${promotionId}/edit`}>
               <HugeiconsIcon icon={Edit03Icon} size={16} className="mr-1" />
-              Edit
+              {tc("edit")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -67,7 +70,7 @@ export function PromotionRowActions({
             }}
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-            Delete
+            {tc("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -75,8 +78,8 @@ export function PromotionRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={`Delete "${promotionName}"?`}
-        description="This will permanently delete the promotion and remove it from your catalog."
+        title={tc("confirm_delete_title", { name: promotionName })}
+        description={tp("delete_promotion_confirm_desc")}
         onConfirm={() => confirmDelete(promotionId)}
         isPending={isExecuting}
       />

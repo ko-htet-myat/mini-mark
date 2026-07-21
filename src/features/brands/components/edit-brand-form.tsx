@@ -4,6 +4,7 @@ import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hoo
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,8 @@ interface BrandFormProps {
 export function UpdateBrandForm({ brand }: BrandFormProps) {
   const router = useRouter();
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tb = useTranslations("Brands");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
     updateBrand.bind(null, { shop: slug }),
@@ -35,7 +38,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       },
       actionProps: {
         onSuccess: () => {
-          toast.success("Brand updated");
+          toast.success(tb("brand_updated"));
           router.push(`/${slug}/dashboard/brands`);
         },
       },
@@ -48,7 +51,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       className="flex flex-col gap-5 max-w-lg"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{tc("name")}</Label>
         <Input id="name" {...form.register("name")} />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
@@ -58,7 +61,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{tc("slug")}</Label>
         <Input id="slug" {...form.register("slug")} />
         {form.formState.errors.slug && (
           <p className="text-sm text-destructive">
@@ -68,7 +71,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{tc("description")}</Label>
         <Textarea id="description" rows={3} {...form.register("description")} />
         {form.formState.errors.description && (
           <p className="text-sm text-destructive">
@@ -78,10 +81,10 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="logoUrl">Logo URL</Label>
+        <Label htmlFor="logoUrl">{tb("logo_url")}</Label>
         <Input
           id="logoUrl"
-          placeholder="https://..."
+          placeholder={tb("url_placeholder")}
           {...form.register("logoUrl")}
         />
         {form.formState.errors.logoUrl && (
@@ -96,7 +99,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
       )}
 
       <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? "Saving..." : "Save changes"}
+        {action.isPending ? tc("saving") : tc("save")}
       </Button>
     </form>
   );

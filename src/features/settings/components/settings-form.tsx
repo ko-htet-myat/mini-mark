@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
 import { updateShopSchema } from "@/features/shop/validations/edit";
 import { Shop } from "@/generated/prisma/client";
 
 export function SettingsForm({ shop }: { shop: Shop }) {
+  const ts = useTranslations("Settings");
+  const tc = useTranslations("Common");
   const { form, action, handleSubmitWithAction } = useHookFormAction(
     updateShopAction,
     zodResolver(updateShopSchema),
@@ -30,7 +33,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
         },
       },
       actionProps: {
-        onSuccess: () => toast.success("Shop updated"),
+        onSuccess: () => toast.success(ts("shop_updated")),
       },
     },
   );
@@ -59,7 +62,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
   return (
     <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Shop name</Label>
+        <Label htmlFor="name">{ts("shop_name")}</Label>
         <Input id="name" {...form.register("name")} />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
@@ -69,12 +72,12 @@ export function SettingsForm({ shop }: { shop: Shop }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{ts("description")}</Label>
         <Textarea id="description" rows={4} {...form.register("description")} />
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="contactEmail">Contact email</Label>
+        <Label htmlFor="contactEmail">{ts("contact_email")}</Label>
         <Input
           id="contactEmail"
           type="email"
@@ -88,13 +91,13 @@ export function SettingsForm({ shop }: { shop: Shop }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Contact phone numbers</Label>
+        <Label>{ts("contact_phones")}</Label>
         {phones.map((phone, index) => (
           <div key={index} className="flex items-center gap-2">
             <Input
               value={phone}
               onChange={(e) => updatePhone(index, e.target.value)}
-              placeholder="+1 555 123 4567"
+              placeholder={ts("phone_placeholder")}
             />
             {phones.length > 1 && (
               <Button
@@ -123,7 +126,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
             onClick={addPhone}
           >
             <HugeiconsIcon icon={Add01Icon} size={16} className="mr-1" />
-            Add phone number
+            {ts("add_phone")}
           </Button>
         )}
       </div>
@@ -133,7 +136,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
       )}
 
       <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? "Saving..." : "Save changes"}
+        {action.isPending ? tc("saving") : ts("save_changes")}
       </Button>
     </form>
   );

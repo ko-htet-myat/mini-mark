@@ -13,16 +13,23 @@ export type BrandRow = {
 interface GetBrandColumnsParams {
   page: number;
   pageSize: number;
+  tc: {
+    serial: string;
+    name: string;
+    slug: string;
+    created: string;
+  };
 }
 
 export function getBrandColumns({
   page,
   pageSize,
+  tc,
 }: GetBrandColumnsParams): ColumnDef<BrandRow>[] {
   return [
     {
       id: "serial",
-      header: "#",
+      header: tc.serial,
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {page * pageSize + row.index + 1}
@@ -30,17 +37,17 @@ export function getBrandColumns({
       ),
       size: 48,
     },
-    { accessorKey: "name", header: "Name" },
+    { accessorKey: "name", header: tc.name },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: tc.slug,
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
+      header: tc.created,
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {

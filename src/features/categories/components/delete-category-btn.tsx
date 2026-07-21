@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteCategory } from "@/features/categories/actions";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
 interface DeleteCategoryButtonProps {
   categoryId: string;
@@ -37,12 +38,14 @@ export function DeleteCategoryButton({
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
   const router = useRouter();
+  const tc = useTranslations("Common");
+  const tcat = useTranslations("Categories");
 
   const { execute, isExecuting } = useAction(
     deleteCategory.bind(null, { shop: slug }),
     {
       onSuccess: () => {
-        toast.success("Category deleted");
+        toast.success(tcat("category_deleted"));
         setOpen(false);
         if (redirectOnSuccess) {
           router.push(
@@ -51,7 +54,7 @@ export function DeleteCategoryButton({
         }
       },
       onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to delete category.");
+        toast.error(error.serverError ?? tcat("failed_delete_category"));
       },
     },
   );
@@ -61,19 +64,22 @@ export function DeleteCategoryButton({
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-destructive">
           <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-          Delete
+          {tc("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Delete "${categoryName}"?`}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {tc("confirm_delete_title", { name: categoryName })}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            category and all its subcategories.
+            {tcat("delete_category_confirm_desc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isExecuting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isExecuting}>
+            {tc("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -82,7 +88,7 @@ export function DeleteCategoryButton({
             disabled={isExecuting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isExecuting ? "Deleting..." : "Delete"}
+            {isExecuting ? tc("deleting") : tc("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

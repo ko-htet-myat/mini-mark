@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export type CategoryRow = {
   id: string;
@@ -20,17 +21,26 @@ interface GetCategoryColumnsParams {
   pageSize: number;
   /** Current depth level: 1, 2, or 3 */
   level: number;
+  tc: {
+    serial: string;
+    name: string;
+    slug: string;
+    subcategories: string;
+    created: string;
+  };
 }
 
 function DrillDownCell({ row, level }: { row: CategoryRow; level: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const tc = useTranslations("Common");
+  const tc2 = useTranslations("Categories");
 
   if (level >= 3 || row._count.children === 0) {
     return (
       <span className="text-muted-foreground text-sm">
-        {row._count.children} sub
+        {tc2("sub_count", { count: row._count.children })}
       </span>
     );
   }
@@ -50,7 +60,7 @@ function DrillDownCell({ row, level }: { row: CategoryRow; level: number }) {
       className="h-7 gap-1 text-xs"
       onClick={handleDrillDown}
     >
-      {row._count.children} sub
+      {tc2("sub_count", { count: row._count.children })}
       <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
     </Button>
   );
@@ -60,11 +70,12 @@ export function getCategoryColumns({
   page,
   pageSize,
   level,
+  tc,
 }: GetCategoryColumnsParams): ColumnDef<CategoryRow>[] {
   return [
     {
       id: "serial",
-      header: "#",
+      header: tc.serial,
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {page * pageSize + row.index + 1}
@@ -72,22 +83,22 @@ export function getCategoryColumns({
       ),
       size: 48,
     },
-    { accessorKey: "name", header: "Name" },
+    { accessorKey: "name", header: tc.name },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: tc.slug,
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
     },
     {
       id: "children",
-      header: "Subcategories",
+      header: tc.subcategories,
       cell: ({ row }) => <DrillDownCell row={row.original} level={level} />,
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
+      header: tc.created,
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {

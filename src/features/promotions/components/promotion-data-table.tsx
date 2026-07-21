@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { PromotionRow, getPromotionColumns } from "./promotion-columns";
+import { useTranslations } from "next-intl";
 
 interface PromotionDataTableProps {
   data: PromotionRow[];
@@ -50,6 +51,8 @@ export function PromotionDataTable({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [nameInput, setNameInput] = useState(nameFilter);
+  const tc = useTranslations("Common");
+  const tp = useTranslations("Promotions");
 
   const pushParams = useCallback(
     (updates: Record<string, string | number>) => {
@@ -67,8 +70,21 @@ export function PromotionDataTable({
   );
 
   const columns = useMemo(
-    () => getPromotionColumns({ page, pageSize }),
-    [page, pageSize],
+    () =>
+      getPromotionColumns({
+        page,
+        pageSize,
+        tc: {
+          serial: tc("serial"),
+          name: tc("name"),
+          slug: tc("slug"),
+          discount: tp("discount"),
+          status: tp("status"),
+          created: tc("created"),
+        },
+        tp: { active: tp("active"), inactive: tp("inactive") },
+      }),
+    [page, pageSize, tc, tp],
   );
 
   const table = useReactTable({
@@ -93,13 +109,13 @@ export function PromotionDataTable({
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <Input
-          placeholder="Filter by name..."
+          placeholder={tc("filter_by_name")}
           value={nameInput}
           onChange={(e) => handleNameFilterChange(e.target.value)}
           className="max-w-sm"
         />
         <Button asChild>
-          <Link href="promotions/create">Add promotion</Link>
+          <Link href="promotions/create">{tp("add_promotion")}</Link>
         </Button>
       </div>
 
@@ -142,7 +158,7 @@ export function PromotionDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No promotions found.
+                  {tp("no_promotions")}
                 </TableCell>
               </TableRow>
             )}
@@ -152,9 +168,9 @@ export function PromotionDataTable({
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{total} total</span>
+          <span>{tc("total_count", { count: total })}</span>
           <div className="flex items-center gap-2">
-            <span>Rows per page</span>
+            <span>{tc("rows_per_page")}</span>
             <Select
               value={String(pageSize)}
               onValueChange={(v) => pushParams({ pageSize: v, page: 0 })}
@@ -175,7 +191,7 @@ export function PromotionDataTable({
 
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
-            Page {page + 1} of {pageCount || 1}
+            {tc("page_of", { page: page + 1, total: pageCount || 1 })}
           </span>
           <div className="flex gap-2">
             <Button
@@ -184,7 +200,7 @@ export function PromotionDataTable({
               onClick={() => pushParams({ page: page - 1 })}
               disabled={page === 0 || isPending}
             >
-              Previous
+              {tc("previous")}
             </Button>
             <Button
               variant="outline"
@@ -192,7 +208,7 @@ export function PromotionDataTable({
               onClick={() => pushParams({ page: page + 1 })}
               disabled={page + 1 >= pageCount || isPending}
             >
-              Next
+              {tc("next")}
             </Button>
           </div>
         </div>

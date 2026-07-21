@@ -50,14 +50,16 @@ export function PublicFooter() {
 
           {/* Quick Links */}
           <div className="space-y-5">
-            <h4 className="text-lg font-semibold text-white">Quick Links</h4>
+            <h4 className="text-lg font-semibold text-white">
+              {t("quick_links")}
+            </h4>
             <ul className="space-y-3">
               <li>
                 <Link
                   href="/"
                   className="text-sm hover:text-white hover:underline transition-colors"
                 >
-                  Home
+                  {t("home")}
                 </Link>
               </li>
               <li>
@@ -65,7 +67,7 @@ export function PublicFooter() {
                   href="/shops"
                   className="text-sm hover:text-white hover:underline transition-colors"
                 >
-                  Shops
+                  {t("shops")}
                 </Link>
               </li>
               <li>
@@ -89,7 +91,7 @@ export function PublicFooter() {
 
           {/* Legal Links */}
           <div className="space-y-5">
-            <h4 className="text-lg font-semibold text-white">Legal</h4>
+            <h4 className="text-lg font-semibold text-white">{t("legal")}</h4>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -112,18 +114,19 @@ export function PublicFooter() {
 
           {/* Newsletter */}
           <div className="space-y-5 col-span-2">
-            <h4 className="text-lg font-semibold text-white">Stay Updated</h4>
-            <p className="text-zinc-400 text-sm">
-              Subscribe to our newsletter for the latest updates.
-            </p>
+            <h4 className="text-lg font-semibold text-white">
+              {t("stay_updated")}
+            </h4>
+            <p className="text-zinc-400 text-sm">{t("newsletter_text")}</p>
             <div className="flex flex-col sm:flex-row gap-2 mt-2">
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("email_placeholder")}
                 className="bg-zinc-900 border border-zinc-800 rounded-md px-4 py-2.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 transition-all flex-1"
               />
               <button className="bg-white text-black font-medium px-4 py-2.5 rounded-md hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
-                Subscribe <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                {t("subscribe")}{" "}
+                <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
               </button>
             </div>
           </div>

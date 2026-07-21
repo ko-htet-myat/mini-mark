@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { useTranslations } from "next-intl";
 import { CategoryRow, getCategoryColumns } from "./category-columns";
 
 interface BreadcrumbItem {
@@ -66,6 +67,8 @@ export function CategoryDataTable({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [nameInput, setNameInput] = useState(nameFilter);
+  const tc = useTranslations("Common");
+  const tcat = useTranslations("Categories");
 
   const pushParams = useCallback(
     (updates: Record<string, string | number | null>) => {
@@ -83,8 +86,20 @@ export function CategoryDataTable({
   );
 
   const columns = useMemo(
-    () => getCategoryColumns({ page, pageSize, level }),
-    [page, pageSize, level],
+    () =>
+      getCategoryColumns({
+        page,
+        pageSize,
+        level,
+        tc: {
+          serial: tc("serial"),
+          name: tc("name"),
+          slug: tc("slug"),
+          subcategories: tcat("subcategories"),
+          created: tc("created"),
+        },
+      }),
+    [page, pageSize, level, tc, tcat],
   );
 
   const table = useReactTable({
@@ -120,21 +135,21 @@ export function CategoryDataTable({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Input
-            placeholder={`Filter by name...`}
+            placeholder={tc("filter_by_name")}
             value={nameInput}
             onChange={(e) => handleNameFilterChange(e.target.value)}
             className="min-w-xs"
           />
         </div>
-        {level < 3 ? (
-          <Button asChild>
-            <Link href={createHref}>Add {levelLabel}</Link>
-          </Button>
-        ) : (
-          <Button asChild>
-            <Link href={createHref}>Add {levelLabel}</Link>
-          </Button>
-        )}
+        <Button asChild>
+          <Link href={createHref}>
+            {level === 1
+              ? tcat("add_category")
+              : level === 2
+                ? tcat("add_subcategory")
+                : tcat("add_sub_subcategory")}
+          </Link>
+        </Button>
       </div>
 
       {/* Breadcrumb navigation */}
@@ -146,7 +161,7 @@ export function CategoryDataTable({
           onClick={() => pushParams({ parentId: null, page: 0, name: null })}
           disabled={!parentId}
         >
-          Categories
+          {tcat("categories_breadcrumb")}
         </Button>
         {breadcrumb.map((crumb, i) => (
           <span key={crumb.id} className="flex items-center gap-1">
@@ -170,7 +185,7 @@ export function CategoryDataTable({
           </span>
         ))}
         <p className=" flex gap-1 text-xs dark:text-green-500 text-green-600 bg-muted px-2 py-1 rounded-md">
-          Level <span>{level}</span>
+          {tcat("level", { level })}
         </p>
       </nav>
 
@@ -213,7 +228,11 @@ export function CategoryDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No {levelLabel.toLowerCase()}s found.
+                  {level === 1
+                    ? tcat("no_categories")
+                    : tcat("no_subcategories", {
+                        label: levelLabel.toLowerCase(),
+                      })}
                 </TableCell>
               </TableRow>
             )}
@@ -223,9 +242,9 @@ export function CategoryDataTable({
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{total} total</span>
+          <span>{tc("total_count", { count: total })}</span>
           <div className="flex items-center gap-2">
-            <span>Rows per page</span>
+            <span>{tc("rows_per_page")}</span>
             <Select
               value={String(pageSize)}
               onValueChange={(v) => pushParams({ pageSize: v, page: 0 })}
@@ -246,7 +265,7 @@ export function CategoryDataTable({
 
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
-            Page {page + 1} of {pageCount || 1}
+            {tc("page_of", { page: page + 1, total: pageCount || 1 })}
           </span>
           <div className="flex gap-2">
             <Button
@@ -255,7 +274,7 @@ export function CategoryDataTable({
               onClick={() => pushParams({ page: page - 1 })}
               disabled={page === 0 || isPending}
             >
-              Previous
+              {tc("previous")}
             </Button>
             <Button
               variant="outline"
@@ -263,7 +282,7 @@ export function CategoryDataTable({
               onClick={() => pushParams({ page: page + 1 })}
               disabled={page + 1 >= pageCount || isPending}
             >
-              Next
+              {tc("next")}
             </Button>
           </div>
         </div>

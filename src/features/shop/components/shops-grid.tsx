@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useState, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Image from "next/image";
@@ -32,6 +33,8 @@ export function ShopGrid({
   page,
   nameFilter,
 }: ShopGridProps) {
+  const t = useTranslations("Shops");
+  const tc = useTranslations("Common");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -74,12 +77,12 @@ export function ShopGrid({
     <div className="space-y-6">
       <div className=" flex gap-2">
         <Input
-          placeholder="Search shops by name..."
+          placeholder={t("search_shops_placeholder")}
           value={nameInput}
           onChange={(e) => handleNameFilterChange(e.target.value)}
           className="max-w-sm"
         />
-        <Button onClick={handleSearch}>Search</Button>
+        <Button onClick={handleSearch}>{tc("search")}</Button>
       </div>
 
       <div
@@ -130,13 +133,15 @@ export function ShopGrid({
           ))
         ) : (
           <p className="col-span-full text-center text-muted-foreground py-12">
-            No shops found.
+            {t("no_shops_found")}
           </p>
         )}
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{total} shops</span>
+        <span className="text-sm text-muted-foreground">
+          {t("shops_count", { count: total })}
+        </span>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -144,10 +149,10 @@ export function ShopGrid({
             onClick={() => pushParams({ page: page - 1 })}
             disabled={page === 0 || isPending}
           >
-            Previous
+            {tc("previous")}
           </Button>
           <span className="text-sm text-muted-foreground self-center">
-            Page {page + 1} of {pageCount || 1}
+            {tc("page_of", { page: page + 1, total: pageCount || 1 })}
           </span>
           <Button
             variant="outline"
@@ -155,7 +160,7 @@ export function ShopGrid({
             onClick={() => pushParams({ page: page + 1 })}
             disabled={page + 1 >= pageCount || isPending}
           >
-            Next
+            {tc("next")}
           </Button>
         </div>
       </div>

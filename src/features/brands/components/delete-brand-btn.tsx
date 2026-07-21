@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
@@ -35,19 +36,21 @@ export function DeleteBrandButton({
   const [open, setOpen] = useState(false);
   const { slug } = useShop();
   const router = useRouter();
+  const tc = useTranslations("Common");
+  const tb = useTranslations("Brands");
 
   const { execute, isExecuting } = useAction(
     deleteBrand.bind(null, { shop: slug }),
     {
       onSuccess: () => {
-        toast.success("Brand deleted");
+        toast.success(tb("brand_deleted"));
         setOpen(false);
         if (redirectOnSuccess) {
           router.push(`/${slug}/dashboard/brands`);
         }
       },
       onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to delete brand.");
+        toast.error(error.serverError ?? tb("failed_delete_brand"));
       },
     },
   );
@@ -57,19 +60,22 @@ export function DeleteBrandButton({
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-destructive">
           <HugeiconsIcon icon={Delete02Icon} size={16} className="mr-1" />
-          Delete
+          {tc("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Delete "${brandName}"?`}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {tc("confirm_delete_title", { name: brandName })}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the brand
-            and remove it from your catalog.
+            {tb("delete_brand_confirm_desc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isExecuting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isExecuting}>
+            {tc("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault(); // stop the dialog auto-closing before the action resolves
@@ -78,7 +84,7 @@ export function DeleteBrandButton({
             disabled={isExecuting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isExecuting ? "Deleting..." : "Delete"}
+            {isExecuting ? tc("deleting") : tc("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
