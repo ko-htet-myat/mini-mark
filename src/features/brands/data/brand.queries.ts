@@ -32,3 +32,17 @@ export async function getBrandsPage({
 
   return { data, total, pageCount: Math.ceil(total / pageSize) };
 }
+
+export async function getShopBrands(shopId: string) {
+  return prisma.brand.findMany({
+    where: { shopId },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      logoUrl: true,
+      _count: { select: { products: true } },
+    },
+    orderBy: { name: "asc" },
+  });
+}

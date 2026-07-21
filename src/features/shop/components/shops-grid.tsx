@@ -103,6 +103,8 @@ export function ShopGrid({
                     src={shop.bannerUrl}
                     alt=""
                     fill
+                    loading="eager"
+                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
                     className="object-cover"
                   />
                 )}
@@ -114,6 +116,7 @@ export function ShopGrid({
                       src={shop.logoUrl}
                       alt={shop.name}
                       fill
+                      sizes="40px"
                       className="object-cover"
                     />
                   )}
