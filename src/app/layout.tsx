@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Figtree } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Figtree,
+  Noto_Sans_Myanmar,
+} from "next/font/google";
 import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
 import { NextIntlClientProvider } from "next-intl";
@@ -19,6 +24,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const notoSansMyanmar = Noto_Sans_Myanmar({
+  variable: "--font-mm",
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["myanmar"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,6 +57,7 @@ export default async function RootLayout({
         geistMono.variable,
         "font-sans",
         figtree.variable,
+        notoSansMyanmar.variable,
       )}
       suppressHydrationWarning
     >

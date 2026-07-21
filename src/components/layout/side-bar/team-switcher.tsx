@@ -25,12 +25,18 @@ export function TeamSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                <HugeiconsIcon icon={Shop} strokeWidth={2} />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-orange-600">
+                <HugeiconsIcon
+                  icon={Shop}
+                  strokeWidth={2}
+                  className=" text-white"
+                />
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate font-semibold">{shop.name}</span>
-                <span className="truncate text-xs">{t("mini_mark")}</span>
+                <span className="truncate text-sm opacity-75">
+                  {t("mini_mark")}
+                </span>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
