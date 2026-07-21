@@ -78,6 +78,7 @@ export function BrandDataTable({
           serial: tc("serial"),
           name: tc("name"),
           slug: tc("slug"),
+          logo: tc("logo"),
           created: tc("created"),
         },
       }),

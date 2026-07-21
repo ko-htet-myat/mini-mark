@@ -7,6 +7,8 @@ type Shop = {
   slug: string;
   name: string;
   ownerId: string;
+  logoUrl: string | null;
+  bannerUrl: string | null;
 };
 
 const ShopContext = createContext<Shop | null>(null);

@@ -13,10 +13,12 @@ import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
 import { updateShopSchema } from "@/features/shop/validations/edit";
 import { Shop } from "@/generated/prisma/client";
+import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
 export function SettingsForm({ shop }: { shop: Shop }) {
   const ts = useTranslations("Settings");
   const tc = useTranslations("Common");
+
   const { form, action, handleSubmitWithAction } = useHookFormAction(
     updateShopAction,
     zodResolver(updateShopSchema),
@@ -129,6 +131,31 @@ export function SettingsForm({ shop }: { shop: Shop }) {
             {ts("add_phone")}
           </Button>
         )}
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <ImageUploadField
+          label={tc("logo")}
+          folder="shops/logos"
+          value={form.watch("logoUrl") ?? ""}
+          onUploaded={(asset) =>
+            form.setValue("logoUrl", asset.url, { shouldDirty: true })
+          }
+          onRemoved={() => form.setValue("logoUrl", "", { shouldDirty: true })}
+          shape="square"
+        />
+        <ImageUploadField
+          label={tc("banner")}
+          folder="shops/banners"
+          value={form.watch("bannerUrl") ?? ""}
+          onUploaded={(asset) =>
+            form.setValue("bannerUrl", asset.url, { shouldDirty: true })
+          }
+          onRemoved={() =>
+            form.setValue("bannerUrl", "", { shouldDirty: true })
+          }
+          shape="wide"
+        />
       </div>
 
       {action.result.serverError && (

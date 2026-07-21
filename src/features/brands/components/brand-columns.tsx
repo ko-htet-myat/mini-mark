@@ -7,6 +7,7 @@ export type BrandRow = {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string | null;
   createdAt: Date;
 };
 
@@ -17,6 +18,7 @@ interface GetBrandColumnsParams {
     serial: string;
     name: string;
     slug: string;
+    logo: string;
     created: string;
   };
 }
@@ -44,6 +46,21 @@ export function getBrandColumns({
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
+    },
+    {
+      id: "logo",
+      header: tc.logo,
+      cell: ({ row }) =>
+        row.original.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={row.original.logoUrl}
+            alt={row.original.name}
+            className="h-10 w-10 rounded object-cover"
+          />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       accessorKey: "createdAt",

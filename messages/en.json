@@ -106,7 +106,10 @@
     "slug": "Slug",
     "description": "Description",
     "created": "Created",
-    "serial": "#"
+    "serial": "#",
+    "logo": "Logo",
+    "banner": "Banner",
+    "image": "Image"
   },
   "NotFound": {
     "page_not_found": "Page Not Found",
@@ -223,6 +226,12 @@
     "shop_url_placeholder": "janes-pottery",
     "creating_shop": "Creating shop...",
     "create_shop_btn": "Create shop"
+  },
+  "Cloudinary": {
+    "removing": "Removing",
+    "replace": "Replace",
+    "upload": "Upload",
+    "remove": "Remove"
   },
   "Metadata": {
     "site_title": "Mini Market Myanmar",

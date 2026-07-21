@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { BrandFormValues, updateBrandSchema } from "../validations";
 import { updateBrand } from "../actions";
 import { useShop } from "@/context/shop-context";
+import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
 interface BrandFormProps {
   brand?: { id: string } & BrandFormValues;
@@ -80,19 +81,15 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="logoUrl">{tb("logo_url")}</Label>
-        <Input
-          id="logoUrl"
-          placeholder={tb("url_placeholder")}
-          {...form.register("logoUrl")}
-        />
-        {form.formState.errors.logoUrl && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.logoUrl.message}
-          </p>
-        )}
-      </div>
+      <ImageUploadField
+        label={tb("logo_url")}
+        folder="brands/logos"
+        value={form.watch("logoUrl") ?? ""}
+        onUploaded={(asset) =>
+          form.setValue("logoUrl", asset.url, { shouldDirty: true })
+        }
+        onRemoved={() => form.setValue("logoUrl", "", { shouldDirty: true })}
+      />
 
       {action.result.serverError && (
         <p className="text-sm text-destructive">{action.result.serverError}</p>

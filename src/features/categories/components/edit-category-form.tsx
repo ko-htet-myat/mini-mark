@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { CategoryFormValues, updateCategorySchema } from "../validations";
 import { updateCategory } from "../actions";
 import { useShop } from "@/context/shop-context";
+import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
 interface ParentOption {
   id: string;
@@ -132,19 +133,15 @@ export function UpdateCategoryForm({
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="imageUrl">{tcat("image_url")}</Label>
-        <Input
-          id="imageUrl"
-          placeholder="https://..."
-          {...form.register("imageUrl")}
-        />
-        {form.formState.errors.imageUrl && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.imageUrl.message}
-          </p>
-        )}
-      </div>
+      <ImageUploadField
+        label={tcat("image_url")}
+        folder="categories/images"
+        value={form.watch("imageUrl") ?? ""}
+        onUploaded={(asset) =>
+          form.setValue("imageUrl", asset.url, { shouldDirty: true })
+        }
+        onRemoved={() => form.setValue("imageUrl", "", { shouldDirty: true })}
+      />
 
       {action.result.serverError && (
         <p className="text-sm text-destructive">{action.result.serverError}</p>

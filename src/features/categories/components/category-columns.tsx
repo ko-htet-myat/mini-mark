@@ -12,6 +12,7 @@ export type CategoryRow = {
   id: string;
   name: string;
   slug: string;
+  imageUrl: string | null;
   createdAt: Date;
   _count: { children: number };
 };
@@ -25,6 +26,7 @@ interface GetCategoryColumnsParams {
     serial: string;
     name: string;
     slug: string;
+    image: string;
     subcategories: string;
     created: string;
   };
@@ -90,6 +92,21 @@ export function getCategoryColumns({
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
+    },
+    {
+      id: "image",
+      header: tc.image,
+      cell: ({ row }) =>
+        row.original.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={row.original.imageUrl}
+            alt={row.original.name}
+            className="h-10 w-10 rounded object-cover"
+          />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       id: "children",

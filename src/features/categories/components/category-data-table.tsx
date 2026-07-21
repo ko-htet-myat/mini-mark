@@ -95,6 +95,7 @@ export function CategoryDataTable({
           serial: tc("serial"),
           name: tc("name"),
           slug: tc("slug"),
+          image: tc("image"),
           subcategories: tcat("subcategories"),
           created: tc("created"),
         },
