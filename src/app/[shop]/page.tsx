@@ -1,20 +1,37 @@
-import { BrandList } from "@/features/brands/components/brand-list";
-import { getShopBrands } from "@/features/brands/data/brand.queries";
-import { CategoryList } from "@/features/categories/components/category-list";
-import { getShopCategories } from "@/features/categories/data/category.queries";
+import { notFound } from "next/navigation";
 import { ShopHeader } from "@/features/shop/components/shop-header";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
+import { getShopCategories } from "@/features/categories/data/category.queries";
+import { getShopBrands } from "@/features/brands/data/brand.queries";
+import { getShopProducts } from "@/features/products/data/products.queries";
+import { CategoryList } from "@/features/categories/components/category-list";
+import { BrandList } from "@/features/brands/components/brand-list";
+import { ProductGrid } from "@/features/products/components/product-grid";
 
 type PageProps = {
   params: Promise<{ shop: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; page?: string }>;
 };
 
-export default async function ShopPage({ params }: PageProps) {
+export default async function ShopPage({ params, searchParams }: PageProps) {
   const { shop: slug } = await params;
+  const { category, brand, page: pageParam } = await searchParams;
+  const page = Number(pageParam) > 0 ? Number(pageParam) : 1;
+
   const shop = await getShopBySlug(slug);
-  const [categories, brands] = await Promise.all([
+  if (!shop) {
+    notFound();
+  }
+
+  const [categories, brands, productsResult] = await Promise.all([
     getShopCategories(shop.id),
     getShopBrands(shop.id),
+    getShopProducts({
+      shopId: shop.id,
+      page,
+      categorySlug: category,
+      brandSlug: brand,
+    }),
   ]);
 
   return (
@@ -27,7 +44,13 @@ export default async function ShopPage({ params }: PageProps) {
       />
       <CategoryList shopSlug={shop.slug} categories={categories} />
       <BrandList shopSlug={shop.slug} brands={brands} />
-      {/* products grid / other sections go here next */}
+      <ProductGrid
+        shopSlug={shop.slug}
+        products={productsResult.products}
+        page={productsResult.page}
+        totalPages={productsResult.totalPages}
+        searchParams={{ category, brand }}
+      />
     </main>
   );
 }
