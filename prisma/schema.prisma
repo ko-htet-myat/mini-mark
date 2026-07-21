@@ -227,6 +227,8 @@ model ProductAttributeValue {
   attributeValueId String
   attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
 
+  extraPrice Decimal? @db.Decimal(10, 2)
+
   @@id([productId, attributeValueId])
   @@index([attributeValueId])
   @@map("product_attribute_value")
