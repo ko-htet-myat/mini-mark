@@ -136,7 +136,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
       <div className="flex flex-col gap-4 sm:flex-row">
         <ImageUploadField
           label={tc("logo")}
-          folder="shops/logos"
+          folder={`${shop.slug}/shops/logos`}
           value={form.watch("logoUrl") ?? ""}
           onUploaded={(asset) =>
             form.setValue("logoUrl", asset.url, { shouldDirty: true })
@@ -146,7 +146,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
         />
         <ImageUploadField
           label={tc("banner")}
-          folder="shops/banners"
+          folder={`${shop.slug}/shops/banners`}
           value={form.watch("bannerUrl") ?? ""}
           onUploaded={(asset) =>
             form.setValue("bannerUrl", asset.url, { shouldDirty: true })

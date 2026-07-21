@@ -135,7 +135,7 @@ export function UpdateCategoryForm({
 
       <ImageUploadField
         label={tcat("image_url")}
-        folder="categories/images"
+        folder={`${slug}/categories/images`}
         value={form.watch("imageUrl") ?? ""}
         onUploaded={(asset) =>
           form.setValue("imageUrl", asset.url, { shouldDirty: true })

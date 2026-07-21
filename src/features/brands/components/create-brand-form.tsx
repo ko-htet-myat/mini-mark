@@ -98,7 +98,7 @@ export function CreateBrandForm({ shopId }: BrandFormProps) {
 
       <ImageUploadField
         label={tb("logo_url")}
-        folder="brands/logos"
+        folder={`${slug}/brands/logos`}
         value={form.watch("logoUrl") ?? ""}
         onUploaded={(asset) =>
           form.setValue("logoUrl", asset.url, { shouldDirty: true })
