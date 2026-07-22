@@ -41,6 +41,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
         description={shop.description}
         logoUrl={shop.logoUrl}
         bannerUrl={shop.bannerUrl}
+        currency={shop.currency}
       />
       <CategoryList shopSlug={shop.slug} categories={categories} />
       <BrandList shopSlug={shop.slug} brands={brands} />
@@ -50,6 +51,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
         page={productsResult.page}
         totalPages={productsResult.totalPages}
         searchParams={{ category, brand }}
+        currency={shop.currency}
       />
     </main>
   );

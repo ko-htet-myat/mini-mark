@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
+import { useShop } from "@/context/shop-context";
+import { formatAmount } from "@/lib/format";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RegisterFn = (...args: any[]) => any;
@@ -92,6 +94,8 @@ export function ProductFormFields({
   autoSlug,
   onCancel,
 }: ProductFormFieldsProps) {
+  const shop = useShop();
+
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!autoSlug) return;
     setValue(
@@ -164,6 +168,7 @@ export function ProductFormFields({
   const compareErr = errors.compareAtPrice?.message;
   const skuErr = errors.sku?.message;
   const stockErr = errors.stock?.message;
+  const statusErr = errors.status?.message;
   const youtubeErr = errors.youtubeUrl?.message;
   const imagesErr = errors.images?.message;
 
@@ -272,13 +277,18 @@ export function ProductFormFields({
                   <Select
                     value={watch("categoryId") || undefined}
                     onValueChange={(value) =>
-                      setValue("categoryId", value, { shouldDirty: true })
+                      setValue(
+                        "categoryId",
+                        value === "__none__" ? "" : value,
+                        { shouldDirty: true },
+                      )
                     }
                   >
-                    <SelectTrigger id="categoryId">
+                    <SelectTrigger id="categoryId" className="w-full">
                       <SelectValue placeholder={tp("select_category")} />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="__none__">{tp("none")}</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.parent ? `${category.parent.name} > ` : ""}
@@ -294,13 +304,16 @@ export function ProductFormFields({
                   <Select
                     value={watch("brandId") || undefined}
                     onValueChange={(value) =>
-                      setValue("brandId", value, { shouldDirty: true })
+                      setValue("brandId", value === "__none__" ? "" : value, {
+                        shouldDirty: true,
+                      })
                     }
                   >
-                    <SelectTrigger id="brandId">
+                    <SelectTrigger id="brandId" className="w-full">
                       <SelectValue placeholder={tp("select_brand")} />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="__none__">{tp("none")}</SelectItem>
                       {brands.map((brand) => (
                         <SelectItem key={brand.id} value={brand.id}>
                           {brand.name}
@@ -342,7 +355,7 @@ export function ProductFormFields({
                           <span className="text-xs text-muted-foreground">
                             {promo.discountType === "PERCENTAGE"
                               ? `${promo.discountValue}% OFF`
-                              : `$${promo.discountValue} OFF`}
+                              : `${formatAmount(Number(promo.discountValue), shop.currency)} OFF`}
                           </span>
                         </div>
                       );
@@ -455,6 +468,29 @@ export function ProductFormFields({
             <Input id="youtubeUrl" {...register("youtubeUrl")} />
             {youtubeErr && (
               <p className="text-sm text-destructive">{youtubeErr}</p>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3 rounded-lg border p-4">
+            <Label htmlFor="status">{tp("status")}</Label>
+            <Select
+              value={watch("status") || undefined}
+              onValueChange={(value) =>
+                setValue("status", value, { shouldDirty: true })
+              }
+            >
+              <SelectTrigger id="status" className="w-full">
+                <SelectValue placeholder={tp("status")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="IN_STOCK">{tp("in_stock")}</SelectItem>
+                <SelectItem value="OUT_OF_STOCK">
+                  {tp("out_of_stock")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {statusErr && (
+              <p className="text-sm text-destructive">{statusErr}</p>
             )}
           </section>
 

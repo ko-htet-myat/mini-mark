@@ -21,6 +21,7 @@ export const updateShopAction = actionClient
       where: { id: shop.id },
       data: {
         name: parsedInput.name,
+        currency: parsedInput.currency,
         description: parsedInput.description || null,
         contactEmail: parsedInput.contactEmail || null,
         contactPhones: parsedInput.contactPhones.filter(Boolean), // drop empty strings from dynamic fields

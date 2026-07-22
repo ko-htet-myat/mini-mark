@@ -9,6 +9,7 @@ type Shop = {
   ownerId: string;
   logoUrl: string | null;
   bannerUrl: string | null;
+  currency: string;
 };
 
 const ShopContext = createContext<Shop | null>(null);

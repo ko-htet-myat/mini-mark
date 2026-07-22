@@ -29,6 +29,7 @@ export const createShopAction = authClient
       data: {
         name: parsedInput.name,
         slug: parsedInput.slug,
+        currency: parsedInput.currency,
         ownerId: user.id,
       },
     });

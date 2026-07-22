@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { ProductRowActions } from "./product-row-actions";
+import { formatAmount } from "@/lib/format";
 
 export type ProductRow = {
   id: string;
@@ -11,6 +12,7 @@ export type ProductRow = {
   images: string[];
   price: number;
   stock: number;
+  status: string;
   isActive: boolean;
   category?: { id: string; name: string } | null;
   brand?: { id: string; name: string } | null;
@@ -32,12 +34,16 @@ interface GetProductColumnsParams {
     brand: string;
     price: string;
     stock: string;
+    status: string;
+    in_stock: string;
+    out_of_stock: string;
     attributes: string;
     active: string;
     actions: string;
   };
   serial: string;
   created: string;
+  currency: string;
 }
 
 export function getProductColumns({
@@ -45,6 +51,7 @@ export function getProductColumns({
   pageSize,
   tp,
   serial,
+  currency,
 }: GetProductColumnsParams): ColumnDef<ProductRow>[] {
   return [
     {
@@ -107,7 +114,9 @@ export function getProductColumns({
       id: "price",
       header: tp.price,
       cell: ({ row }) => (
-        <span className="font-medium">${row.original.price.toFixed(2)}</span>
+        <span className="font-medium">
+          {formatAmount(row.original.price, currency)}
+        </span>
       ),
     },
     {
@@ -120,6 +129,18 @@ export function getProductColumns({
           {row.original.stock}
         </span>
       ),
+    },
+    {
+      id: "status",
+      header: tp.status,
+      cell: ({ row }) => {
+        const isInStock = row.original.status === "IN_STOCK";
+        return (
+          <Badge variant={isInStock ? "default" : "secondary"}>
+            {isInStock ? tp.in_stock : tp.out_of_stock}
+          </Badge>
+        );
+      },
     },
     {
       id: "attributes",

@@ -81,6 +81,14 @@ model Verification {
   @@map("verification")
 }
 
+enum Currency {
+  USD
+  MMK
+  JPY
+  KRW
+  THB
+}
+
 model Shop {
   id                   String                @id @default(cuid())
   slug                 String                @unique
@@ -89,6 +97,7 @@ model Shop {
   logoUrl              String?
   bannerUrl            String?
   contactEmail         String?
+  currency             Currency              @default(MMK)
   contactPhones        String[]              @default([])
   ownerId              String                @unique
   owner                User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -150,18 +159,24 @@ model Brand {
   @@map("brand")
 }
 
+enum ProductStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+}
+
 model Product {
-  id             String   @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
   slug           String
   description    String?
-  price          Decimal  @db.Decimal(10, 2)
-  compareAtPrice Decimal? @db.Decimal(10, 2)
+  price          Decimal       @db.Decimal(10, 2)
+  compareAtPrice Decimal?      @db.Decimal(10, 2)
   sku            String?
-  stock          Int      @default(0)
-  images         String[] @default([])
+  stock          Int           @default(0)
+  status         ProductStatus @default(IN_STOCK)
+  images         String[]      @default([])
   youtubeUrl     String?
-  isActive       Boolean  @default(true)
+  isActive       Boolean       @default(true)
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
@@ -179,6 +194,8 @@ model Product {
   updatedAt DateTime @updatedAt
 
   @@unique([shopId, slug])
+  @@index([shopId, isActive, categoryId])
+  @@index([shopId, isActive, brandId])
   @@index([shopId])
   @@index([categoryId])
   @@index([brandId])

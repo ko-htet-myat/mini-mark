@@ -71,6 +71,7 @@ export async function getProductsPage({
       : null,
     sku: product.sku,
     stock: product.stock,
+    status: product.status,
     images: product.images,
     youtubeUrl: product.youtubeUrl,
     isActive: product.isActive,

@@ -26,6 +26,7 @@ import {
   Calculator01Icon,
   GoldIngotsIcon,
   SaleTag02Icon,
+  Store,
 } from "@hugeicons/core-free-icons";
 import { SystemNav } from "./system-nav";
 import { useShop } from "@/context/shop-context";
@@ -135,6 +136,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   ];
 
   const systemMain = [
+    {
+      title: t("shopfront"),
+      url: `/${slug}`,
+      icon: <HugeiconsIcon icon={Store} strokeWidth={2} />,
+    },
     {
       title: t("calculator"),
       url: `${base}/calculator`,

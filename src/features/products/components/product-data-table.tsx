@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ProductRow, getProductColumns } from "./product-columns";
+import { useShop } from "@/context/shop-context";
 
 interface ProductDataTableProps {
   data: ProductRow[];
@@ -53,6 +54,7 @@ export function ProductDataTable({
   const [nameInput, setNameInput] = useState(nameFilter);
   const tc = useTranslations("Common");
   const tp = useTranslations("Products");
+  const shop = useShop();
 
   const pushParams = useCallback(
     (updates: Record<string, string | number>) => {
@@ -76,18 +78,22 @@ export function ProductDataTable({
         pageSize,
         serial: tc("serial"),
         created: tc("created"),
+        currency: shop.currency,
         tp: {
           product: "Product",
           category: tp("category"),
           brand: tp("brand"),
           price: tp("price"),
           stock: tp("stock"),
+          status: tp("status"),
+          in_stock: tp("in_stock"),
+          out_of_stock: tp("out_of_stock"),
           attributes: "Attributes",
           active: "Active",
           actions: "Actions",
         },
       }),
-    [page, pageSize, tc, tp],
+    [page, pageSize, tc, tp, shop.currency],
   );
 
   const table = useReactTable({

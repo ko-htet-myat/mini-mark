@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
@@ -26,6 +33,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
       formProps: {
         defaultValues: {
           name: shop.name,
+          currency: shop.currency,
           description: shop.description ?? "",
           contactEmail: shop.contactEmail ?? "",
           contactPhones:
@@ -71,6 +79,31 @@ export function SettingsForm({ shop }: { shop: Shop }) {
             {form.formState.errors.name.message}
           </p>
         )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="currency">{ts("currency")}</Label>
+        <Select
+          value={form.watch("currency")}
+          onValueChange={(value) =>
+            form.setValue(
+              "currency",
+              value as "MMK" | "USD" | "JPY" | "KRW" | "THB",
+              { shouldDirty: true },
+            )
+          }
+        >
+          <SelectTrigger id="currency">
+            <SelectValue placeholder={ts("currency")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="MMK">MMK</SelectItem>
+            <SelectItem value="USD">USD</SelectItem>
+            <SelectItem value="JPY">JPY</SelectItem>
+            <SelectItem value="KRW">KRW</SelectItem>
+            <SelectItem value="THB">THB</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex flex-col gap-2">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProductStatus } from "@/generated/prisma/enums";
 
 const optionalNumber = (schema: z.ZodNumber) =>
   z.preprocess((val) => {
@@ -69,6 +70,8 @@ export const createProductSchema = z.object({
     .url("Enter a valid URL")
     .optional()
     .or(z.literal("")),
+
+  status: z.nativeEnum(ProductStatus).default("IN_STOCK"),
 
   isActive: z.boolean().default(true),
 

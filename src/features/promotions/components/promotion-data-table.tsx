@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import { PromotionRow, getPromotionColumns } from "./promotion-columns";
 import { useTranslations } from "next-intl";
+import { useShop } from "@/context/shop-context";
 
 interface PromotionDataTableProps {
   data: PromotionRow[];
@@ -53,6 +54,7 @@ export function PromotionDataTable({
   const [nameInput, setNameInput] = useState(nameFilter);
   const tc = useTranslations("Common");
   const tp = useTranslations("Promotions");
+  const shop = useShop();
 
   const pushParams = useCallback(
     (updates: Record<string, string | number>) => {
@@ -74,6 +76,7 @@ export function PromotionDataTable({
       getPromotionColumns({
         page,
         pageSize,
+        currency: shop.currency,
         tc: {
           serial: tc("serial"),
           name: tc("name"),
@@ -84,7 +87,7 @@ export function PromotionDataTable({
         },
         tp: { active: tp("active"), inactive: tp("inactive") },
       }),
-    [page, pageSize, tc, tp],
+    [page, pageSize, shop.currency, tc, tp],
   );
 
   const table = useReactTable({

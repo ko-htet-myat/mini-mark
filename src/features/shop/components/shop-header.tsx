@@ -5,6 +5,7 @@ type ShopHeaderProps = {
   description?: string | null;
   logoUrl?: string | null;
   bannerUrl?: string | null;
+  currency?: string;
 };
 
 export function ShopHeader({
@@ -12,6 +13,7 @@ export function ShopHeader({
   description,
   logoUrl,
   bannerUrl,
+  currency,
 }: ShopHeaderProps) {
   return (
     <div className="w-full">
@@ -50,7 +52,14 @@ export function ShopHeader({
         </div>
 
         <div className="pb-2">
-          <h1 className="text-xl font-semibold sm:text-2xl">{name}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold sm:text-2xl">{name}</h1>
+            {currency && (
+              <span className="rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
+                {currency}
+              </span>
+            )}
+          </div>
           {description && (
             <p className="text-sm text-muted-foreground line-clamp-2">
               {description}

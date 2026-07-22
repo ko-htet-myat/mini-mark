@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PromotionRowActions } from "./promotion-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
+import { formatAmount } from "@/lib/format";
 
 export type PromotionRow = {
   id: string;
@@ -18,6 +19,7 @@ export type PromotionRow = {
 interface GetPromotionColumnsParams {
   page: number;
   pageSize: number;
+  currency: string;
   tc: {
     serial: string;
     name: string;
@@ -32,6 +34,7 @@ interface GetPromotionColumnsParams {
 export function getPromotionColumns({
   page,
   pageSize,
+  currency,
   tc,
   tp,
 }: GetPromotionColumnsParams): ColumnDef<PromotionRow>[] {
@@ -61,7 +64,7 @@ export function getPromotionColumns({
         <span>
           {row.original.discountType === "PERCENTAGE"
             ? `${row.original.discountValue.toString()}%`
-            : `${row.original.discountValue.toString()} MMK`}
+            : formatAmount(row.original.discountValue, currency)}
         </span>
       ),
     },

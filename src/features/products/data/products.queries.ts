@@ -38,6 +38,7 @@ export async function getShopProducts({
         compareAtPrice: true,
         images: true,
         stock: true,
+        status: true,
       },
       skip: (page - 1) * pageSize,
       take: pageSize,

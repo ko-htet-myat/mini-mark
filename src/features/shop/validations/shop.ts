@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Currency } from "@/generated/prisma/enums";
 
 export const RESERVED_SLUGS = [
   "sign-in",
@@ -32,6 +33,7 @@ export const createShopSchema = z.object({
     .refine((val) => !RESERVED_SLUGS.includes(val), {
       message: "This slug is reserved, please choose another",
     }),
+  currency: z.nativeEnum(Currency).default("MMK"),
 });
 
 export type CreateShopInput = z.infer<typeof createShopSchema>;

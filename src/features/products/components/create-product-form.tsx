@@ -74,6 +74,7 @@ export function CreateProductForm({
           compareAtPrice: undefined as unknown as number,
           sku: "",
           stock: 0,
+          status: "IN_STOCK",
           images: [],
           youtubeUrl: "",
           isActive: true,

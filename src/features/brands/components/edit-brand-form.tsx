@@ -95,9 +95,19 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
         <p className="text-sm text-destructive">{action.result.serverError}</p>
       )}
 
-      <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? tc("saving") : tc("save")}
-      </Button>
+      <div className="flex items-center gap-4 mt-2">
+        <Button type="submit" disabled={action.isPending} className="w-fit">
+          {action.isPending ? tc("saving") : tc("save")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/${slug}/dashboard/brands`)}
+          disabled={action.isPending}
+        >
+          {tc("cancel")}
+        </Button>
+      </div>
     </form>
   );
 }

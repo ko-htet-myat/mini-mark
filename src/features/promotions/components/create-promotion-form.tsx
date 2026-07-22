@@ -164,9 +164,19 @@ export function CreatePromotionForm({ shopId }: PromotionFormProps) {
         <p className="text-sm text-destructive">{action.result.serverError}</p>
       )}
 
-      <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? tc("saving") : tp("create_promotion")}
-      </Button>
+      <div className="flex items-center gap-4 mt-2">
+        <Button type="submit" disabled={action.isPending} className="w-fit">
+          {action.isPending ? tc("saving") : tp("create_promotion")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/${slug}/dashboard/promotions`)}
+          disabled={action.isPending}
+        >
+          {tc("cancel")}
+        </Button>
+      </div>
     </form>
   );
 }

@@ -157,9 +157,19 @@ export function CreateAttributeForm({ shopId }: AttributeFormProps) {
         <p className="text-sm text-destructive">{action.result.serverError}</p>
       )}
 
-      <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? tc("saving") : ta("create_attribute")}
-      </Button>
+      <div className="flex items-center gap-4 mt-2">
+        <Button type="submit" disabled={action.isPending} className="w-fit">
+          {action.isPending ? tc("saving") : ta("create_attribute")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/${slug}/dashboard/attributes`)}
+          disabled={action.isPending}
+        >
+          {tc("cancel")}
+        </Button>
+      </div>
     </form>
   );
 }

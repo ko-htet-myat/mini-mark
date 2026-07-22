@@ -49,6 +49,7 @@ interface ProductInitialValues {
   compareAtPrice?: number | null;
   sku?: string | null;
   stock: number;
+  status: "IN_STOCK" | "OUT_OF_STOCK";
   images: string[];
   youtubeUrl?: string | null;
   isActive: boolean;
@@ -96,6 +97,7 @@ export function EditProductForm({
             initialData.compareAtPrice ?? (undefined as unknown as number),
           sku: initialData.sku ?? "",
           stock: initialData.stock ?? 0,
+          status: initialData.status ?? "IN_STOCK",
           images: initialData.images ?? [],
           youtubeUrl: initialData.youtubeUrl ?? "",
           isActive: initialData.isActive ?? true,

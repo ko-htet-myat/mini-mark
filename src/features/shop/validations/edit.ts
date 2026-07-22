@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { Currency } from "@/generated/prisma/enums";
 
 export const updateShopSchema = z.object({
   name: z.string().min(2, "Shop name must be at least 2 characters").max(50),
+  currency: z.nativeEnum(Currency),
   description: z.string().max(500, "Keep it under 500 characters").optional(),
   contactEmail: z
     .string()

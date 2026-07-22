@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTranslations } from "next-intl";
 import { createShopAction } from "@/features/shop/actions/shop";
 import { createShopSchema } from "@/features/shop/validations/shop";
@@ -20,7 +27,7 @@ export default function CreateShopPage() {
     zodResolver(createShopSchema),
     {
       formProps: {
-        defaultValues: { name: "", slug: "" },
+        defaultValues: { name: "", slug: "", currency: "MMK" },
       },
       actionProps: {
         onSuccess: ({ data }) => {
@@ -75,6 +82,30 @@ export default function CreateShopPage() {
               {form.formState.errors.slug.message}
             </p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="currency">{t("currency")}</Label>
+          <Select
+            value={form.watch("currency")}
+            onValueChange={(value) =>
+              form.setValue(
+                "currency",
+                value as "MMK" | "USD" | "JPY" | "KRW" | "THB",
+              )
+            }
+          >
+            <SelectTrigger id="currency">
+              <SelectValue placeholder={t("currency")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="MMK">MMK</SelectItem>
+              <SelectItem value="USD">USD</SelectItem>
+              <SelectItem value="JPY">JPY</SelectItem>
+              <SelectItem value="KRW">KRW</SelectItem>
+              <SelectItem value="THB">THB</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Non-field errors (e.g. "Not authenticated", "You already have a shop") */}

@@ -8,6 +8,7 @@ type ProductGridProps = {
   page: number;
   totalPages: number;
   searchParams?: Record<string, string | undefined>;
+  currency?: string;
 };
 
 function buildPageHref(
@@ -31,6 +32,7 @@ export function ProductGrid({
   page,
   totalPages,
   searchParams,
+  currency,
 }: ProductGridProps) {
   return (
     <section id="products" className="px-6 py-6">
@@ -45,6 +47,7 @@ export function ProductGrid({
               key={product.id}
               shopSlug={shopSlug}
               product={product}
+              currency={currency}
             />
           ))}
         </div>

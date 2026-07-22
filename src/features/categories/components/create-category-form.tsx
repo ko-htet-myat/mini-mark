@@ -165,9 +165,19 @@ export function CreateCategoryForm({
         <p className="text-sm text-destructive">{action.result.serverError}</p>
       )}
 
-      <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? tc("saving") : tcat("create_category")}
-      </Button>
+      <div className="flex items-center gap-4 mt-2">
+        <Button type="submit" disabled={action.isPending} className="w-fit">
+          {action.isPending ? tc("saving") : tcat("create_category")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/${slug}/dashboard/categories`)}
+          disabled={action.isPending}
+        >
+          {tc("cancel")}
+        </Button>
+      </div>
     </form>
   );
 }
