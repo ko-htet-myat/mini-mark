@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 import { formatAmount } from "@/lib/format";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Add01Icon,
+  Edit02Icon,
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RegisterFn = (...args: any[]) => any;
@@ -143,11 +159,25 @@ export function ProductFormFields({
     setValue("promotionIds", updated, { shouldDirty: true });
   }
 
-  function addVariant() {
-    appendVariant({
+  const [variantDialogOpen, setVariantDialogOpen] = useState(false);
+  const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
+    null,
+  );
+  const [variantForm, setVariantForm] = useState({
+    sku: "",
+    price: "" as string | number,
+    compareAtPrice: "" as string | number,
+    stock: 0,
+    imageUrl: "",
+    isActive: true,
+    attributeValues: [] as { attributeValueId: string }[],
+  });
+
+  function resetVariantForm() {
+    setVariantForm({
       sku: "",
-      price: null,
-      compareAtPrice: null,
+      price: "",
+      compareAtPrice: "",
       stock: 0,
       imageUrl: "",
       isActive: true,
@@ -155,19 +185,69 @@ export function ProductFormFields({
     });
   }
 
-  function toggleVariantAttributeValue(variantIndex: number, valId: string) {
-    const current = watch(`variants.${variantIndex}.attributeValues`) ?? [];
-    const exists = current.some(
-      (v: { attributeValueId: string }) => v.attributeValueId === valId,
-    );
-    const updated = exists
-      ? current.filter(
-          (v: { attributeValueId: string }) => v.attributeValueId !== valId,
-        )
-      : [...current, { attributeValueId: valId }];
-    setValue(`variants.${variantIndex}.attributeValues`, updated, {
-      shouldDirty: true,
+  function openAddVariantDialog() {
+    resetVariantForm();
+    setEditingVariantIndex(null);
+    setVariantDialogOpen(true);
+  }
+
+  function openEditVariantDialog(index: number) {
+    const v = watch(`variants.${index}`) as
+      | {
+          sku?: string | null;
+          price?: number | null;
+          compareAtPrice?: number | null;
+          stock?: number;
+          imageUrl?: string | null;
+          isActive?: boolean;
+          attributeValues?: { attributeValueId: string }[];
+        }
+      | undefined;
+    setVariantForm({
+      sku: v?.sku ?? "",
+      price: v?.price ?? "",
+      compareAtPrice: v?.compareAtPrice ?? "",
+      stock: v?.stock ?? 0,
+      imageUrl: v?.imageUrl ?? "",
+      isActive: v?.isActive ?? true,
+      attributeValues: v?.attributeValues ?? [],
     });
+    setEditingVariantIndex(index);
+    setVariantDialogOpen(true);
+  }
+
+  function saveVariantFromDialog() {
+    const data = {
+      sku: variantForm.sku,
+      price: variantForm.price === "" ? null : Number(variantForm.price),
+      compareAtPrice:
+        variantForm.compareAtPrice === ""
+          ? null
+          : Number(variantForm.compareAtPrice),
+      stock: variantForm.stock,
+      imageUrl: variantForm.imageUrl || "",
+      isActive: variantForm.isActive,
+      attributeValues: variantForm.attributeValues,
+    };
+
+    if (editingVariantIndex !== null) {
+      setValue(`variants.${editingVariantIndex}`, data, { shouldDirty: true });
+    } else {
+      appendVariant(data);
+    }
+    setVariantDialogOpen(false);
+  }
+
+  function toggleVariantAttributeValue(valId: string) {
+    const exists = variantForm.attributeValues.some(
+      (v) => v.attributeValueId === valId,
+    );
+    setVariantForm((prev) => ({
+      ...prev,
+      attributeValues: exists
+        ? prev.attributeValues.filter((v) => v.attributeValueId !== valId)
+        : [...prev.attributeValues, { attributeValueId: valId }],
+    }));
   }
 
   const nameErr = errors.name?.message;
@@ -372,8 +452,12 @@ export function ProductFormFields({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={addVariant}
+                      onClick={openAddVariantDialog}
                     >
+                      <HugeiconsIcon
+                        icon={Add01Icon}
+                        className="mr-1 h-3.5 w-3.5"
+                      />
                       {tp("add_variant")}
                     </Button>
                   </div>
@@ -385,147 +469,73 @@ export function ProductFormFields({
                   )}
 
                   {variantFields.map((field, index) => {
-                    const variantAttrValues =
-                      watch(`variants.${index}.attributeValues`) ?? [];
-                    const variantAttrValueIds = variantAttrValues.map(
-                      (v: { attributeValueId: string }) => v.attributeValueId,
-                    );
+                    const v = watch(`variants.${index}`) as
+                      | {
+                          sku?: string | null;
+                          price?: number | null;
+                          stock?: number;
+                          attributeValues?: { attributeValueId: string }[];
+                        }
+                      | undefined;
+                    const attrValues = v?.attributeValues ?? [];
+                    const attrLabels = attrValues
+                      .map((av: { attributeValueId: string }) => {
+                        for (const attr of attributes) {
+                          const found = attr.values.find(
+                            (val) => val.id === av.attributeValueId,
+                          );
+                          if (found) return found.value;
+                        }
+                        return null;
+                      })
+                      .filter(Boolean)
+                      .join(", ");
 
                     return (
                       <div
                         key={field.id}
-                        className="flex flex-col gap-3 rounded-md border p-3 bg-muted/10"
+                        className="flex items-center justify-between gap-3 rounded-md border p-3 bg-muted/10"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">
-                            {tp("variant")} #{index + 1}
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                          <span className="text-sm font-medium truncate">
+                            {attrLabels || `${tp("variant")} #${index + 1}`}
                           </span>
+                          <span className="text-xs text-muted-foreground">
+                            {v?.sku ? `SKU: ${v.sku}` : ""}
+                            {v?.sku && (v?.price || v?.stock) ? " | " : ""}
+                            {v?.price
+                              ? `Price: ${formatAmount(Number(v.price), currency)}`
+                              : ""}
+                            {v?.price && v?.stock ? " | " : ""}
+                            {v?.stock !== undefined ? `Stock: ${v.stock}` : ""}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
                           <Button
                             type="button"
                             variant="ghost"
-                            size="sm"
-                            className="text-destructive h-7 text-xs"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => openEditVariantDialog(index)}
+                          >
+                            <HugeiconsIcon
+                              icon={Edit02Icon}
+                              className="h-3.5 w-3.5"
+                            />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive"
                             onClick={() => removeVariant(index)}
                           >
-                            {tp("remove")}
+                            <HugeiconsIcon
+                              icon={Cancel01Icon}
+                              className="h-3.5 w-3.5"
+                            />
                           </Button>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <Label className="text-xs">{tp("sku")}</Label>
-                            <Input
-                              {...register(`variants.${index}.sku`)}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <Label className="text-xs">{tp("stock")}</Label>
-                            <Input
-                              type="number"
-                              step="1"
-                              min="0"
-                              {...register(`variants.${index}.stock`)}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <Label className="text-xs">
-                              {tp("price")} ({tp("optional")})
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              {...register(`variants.${index}.price`)}
-                              className="h-8 text-sm"
-                              placeholder={tp("inherits_product_price")}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <Label className="text-xs">
-                              {tp("compare_at_price")}
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              {...register(`variants.${index}.compareAtPrice`)}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                          <Label className="text-xs">
-                            {tp("variant_image")}
-                          </Label>
-                          <ImageUploadField
-                            label={tp("add_image")}
-                            folder={`${shopSlug}/products/variants`}
-                            value={watch(`variants.${index}.imageUrl`) ?? ""}
-                            onUploaded={(asset) =>
-                              setValue(
-                                `variants.${index}.imageUrl`,
-                                asset.url,
-                                {
-                                  shouldDirty: true,
-                                },
-                              )
-                            }
-                            onRemoved={() =>
-                              setValue(`variants.${index}.imageUrl`, "", {
-                                shouldDirty: true,
-                              })
-                            }
-                          />
-                        </div>
-
-                        {attributes.length > 0 && (
-                          <div className="flex flex-col gap-2">
-                            <Label className="text-xs">
-                              {tp("attributes")}
-                            </Label>
-                            {attributes.map((attr) => (
-                              <div
-                                key={attr.id}
-                                className="flex flex-col gap-1"
-                              >
-                                <span className="text-xs text-muted-foreground font-medium">
-                                  {attr.name}
-                                </span>
-                                <div className="flex flex-wrap gap-1">
-                                  {attr.values.map((val) => {
-                                    const isChecked =
-                                      variantAttrValueIds.includes(val.id);
-                                    return (
-                                      <button
-                                        key={val.id}
-                                        type="button"
-                                        onClick={() =>
-                                          toggleVariantAttributeValue(
-                                            index,
-                                            val.id,
-                                          )
-                                        }
-                                        className={`px-2 py-1 rounded border text-xs cursor-pointer transition-colors ${
-                                          isChecked
-                                            ? "bg-primary text-primary-foreground border-primary"
-                                            : "bg-background hover:bg-muted"
-                                        }`}
-                                      >
-                                        {val.value}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     );
                   })}
@@ -537,6 +547,169 @@ export function ProductFormFields({
                   )}
                 </section>
               )}
+
+              <Dialog
+                open={variantDialogOpen}
+                onOpenChange={setVariantDialogOpen}
+              >
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingVariantIndex !== null
+                        ? tp("edit_variant")
+                        : tp("add_variant")}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {tp("variant_dialog_description")}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs">{tp("sku")}</Label>
+                        <Input
+                          value={variantForm.sku}
+                          onChange={(e) =>
+                            setVariantForm((prev) => ({
+                              ...prev,
+                              sku: e.target.value,
+                            }))
+                          }
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs">{tp("stock")}</Label>
+                        <Input
+                          type="number"
+                          step="1"
+                          min="0"
+                          value={variantForm.stock}
+                          onChange={(e) =>
+                            setVariantForm((prev) => ({
+                              ...prev,
+                              stock: Number(e.target.value),
+                            }))
+                          }
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs">
+                          {tp("price")} ({tp("optional")})
+                        </Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={variantForm.price}
+                          onChange={(e) =>
+                            setVariantForm((prev) => ({
+                              ...prev,
+                              price: e.target.value,
+                            }))
+                          }
+                          className="h-8 text-sm"
+                          placeholder={tp("inherits_product_price")}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs">
+                          {tp("compare_at_price")}
+                        </Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={variantForm.compareAtPrice}
+                          onChange={(e) =>
+                            setVariantForm((prev) => ({
+                              ...prev,
+                              compareAtPrice: e.target.value,
+                            }))
+                          }
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs">{tp("variant_image")}</Label>
+                      <ImageUploadField
+                        label={tp("add_image")}
+                        folder={`${shopSlug}/products/variants`}
+                        value={variantForm.imageUrl}
+                        onUploaded={(asset) =>
+                          setVariantForm((prev) => ({
+                            ...prev,
+                            imageUrl: asset.url,
+                          }))
+                        }
+                        onRemoved={() =>
+                          setVariantForm((prev) => ({
+                            ...prev,
+                            imageUrl: "",
+                          }))
+                        }
+                      />
+                    </div>
+
+                    {attributes.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        <Label className="text-xs">{tp("attributes")}</Label>
+                        {attributes.map((attr) => (
+                          <div key={attr.id} className="flex flex-col gap-1">
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {attr.name}
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {attr.values.map((val) => {
+                                const isChecked =
+                                  variantForm.attributeValues.some(
+                                    (av) => av.attributeValueId === val.id,
+                                  );
+                                return (
+                                  <button
+                                    key={val.id}
+                                    type="button"
+                                    onClick={() =>
+                                      toggleVariantAttributeValue(val.id)
+                                    }
+                                    className={`px-2 py-1 rounded border text-xs cursor-pointer transition-colors ${
+                                      isChecked
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "bg-background hover:bg-muted"
+                                    }`}
+                                  >
+                                    {val.value}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">
+                        {tc("cancel")}
+                      </Button>
+                    </DialogClose>
+                    <Button type="button" onClick={saveVariantFromDialog}>
+                      {editingVariantIndex !== null
+                        ? tp("save_changes")
+                        : tp("add_variant")}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
           </Tabs>
         </div>

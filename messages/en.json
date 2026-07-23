@@ -148,7 +148,8 @@
     "inherits_product_price": "Inherits product price",
     "optional": "Optional",
     "remove": "Remove",
-    "variant": "Variant"
+    "variant": "Variant",
+    "variant_dialog_description": "Configure this variant's unique SKU, price, stock, and attribute options."
   },
   "NotFound": {
     "page_not_found": "Page Not Found",
