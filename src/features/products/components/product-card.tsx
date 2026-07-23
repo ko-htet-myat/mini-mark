@@ -21,9 +21,9 @@ export function ProductCard({
       className="group flex flex-col overflow-hidden rounded-lg border bg-background"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-muted">
-        {product.images[0] ? (
+        {product.imageUrl ? (
           <Image
-            src={product.images[0]}
+            src={product.imageUrl}
             alt={product.name}
             fill
             className="object-cover transition-transform group-hover:scale-105"

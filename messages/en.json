@@ -137,7 +137,18 @@
     "out_of_stock": "Out of Stock",
     "create_product": "Create Product",
     "product_created": "Product created successfully",
-    "product_updated": "Product updated successfully"
+    "product_updated": "Product updated successfully",
+    "has_variants": "Has Variants",
+    "has_variants_description": "Enable if this product has multiple variants (e.g. size, color)",
+    "variants": "Variants",
+    "add_variant": "Add Variant",
+    "no_variants": "No variants found.",
+    "attributes": "Attributes",
+    "variant_image": "Variant Image",
+    "inherits_product_price": "Inherits product price",
+    "optional": "Optional",
+    "remove": "Remove",
+    "variant": "Variant"
   },
   "NotFound": {
     "page_not_found": "Page Not Found",

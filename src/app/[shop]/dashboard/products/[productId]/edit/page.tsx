@@ -35,17 +35,24 @@ export default async function EditProductPage({
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
-    sku: product.sku,
-    stock: product.stock,
-    status: product.status,
-    images: product.images,
+    imageUrl: product.imageUrl,
     youtubeUrl: product.youtubeUrl,
     isActive: product.isActive,
+    hasVariants: product.hasVariants,
     categoryId: product.categoryId,
     brandId: product.brandId,
-    attributeValues: product.attributeValues.map((av) => ({
-      attributeValueId: av.attributeValue.id,
-      extraPrice: av.extraPrice ? Number(av.extraPrice) : null,
+    variants: product.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      price: v.price,
+      compareAtPrice: v.compareAtPrice,
+      stock: v.stock,
+      imageUrl: v.imageUrl,
+      isActive: v.isActive,
+      attributeValues: v.attributeValues.map((av) => ({
+        attributeValueId: av.attributeValueId,
+        attributeValue: av.attributeValue,
+      })),
     })),
     promotionIds: product.promotions.map((p) => p.id),
   };
@@ -55,6 +62,8 @@ export default async function EditProductPage({
       <h1 className="text-2xl font-bold tracking-tight">Edit Product</h1>
       <EditProductForm
         shopId={shop.id}
+        shopSlug={shop.slug}
+        currency={shop.currency}
         categories={categories}
         brands={brands}
         attributes={attributes}

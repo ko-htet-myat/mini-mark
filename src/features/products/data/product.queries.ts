@@ -38,11 +38,15 @@ export async function getProductsPage({
       include: {
         category: { select: { id: true, name: true } },
         brand: { select: { id: true, name: true } },
-        attributeValues: {
+        variants: {
           include: {
-            attributeValue: {
+            attributeValues: {
               include: {
-                attribute: { select: { id: true, name: true } },
+                attributeValue: {
+                  include: {
+                    attribute: { select: { id: true, name: true } },
+                  },
+                },
               },
             },
           },
@@ -69,12 +73,10 @@ export async function getProductsPage({
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
-    sku: product.sku,
-    stock: product.stock,
-    status: product.status,
-    images: product.images,
+    imageUrl: product.imageUrl,
     youtubeUrl: product.youtubeUrl,
     isActive: product.isActive,
+    hasVariants: product.hasVariants,
     shopId: product.shopId,
     categoryId: product.categoryId,
     brandId: product.brandId,
@@ -82,9 +84,21 @@ export async function getProductsPage({
     updatedAt: product.updatedAt,
     category: product.category,
     brand: product.brand,
-    attributeValues: product.attributeValues.map((av) => ({
-      ...av,
-      extraPrice: av.extraPrice ? Number(av.extraPrice) : null,
+    variants: product.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      price: v.price ? Number(v.price) : null,
+      compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+      stock: v.stock,
+      status: v.status,
+      imageUrl: v.imageUrl,
+      isActive: v.isActive,
+      attributeValues: v.attributeValues.map((av) => ({
+        attributeValue: {
+          attribute: av.attributeValue.attribute,
+          value: av.attributeValue.value,
+        },
+      })),
     })),
     promotions: product.promotions.map((p) => ({
       id: p.id,
@@ -103,11 +117,15 @@ export async function getProductById(id: string, shopId: string) {
     include: {
       category: { select: { id: true, name: true } },
       brand: { select: { id: true, name: true } },
-      attributeValues: {
+      variants: {
         include: {
-          attributeValue: {
+          attributeValues: {
             include: {
-              attribute: { select: { id: true, name: true } },
+              attributeValue: {
+                include: {
+                  attribute: { select: { id: true, name: true } },
+                },
+              },
             },
           },
         },
@@ -124,9 +142,23 @@ export async function getProductById(id: string, shopId: string) {
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
-    attributeValues: product.attributeValues.map((av) => ({
-      ...av,
-      extraPrice: av.extraPrice ? Number(av.extraPrice) : null,
+    variants: product.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      price: v.price ? Number(v.price) : null,
+      compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+      stock: v.stock,
+      status: v.status,
+      imageUrl: v.imageUrl,
+      isActive: v.isActive,
+      attributeValues: v.attributeValues.map((av) => ({
+        attributeValueId: av.attributeValueId,
+        attributeValue: {
+          id: av.attributeValue.id,
+          value: av.attributeValue.value,
+          attribute: av.attributeValue.attribute,
+        },
+      })),
     })),
   };
 }

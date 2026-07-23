@@ -165,18 +165,17 @@ enum ProductStatus {
 }
 
 model Product {
-  id             String        @id @default(cuid())
+  id             String   @id @default(cuid())
   name           String
   slug           String
   description    String?
-  price          Decimal       @db.Decimal(10, 2)
-  compareAtPrice Decimal?      @db.Decimal(10, 2)
-  sku            String?
-  stock          Int           @default(0)
-  status         ProductStatus @default(IN_STOCK)
-  images         String[]      @default([])
+  price          Decimal  @db.Decimal(10, 2) // base/"from" price
+  compareAtPrice Decimal? @db.Decimal(10, 2)
+  imageUrl       String?
   youtubeUrl     String?
-  isActive       Boolean       @default(true)
+  isActive       Boolean  @default(true)
+  hasVariants    Boolean  @default(false) // 👈 new: drives simple-vs-variant UI branch
+  // ⛔ removed: sku, stock, status — now on ProductVariant
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
@@ -187,8 +186,8 @@ model Product {
   brandId String?
   brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
 
-  attributeValues ProductAttributeValue[]
-  promotions      Promotion[]
+  variants   ProductVariant[] // 👈 replaces attributeValues
+  promotions Promotion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -227,7 +226,7 @@ model AttributeValue {
   attributeId String
   attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
 
-  products ProductAttributeValue[]
+  variants ProductVariantAttributeValue[] // ✅ matches ProductVariantAttributeValue.attributeValue field
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -237,18 +236,39 @@ model AttributeValue {
   @@map("attribute_value")
 }
 
-model ProductAttributeValue {
+model ProductVariant {
+  id             String        @id @default(cuid())
+  sku            String?
+  price          Decimal?      @db.Decimal(10, 2) // null = inherit Product.price
+  compareAtPrice Decimal?      @db.Decimal(10, 2)
+  stock          Int           @default(0)
+  status         ProductStatus @default(IN_STOCK)
+  imageUrl       String?
+  isActive       Boolean       @default(true)
+
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  attributeValues ProductVariantAttributeValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([status])
+  @@map("product_variant")
+}
+
+model ProductVariantAttributeValue {
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   attributeValueId String
   attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
 
-  extraPrice Decimal? @db.Decimal(10, 2)
-
-  @@id([productId, attributeValueId])
+  @@id([variantId, attributeValueId])
   @@index([attributeValueId])
-  @@map("product_attribute_value")
+  @@map("product_variant_attribute_value")
 }
 
 enum DiscountType {

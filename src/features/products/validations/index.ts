@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ProductStatus } from "@/generated/prisma/enums";
 
 const optionalNumber = (schema: z.ZodNumber) =>
   z.preprocess((val) => {
@@ -8,13 +7,33 @@ const optionalNumber = (schema: z.ZodNumber) =>
     return isNaN(num) ? undefined : num;
   }, schema.optional());
 
-const attributeValueSchema = z.object({
+const variantAttributeValueSchema = z.object({
   attributeValueId: z.string().min(1),
-  extraPrice: z
-    .number()
-    .positive("Extra price must be greater than 0")
+});
+
+const variantSchema = z.object({
+  id: z.string().optional(),
+  sku: z
+    .string()
+    .trim()
+    .max(64, "SKU is too long")
     .optional()
-    .nullable(),
+    .or(z.literal("")),
+  price: optionalNumber(z.number().positive("Price must be greater than 0")),
+  compareAtPrice: optionalNumber(z.number().positive("Must be greater than 0")),
+  stock: z.coerce
+    .number()
+    .int("Stock must be a whole number")
+    .min(0, "Stock can't be negative")
+    .default(0),
+  imageUrl: z
+    .string()
+    .trim()
+    .url("Enter a valid URL")
+    .optional()
+    .or(z.literal("")),
+  isActive: z.boolean().default(true),
+  attributeValues: z.array(variantAttributeValueSchema).default([]),
 });
 
 export const createProductSchema = z.object({
@@ -49,20 +68,12 @@ export const createProductSchema = z.object({
 
   compareAtPrice: optionalNumber(z.number().positive("Must be greater than 0")),
 
-  sku: z
+  imageUrl: z
     .string()
     .trim()
-    .max(64, "SKU is too long")
+    .url("Enter a valid URL")
     .optional()
     .or(z.literal("")),
-
-  stock: z.coerce
-    .number()
-    .int("Stock must be a whole number")
-    .min(0, "Stock can't be negative")
-    .default(0),
-
-  images: z.array(z.string().url("Each image must be a valid URL")).default([]),
 
   youtubeUrl: z
     .string()
@@ -71,14 +82,14 @@ export const createProductSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  status: z.nativeEnum(ProductStatus).default("IN_STOCK"),
-
   isActive: z.boolean().default(true),
 
   categoryId: z.string().optional().or(z.literal("")),
   brandId: z.string().optional().or(z.literal("")),
 
-  attributeValues: z.array(attributeValueSchema).default([]),
+  hasVariants: z.boolean().default(false),
+  variants: z.array(variantSchema).default([]),
+
   promotionIds: z.array(z.string()).default([]),
 });
 

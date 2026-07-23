@@ -20,6 +20,8 @@ export default async function CreateProductPage({
       <h1 className="text-2xl font-bold tracking-tight">Create Product</h1>
       <CreateProductForm
         shopId={shop.id}
+        shopSlug={shop.slug}
+        currency={shop.currency}
         categories={categories}
         brands={brands}
         attributes={attributes}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
-import { useShop } from "@/context/shop-context";
 import { formatAmount } from "@/lib/format";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,6 +24,8 @@ type RegisterFn = (...args: any[]) => any;
 type WatchFn = (...args: any[]) => any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SetValueFn = (...args: any[]) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Control = any;
 
 interface CategoryOption {
   id: string;
@@ -61,6 +63,7 @@ export interface ProductFormFieldsProps {
   register: RegisterFn;
   watch: WatchFn;
   setValue: SetValueFn;
+  control: Control;
   errors: Errors;
   isPending: boolean;
   serverError?: string;
@@ -69,6 +72,7 @@ export interface ProductFormFieldsProps {
   attributes: AttributeOption[];
   promotions: PromotionOption[];
   shopSlug: string;
+  currency: string;
   tc: (key: string, values?: Record<string, unknown>) => string;
   tp: (key: string, values?: Record<string, unknown>) => string;
   submitLabel: string;
@@ -80,6 +84,7 @@ export function ProductFormFields({
   register,
   watch,
   setValue,
+  control,
   errors,
   isPending,
   serverError,
@@ -88,13 +93,23 @@ export function ProductFormFields({
   attributes,
   promotions,
   shopSlug,
+  currency,
   tc,
   tp,
   submitLabel,
   autoSlug,
   onCancel,
 }: ProductFormFieldsProps) {
-  const shop = useShop();
+  const hasVariants = watch("hasVariants");
+
+  const {
+    fields: variantFields,
+    append: appendVariant,
+    remove: removeVariant,
+  } = useFieldArray({
+    control,
+    name: "variants",
+  });
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!autoSlug) return;
@@ -109,48 +124,15 @@ export function ProductFormFields({
     );
   }
 
-  const images = watch("images") ?? [];
-  const selectedValues = watch("attributeValues") ?? [];
+  const imageUrl = watch("imageUrl") ?? "";
   const selectedPromotions = watch("promotionIds") ?? [];
-  const selectedValueIds = selectedValues.map(
-    (v: { attributeValueId: string }) => v.attributeValueId,
-  );
 
-  function addImage(url: string) {
-    setValue("images", [...images, url], { shouldDirty: true });
+  function setImage(url: string) {
+    setValue("imageUrl", url || "", { shouldDirty: true });
   }
 
-  function removeImage(url: string) {
-    setValue(
-      "images",
-      images.filter((img: string) => img !== url),
-      { shouldDirty: true },
-    );
-  }
-
-  function toggleAttributeValue(valId: string) {
-    const exists = selectedValueIds.includes(valId);
-    const updated = exists
-      ? selectedValues.filter(
-          (v: { attributeValueId: string }) => v.attributeValueId !== valId,
-        )
-      : [...selectedValues, { attributeValueId: valId, extraPrice: null }];
-    setValue("attributeValues", updated, { shouldDirty: true });
-  }
-
-  function setExtraPrice(valId: string, extraPrice: number | null) {
-    const updated = selectedValues.map(
-      (v: { attributeValueId: string; extraPrice?: number | null }) =>
-        v.attributeValueId === valId ? { ...v, extraPrice } : v,
-    );
-    setValue("attributeValues", updated, { shouldDirty: true });
-  }
-
-  function getExtraPrice(valId: string): number | null | undefined {
-    return selectedValues.find(
-      (v: { attributeValueId: string; extraPrice?: number | null }) =>
-        v.attributeValueId === valId,
-    )?.extraPrice;
+  function removeImage() {
+    setValue("imageUrl", "", { shouldDirty: true });
   }
 
   function togglePromotion(promoId: string) {
@@ -161,16 +143,40 @@ export function ProductFormFields({
     setValue("promotionIds", updated, { shouldDirty: true });
   }
 
+  function addVariant() {
+    appendVariant({
+      sku: "",
+      price: null,
+      compareAtPrice: null,
+      stock: 0,
+      imageUrl: "",
+      isActive: true,
+      attributeValues: [],
+    });
+  }
+
+  function toggleVariantAttributeValue(variantIndex: number, valId: string) {
+    const current = watch(`variants.${variantIndex}.attributeValues`) ?? [];
+    const exists = current.some(
+      (v: { attributeValueId: string }) => v.attributeValueId === valId,
+    );
+    const updated = exists
+      ? current.filter(
+          (v: { attributeValueId: string }) => v.attributeValueId !== valId,
+        )
+      : [...current, { attributeValueId: valId }];
+    setValue(`variants.${variantIndex}.attributeValues`, updated, {
+      shouldDirty: true,
+    });
+  }
+
   const nameErr = errors.name?.message;
   const slugErr = errors.slug?.message;
   const descErr = errors.description?.message;
   const priceErr = errors.price?.message;
   const compareErr = errors.compareAtPrice?.message;
-  const skuErr = errors.sku?.message;
-  const stockErr = errors.stock?.message;
-  const statusErr = errors.status?.message;
   const youtubeErr = errors.youtubeUrl?.message;
-  const imagesErr = errors.images?.message;
+  const imagesErr = errors.imageUrl?.message;
 
   return (
     <>
@@ -243,30 +249,6 @@ export function ProductFormFields({
                   />
                   {compareErr && (
                     <p className="text-sm text-destructive">{compareErr}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="sku">{tp("sku")}</Label>
-                  <Input id="sku" {...register("sku")} />
-                  {skuErr && (
-                    <p className="text-sm text-destructive">{skuErr}</p>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="stock">{tp("stock")}</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    step="1"
-                    min="0"
-                    {...register("stock")}
-                  />
-                  {stockErr && (
-                    <p className="text-sm text-destructive">{stockErr}</p>
                   )}
                 </div>
               </div>
@@ -355,7 +337,7 @@ export function ProductFormFields({
                           <span className="text-xs text-muted-foreground">
                             {promo.discountType === "PERCENTAGE"
                               ? `${promo.discountValue}% OFF`
-                              : `${formatAmount(Number(promo.discountValue), shop.currency)} OFF`}
+                              : `${formatAmount(Number(promo.discountValue), currency)} OFF`}
                           </span>
                         </div>
                       );
@@ -364,55 +346,195 @@ export function ProductFormFields({
                 </section>
               )}
 
-              {attributes.length > 0 && (
-                <section className="flex flex-col gap-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                    Product Attributes & Variants
-                  </h3>
-                  <div className="grid gap-4 border rounded-lg p-4 bg-muted/20">
-                    {attributes.map((attr) => (
-                      <div key={attr.id} className="flex flex-col gap-2">
-                        <span className="text-sm font-medium">{attr.name}</span>
-                        <div className="flex flex-wrap gap-2">
-                          {attr.values.map((val) => {
-                            const isChecked = selectedValueIds.includes(val.id);
-                            return (
-                              <div key={val.id} className="flex flex-col gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleAttributeValue(val.id)}
-                                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm cursor-pointer transition-colors ${
-                                    isChecked
-                                      ? "bg-primary text-primary-foreground border-primary"
-                                      : "bg-background hover:bg-muted"
-                                  }`}
-                                >
-                                  {val.value}
-                                </button>
-                                {isChecked && (
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    placeholder="Extra price"
-                                    value={getExtraPrice(val.id) ?? ""}
-                                    onChange={(e) => {
-                                      const v = e.target.value;
-                                      setExtraPrice(
-                                        val.id,
-                                        v === "" ? null : Number(v),
-                                      );
-                                    }}
-                                    className="h-7 w-28 text-xs"
-                                  />
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+              <section className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="hasVariants">{tp("has_variants")}</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {tp("has_variants_description")}
+                  </p>
+                </div>
+                <Switch
+                  id="hasVariants"
+                  checked={hasVariants}
+                  onCheckedChange={(checked) =>
+                    setValue("hasVariants", checked, { shouldDirty: true })
+                  }
+                />
+              </section>
+
+              {hasVariants && (
+                <section className="flex flex-col gap-3 rounded-lg border p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      {tp("variants")}
+                    </h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addVariant}
+                    >
+                      {tp("add_variant")}
+                    </Button>
                   </div>
+
+                  {variantFields.length === 0 && (
+                    <p className="text-sm text-muted-foreground py-4 text-center">
+                      {tp("no_variants")}
+                    </p>
+                  )}
+
+                  {variantFields.map((field, index) => {
+                    const variantAttrValues =
+                      watch(`variants.${index}.attributeValues`) ?? [];
+                    const variantAttrValueIds = variantAttrValues.map(
+                      (v: { attributeValueId: string }) => v.attributeValueId,
+                    );
+
+                    return (
+                      <div
+                        key={field.id}
+                        className="flex flex-col gap-3 rounded-md border p-3 bg-muted/10"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">
+                            {tp("variant")} #{index + 1}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive h-7 text-xs"
+                            onClick={() => removeVariant(index)}
+                          >
+                            {tp("remove")}
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">{tp("sku")}</Label>
+                            <Input
+                              {...register(`variants.${index}.sku`)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">{tp("stock")}</Label>
+                            <Input
+                              type="number"
+                              step="1"
+                              min="0"
+                              {...register(`variants.${index}.stock`)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">
+                              {tp("price")} ({tp("optional")})
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              {...register(`variants.${index}.price`)}
+                              className="h-8 text-sm"
+                              placeholder={tp("inherits_product_price")}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">
+                              {tp("compare_at_price")}
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              {...register(`variants.${index}.compareAtPrice`)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <Label className="text-xs">
+                            {tp("variant_image")}
+                          </Label>
+                          <ImageUploadField
+                            label={tp("add_image")}
+                            folder={`${shopSlug}/products/variants`}
+                            value={watch(`variants.${index}.imageUrl`) ?? ""}
+                            onUploaded={(asset) =>
+                              setValue(
+                                `variants.${index}.imageUrl`,
+                                asset.url,
+                                {
+                                  shouldDirty: true,
+                                },
+                              )
+                            }
+                            onRemoved={() =>
+                              setValue(`variants.${index}.imageUrl`, "", {
+                                shouldDirty: true,
+                              })
+                            }
+                          />
+                        </div>
+
+                        {attributes.length > 0 && (
+                          <div className="flex flex-col gap-2">
+                            <Label className="text-xs">
+                              {tp("attributes")}
+                            </Label>
+                            {attributes.map((attr) => (
+                              <div
+                                key={attr.id}
+                                className="flex flex-col gap-1"
+                              >
+                                <span className="text-xs text-muted-foreground font-medium">
+                                  {attr.name}
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                  {attr.values.map((val) => {
+                                    const isChecked =
+                                      variantAttrValueIds.includes(val.id);
+                                    return (
+                                      <button
+                                        key={val.id}
+                                        type="button"
+                                        onClick={() =>
+                                          toggleVariantAttributeValue(
+                                            index,
+                                            val.id,
+                                          )
+                                        }
+                                        className={`px-2 py-1 rounded border text-xs cursor-pointer transition-colors ${
+                                          isChecked
+                                            ? "bg-primary text-primary-foreground border-primary"
+                                            : "bg-background hover:bg-muted"
+                                        }`}
+                                      >
+                                        {val.value}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {errors.variants && (
+                    <p className="text-sm text-destructive">
+                      {errors.variants.message?.toString()}
+                    </p>
+                  )}
                 </section>
               )}
             </TabsContent>
@@ -426,33 +548,32 @@ export function ProductFormFields({
               {tp("section_media")}
             </h3>
             <div className="flex flex-col gap-3">
-              <Label>{tp("images")}</Label>
-              <div className="flex flex-wrap gap-2">
-                {images.map((url: string) => (
-                  <div key={url} className="relative w-20 h-20">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt=""
-                      className="w-20 h-20 object-cover rounded-md border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(url)}
-                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <ImageUploadField
-                label={tp("add_image")}
-                folder={`${shopSlug}/products/images`}
-                value=""
-                onUploaded={(asset) => addImage(asset.url)}
-                onRemoved={() => {}}
-              />
+              <Label>{tc("image")}</Label>
+              {imageUrl ? (
+                <div className="relative w-full aspect-square">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageUrl}
+                    alt=""
+                    className="w-full h-full object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <ImageUploadField
+                  label={tp("add_image")}
+                  folder={`${shopSlug}/products/images`}
+                  value=""
+                  onUploaded={(asset) => setImage(asset.url)}
+                  onRemoved={() => {}}
+                />
+              )}
               {imagesErr && (
                 <p className="text-sm text-destructive">
                   {tp("images_invalid")}
@@ -468,29 +589,6 @@ export function ProductFormFields({
             <Input id="youtubeUrl" {...register("youtubeUrl")} />
             {youtubeErr && (
               <p className="text-sm text-destructive">{youtubeErr}</p>
-            )}
-          </section>
-
-          <section className="flex flex-col gap-3 rounded-lg border p-4">
-            <Label htmlFor="status">{tp("status")}</Label>
-            <Select
-              value={watch("status") || undefined}
-              onValueChange={(value) =>
-                setValue("status", value, { shouldDirty: true })
-              }
-            >
-              <SelectTrigger id="status" className="w-full">
-                <SelectValue placeholder={tp("status")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="IN_STOCK">{tp("in_stock")}</SelectItem>
-                <SelectItem value="OUT_OF_STOCK">
-                  {tp("out_of_stock")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {statusErr && (
-              <p className="text-sm text-destructive">{statusErr}</p>
             )}
           </section>
 

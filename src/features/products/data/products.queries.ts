@@ -36,9 +36,17 @@ export async function getShopProducts({
         slug: true,
         price: true,
         compareAtPrice: true,
-        images: true,
-        stock: true,
-        status: true,
+        imageUrl: true,
+        hasVariants: true,
+        variants: {
+          select: {
+            stock: true,
+            status: true,
+            imageUrl: true,
+            price: true,
+            isActive: true,
+          },
+        },
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -47,12 +55,21 @@ export async function getShopProducts({
     prisma.product.count({ where }),
   ]);
 
-  // Convert Decimal -> number here, once, so nothing downstream has to deal with Prisma.Decimal
-  const products = rawProducts.map((p) => ({
-    ...p,
-    price: p.price.toNumber(),
-    compareAtPrice: p.compareAtPrice ? p.compareAtPrice.toNumber() : null,
-  }));
+  const products = rawProducts.map((p) => {
+    const activeVariants = p.variants.filter((v) => v.isActive);
+    const totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
+    const allOutOfStock =
+      activeVariants.length > 0 && activeVariants.every((v) => v.stock === 0);
+
+    return {
+      ...p,
+      price: p.price.toNumber(),
+      compareAtPrice: p.compareAtPrice ? p.compareAtPrice.toNumber() : null,
+      stock: totalStock,
+      status: allOutOfStock ? ("OUT_OF_STOCK" as const) : ("IN_STOCK" as const),
+      imageUrl: p.imageUrl,
+    };
+  });
 
   return {
     products,

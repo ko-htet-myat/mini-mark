@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 
 import { updateProductSchema } from "../validations";
 import { updateProduct } from "../actions";
-import { useShop } from "@/context/shop-context";
 import { ProductFormFields } from "./product-form-fields";
 
 interface CategoryOption {
@@ -40,6 +39,24 @@ interface PromotionOption {
   discountValue: number | string | { toString(): string };
 }
 
+interface ProductVariantInitialValues {
+  id?: string;
+  sku?: string | null;
+  price?: number | null;
+  compareAtPrice?: number | null;
+  stock: number;
+  imageUrl?: string | null;
+  isActive: boolean;
+  attributeValues?: {
+    attributeValueId: string;
+    attributeValue: {
+      id: string;
+      value: string;
+      attribute: { id: string; name: string };
+    };
+  }[];
+}
+
 interface ProductInitialValues {
   id: string;
   name: string;
@@ -47,20 +64,20 @@ interface ProductInitialValues {
   description?: string | null;
   price: number;
   compareAtPrice?: number | null;
-  sku?: string | null;
-  stock: number;
-  status: "IN_STOCK" | "OUT_OF_STOCK";
-  images: string[];
+  imageUrl?: string | null;
   youtubeUrl?: string | null;
   isActive: boolean;
+  hasVariants: boolean;
   categoryId?: string | null;
   brandId?: string | null;
-  attributeValues?: { attributeValueId: string; extraPrice?: number | null }[];
+  variants?: ProductVariantInitialValues[];
   promotionIds?: string[];
 }
 
 interface EditProductFormProps {
   shopId: string;
+  shopSlug: string;
+  currency: string;
   categories: CategoryOption[];
   brands: BrandOption[];
   attributes: AttributeOption[];
@@ -70,6 +87,8 @@ interface EditProductFormProps {
 
 export function EditProductForm({
   shopId,
+  shopSlug,
+  currency,
   categories,
   brands,
   attributes,
@@ -77,12 +96,11 @@ export function EditProductForm({
   initialData,
 }: EditProductFormProps) {
   const router = useRouter();
-  const { slug } = useShop();
   const tc = useTranslations("Common");
   const tp = useTranslations("Products");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    updateProduct.bind(null, { shop: slug }),
+    updateProduct.bind(null, { shop: shopSlug }),
     zodResolver(updateProductSchema),
     {
       formProps: {
@@ -95,18 +113,25 @@ export function EditProductForm({
           price: initialData.price ?? (undefined as unknown as number),
           compareAtPrice:
             initialData.compareAtPrice ?? (undefined as unknown as number),
-          sku: initialData.sku ?? "",
-          stock: initialData.stock ?? 0,
-          status: initialData.status ?? "IN_STOCK",
-          images: initialData.images ?? [],
+          imageUrl: initialData.imageUrl ?? "",
           youtubeUrl: initialData.youtubeUrl ?? "",
           isActive: initialData.isActive ?? true,
+          hasVariants: initialData.hasVariants ?? false,
           categoryId: initialData.categoryId ?? "",
           brandId: initialData.brandId ?? "",
-          attributeValues:
-            initialData.attributeValues?.map((av) => ({
-              attributeValueId: av.attributeValueId,
-              extraPrice: av.extraPrice ?? null,
+          variants:
+            initialData.variants?.map((v) => ({
+              id: v.id,
+              sku: v.sku ?? "",
+              price: v.price ?? null,
+              compareAtPrice: v.compareAtPrice ?? null,
+              stock: v.stock ?? 0,
+              imageUrl: v.imageUrl ?? "",
+              isActive: v.isActive ?? true,
+              attributeValues:
+                v.attributeValues?.map((av) => ({
+                  attributeValueId: av.attributeValueId,
+                })) ?? [],
             })) ?? [],
           promotionIds: initialData.promotionIds ?? [],
         },
@@ -114,7 +139,7 @@ export function EditProductForm({
       actionProps: {
         onSuccess: () => {
           toast.success(tp("product_updated"));
-          router.push(`/${slug}/dashboard/products`);
+          router.push(`/${shopSlug}/dashboard/products`);
         },
       },
     },
@@ -126,6 +151,7 @@ export function EditProductForm({
         register={form.register}
         watch={form.watch}
         setValue={form.setValue}
+        control={form.control}
         errors={form.formState.errors}
         isPending={action.isPending}
         serverError={action.result.serverError}
@@ -133,11 +159,12 @@ export function EditProductForm({
         brands={brands}
         attributes={attributes}
         promotions={promotions}
-        shopSlug={slug}
+        shopSlug={shopSlug}
+        currency={currency}
         tc={tc as (key: string, values?: Record<string, unknown>) => string}
         tp={tp as (key: string, values?: Record<string, unknown>) => string}
         submitLabel="Update Product"
-        onCancel={() => router.push(`/${slug}/dashboard/products`)}
+        onCancel={() => router.push(`/${shopSlug}/dashboard/products`)}
       />
     </form>
   );

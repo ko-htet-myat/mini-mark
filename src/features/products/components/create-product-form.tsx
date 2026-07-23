@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 
 import { createProductSchema } from "../validations";
 import { createProduct } from "../actions";
-import { useShop } from "@/context/shop-context";
 import { ProductFormFields } from "./product-form-fields";
 
 interface CategoryOption {
@@ -42,6 +41,8 @@ interface PromotionOption {
 
 interface CreateProductFormProps {
   shopId: string;
+  shopSlug: string;
+  currency: string;
   categories: CategoryOption[];
   brands: BrandOption[];
   attributes: AttributeOption[];
@@ -50,18 +51,19 @@ interface CreateProductFormProps {
 
 export function CreateProductForm({
   shopId,
+  shopSlug,
+  currency,
   categories,
   brands,
   attributes,
   promotions,
 }: CreateProductFormProps) {
   const router = useRouter();
-  const { slug } = useShop();
   const tc = useTranslations("Common");
   const tp = useTranslations("Products");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    createProduct.bind(null, { shop: slug }),
+    createProduct.bind(null, { shop: shopSlug }),
     zodResolver(createProductSchema),
     {
       formProps: {
@@ -72,22 +74,20 @@ export function CreateProductForm({
           description: "",
           price: undefined as unknown as number,
           compareAtPrice: undefined as unknown as number,
-          sku: "",
-          stock: 0,
-          status: "IN_STOCK",
-          images: [],
+          imageUrl: "",
           youtubeUrl: "",
           isActive: true,
           categoryId: "",
           brandId: "",
-          attributeValues: [],
+          hasVariants: false,
+          variants: [],
           promotionIds: [],
         },
       },
       actionProps: {
         onSuccess: () => {
           toast.success(tp("product_created"));
-          router.push(`/${slug}/dashboard/products`);
+          router.push(`/${shopSlug}/dashboard/products`);
         },
       },
     },
@@ -99,6 +99,7 @@ export function CreateProductForm({
         register={form.register}
         watch={form.watch}
         setValue={form.setValue}
+        control={form.control}
         errors={form.formState.errors}
         isPending={action.isPending}
         serverError={action.result.serverError}
@@ -106,12 +107,13 @@ export function CreateProductForm({
         brands={brands}
         attributes={attributes}
         promotions={promotions}
-        shopSlug={slug}
+        shopSlug={shopSlug}
+        currency={currency}
         tc={tc as (key: string, values?: Record<string, unknown>) => string}
         tp={tp as (key: string, values?: Record<string, unknown>) => string}
         submitLabel={tp("create_product")}
         autoSlug
-        onCancel={() => router.push(`/${slug}/dashboard/products`)}
+        onCancel={() => router.push(`/${shopSlug}/dashboard/products`)}
       />
     </form>
   );

@@ -18,7 +18,8 @@ export const createProduct = shopOwnerActionClient
       shopId,
       categoryId,
       brandId,
-      attributeValues = [],
+      hasVariants,
+      variants = [],
       promotionIds = [],
       ...data
     } = parsedInput;
@@ -28,14 +29,26 @@ export const createProduct = shopOwnerActionClient
         data: {
           ...data,
           shopId,
+          hasVariants,
           categoryId: categoryId || null,
           brandId: brandId || null,
-          attributeValues: {
-            create: attributeValues.map((av) => ({
-              attributeValueId: av.attributeValueId,
-              extraPrice: av.extraPrice ?? null,
-            })),
-          },
+          variants: hasVariants
+            ? {
+                create: variants.map((v) => ({
+                  sku: v.sku || null,
+                  price: v.price ?? null,
+                  compareAtPrice: v.compareAtPrice ?? null,
+                  stock: v.stock ?? 0,
+                  imageUrl: v.imageUrl || null,
+                  isActive: v.isActive ?? true,
+                  attributeValues: {
+                    create: v.attributeValues.map((av) => ({
+                      attributeValueId: av.attributeValueId,
+                    })),
+                  },
+                })),
+              }
+            : undefined,
           promotions:
             promotionIds.length > 0
               ? {
@@ -46,7 +59,15 @@ export const createProduct = shopOwnerActionClient
       });
 
       revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-      return { product };
+      return {
+        product: {
+          ...product,
+          price: Number(product.price),
+          compareAtPrice: product.compareAtPrice
+            ? Number(product.compareAtPrice)
+            : null,
+        },
+      };
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -66,16 +87,16 @@ export const updateProduct = shopOwnerActionClient
       shopId,
       categoryId,
       brandId,
-      attributeValues = [],
+      hasVariants,
+      variants = [],
       promotionIds = [],
       ...data
     } = parsedInput;
 
     try {
-      // Execute in transaction to sync relationships cleanly
       const updated = await prisma.$transaction(async (tx) => {
-        // Clear old attribute values
-        await tx.productAttributeValue.deleteMany({
+        // Delete old variants (cascades to attributeValues via onDelete)
+        await tx.productVariant.deleteMany({
           where: { productId: id },
         });
 
@@ -83,14 +104,26 @@ export const updateProduct = shopOwnerActionClient
           where: { id, shopId },
           data: {
             ...data,
+            hasVariants,
             categoryId: categoryId || null,
             brandId: brandId || null,
-            attributeValues: {
-              create: attributeValues.map((av) => ({
-                attributeValueId: av.attributeValueId,
-                extraPrice: av.extraPrice ?? null,
-              })),
-            },
+            variants: hasVariants
+              ? {
+                  create: variants.map((v) => ({
+                    sku: v.sku || null,
+                    price: v.price ?? null,
+                    compareAtPrice: v.compareAtPrice ?? null,
+                    stock: v.stock ?? 0,
+                    imageUrl: v.imageUrl || null,
+                    isActive: v.isActive ?? true,
+                    attributeValues: {
+                      create: v.attributeValues.map((av) => ({
+                        attributeValueId: av.attributeValueId,
+                      })),
+                    },
+                  })),
+                }
+              : undefined,
             promotions: {
               set: promotionIds.map((pId) => ({ id: pId })),
             },
@@ -102,7 +135,15 @@ export const updateProduct = shopOwnerActionClient
 
       revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
       revalidatePath(`/${ctx.shop.slug}/dashboard/products/${id}/edit`);
-      return { product: updated };
+      return {
+        product: {
+          ...updated,
+          price: Number(updated.price),
+          compareAtPrice: updated.compareAtPrice
+            ? Number(updated.compareAtPrice)
+            : null,
+        },
+      };
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
@@ -134,5 +175,13 @@ export const toggleProductStatus = shopOwnerActionClient
       data: { isActive: parsedInput.isActive },
     });
     revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-    return { product: updated };
+    return {
+      product: {
+        ...updated,
+        price: Number(updated.price),
+        compareAtPrice: updated.compareAtPrice
+          ? Number(updated.compareAtPrice)
+          : null,
+      },
+    };
   });

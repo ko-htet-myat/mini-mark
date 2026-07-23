@@ -9,21 +9,44 @@ export type ProductRow = {
   id: string;
   name: string;
   slug: string;
-  images: string[];
+  imageUrl?: string | null;
   price: number;
-  stock: number;
-  status: string;
+  compareAtPrice?: number | null;
   isActive: boolean;
+  hasVariants: boolean;
   category?: { id: string; name: string } | null;
   brand?: { id: string; name: string } | null;
-  attributeValues: {
-    attributeValue: {
-      attribute: { name: string };
-      value: string;
-    };
+  variants: {
+    id: string;
+    sku?: string | null;
+    price?: number | null;
+    stock: number;
+    status: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    attributeValues: {
+      attributeValue: {
+        attribute: { name: string };
+        value: string;
+      };
+    }[];
   }[];
   promotions: { id: string; name: string }[];
 };
+
+function getAggregateStock(variants: ProductRow["variants"]): number {
+  return variants
+    .filter((v) => v.isActive)
+    .reduce((sum, v) => sum + v.stock, 0);
+}
+
+function getAggregateStatus(
+  variants: ProductRow["variants"],
+): "IN_STOCK" | "OUT_OF_STOCK" {
+  const active = variants.filter((v) => v.isActive);
+  if (active.length === 0) return "OUT_OF_STOCK";
+  return active.every((v) => v.stock === 0) ? "OUT_OF_STOCK" : "IN_STOCK";
+}
 
 interface GetProductColumnsParams {
   page: number;
@@ -37,7 +60,7 @@ interface GetProductColumnsParams {
     status: string;
     in_stock: string;
     out_of_stock: string;
-    attributes: string;
+    variants: string;
     active: string;
     actions: string;
   };
@@ -69,10 +92,10 @@ export function getProductColumns({
       header: tp.product,
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          {row.original.images[0] ? (
+          {row.original.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={row.original.images[0]}
+              src={row.original.imageUrl}
               alt={row.original.name}
               className="h-10 w-10 rounded object-cover border"
             />
@@ -122,19 +145,23 @@ export function getProductColumns({
     {
       id: "stock",
       header: tp.stock,
-      cell: ({ row }) => (
-        <span
-          className={`font-medium ${row.original.stock === 0 ? "text-destructive" : ""}`}
-        >
-          {row.original.stock}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const stock = getAggregateStock(row.original.variants);
+        return (
+          <span
+            className={`font-medium ${stock === 0 ? "text-destructive" : ""}`}
+          >
+            {stock}
+          </span>
+        );
+      },
     },
     {
       id: "status",
       header: tp.status,
       cell: ({ row }) => {
-        const isInStock = row.original.status === "IN_STOCK";
+        const status = getAggregateStatus(row.original.variants);
+        const isInStock = status === "IN_STOCK";
         return (
           <Badge variant={isInStock ? "default" : "destructive"}>
             {isInStock ? tp.in_stock : tp.out_of_stock}
@@ -143,21 +170,32 @@ export function getProductColumns({
       },
     },
     {
-      id: "attributes",
-      header: tp.attributes,
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {row.original.attributeValues.length > 0 ? (
-            row.original.attributeValues.map((av, idx) => (
-              <Badge key={idx} variant="outline" className="text-[10px]">
-                {av.attributeValue.attribute.name}: {av.attributeValue.value}
-              </Badge>
-            ))
-          ) : (
-            <span className="text-xs text-muted-foreground">—</span>
-          )}
-        </div>
-      ),
+      id: "variants",
+      header: tp.variants,
+      cell: ({ row }) => {
+        const variants = row.original.variants;
+        if (!row.original.hasVariants) {
+          return <span className="text-xs text-muted-foreground">—</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {variants.length > 0 ? (
+              variants.map((v) => {
+                const attrs = v.attributeValues
+                  .map((av) => av.attributeValue.value)
+                  .join(", ");
+                return (
+                  <Badge key={v.id} variant="outline" className="text-[10px]">
+                    {attrs || `#${v.id.slice(0, 6)}`}
+                  </Badge>
+                );
+              })
+            ) : (
+              <span className="text-xs text-muted-foreground">—</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       id: "actions",
