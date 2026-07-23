@@ -136,7 +136,7 @@ export function getProductColumns({
       cell: ({ row }) => {
         const isInStock = row.original.status === "IN_STOCK";
         return (
-          <Badge variant={isInStock ? "default" : "secondary"}>
+          <Badge variant={isInStock ? "default" : "destructive"}>
             {isInStock ? tp.in_stock : tp.out_of_stock}
           </Badge>
         );
