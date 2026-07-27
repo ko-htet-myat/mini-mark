@@ -88,6 +88,7 @@ export function ProductDataTable({
           status: tp("status"),
           in_stock: tp("in_stock"),
           out_of_stock: tp("out_of_stock"),
+          low_stock: tp("low_stock"),
           variants: "Variants",
           active: "Active",
           actions: "Actions",

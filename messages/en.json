@@ -135,6 +135,7 @@
     "status": "Status",
     "in_stock": "In Stock",
     "out_of_stock": "Out of Stock",
+    "low_stock": "Low Stock",
     "create_product": "Create Product",
     "product_created": "Product created successfully",
     "product_updated": "Product updated successfully",

@@ -60,6 +60,7 @@ interface GetProductColumnsParams {
     status: string;
     in_stock: string;
     out_of_stock: string;
+    low_stock: string;
     variants: string;
     active: string;
     actions: string;
@@ -124,14 +125,29 @@ export function getProductColumns({
         ),
     },
     {
-      id: "brand",
-      header: tp.brand,
-      cell: ({ row }) =>
-        row.original.brand ? (
-          <Badge variant="secondary">{row.original.brand.name}</Badge>
-        ) : (
-          <span className="text-xs text-muted-foreground">—</span>
-        ),
+      id: "stock",
+      header: tp.stock,
+      cell: ({ row }) => {
+        const stock = getAggregateStock(row.original.variants);
+        return (
+          <>
+            {stock === 0 ? (
+              <span className={"text-destructive"}>{tp.out_of_stock}</span>
+            ) : (
+              <>
+                <span
+                  className={`font-medium ${stock === 0 ? "text-destructive" : ""}`}
+                >
+                  {stock}{" "}
+                </span>
+                {stock < 10 ? (
+                  <span className={"text-yellow-500"}>({tp.low_stock})</span>
+                ) : null}
+              </>
+            )}
+          </>
+        );
+      },
     },
     {
       id: "price",
@@ -143,60 +159,45 @@ export function getProductColumns({
       ),
     },
     {
-      id: "stock",
-      header: tp.stock,
-      cell: ({ row }) => {
-        const stock = getAggregateStock(row.original.variants);
-        return (
-          <span
-            className={`font-medium ${stock === 0 ? "text-destructive" : ""}`}
-          >
-            {stock}
-          </span>
-        );
-      },
+      id: "active",
+      header: tp.active,
+      cell: ({ row }) => (
+        <Badge
+          variant={row.original.isActive ? "default" : "secondary"}
+          className={row.original.isActive ? "bg-green-600" : ""}
+        >
+          {row.original.isActive ? "Active" : "Draft"}
+        </Badge>
+      ),
     },
-    {
-      id: "status",
-      header: tp.status,
-      cell: ({ row }) => {
-        const status = getAggregateStatus(row.original.variants);
-        const isInStock = status === "IN_STOCK";
-        return (
-          <Badge variant={isInStock ? "default" : "destructive"}>
-            {isInStock ? tp.in_stock : tp.out_of_stock}
-          </Badge>
-        );
-      },
-    },
-    {
-      id: "variants",
-      header: tp.variants,
-      cell: ({ row }) => {
-        const variants = row.original.variants;
-        if (!row.original.hasVariants) {
-          return <span className="text-xs text-muted-foreground">—</span>;
-        }
-        return (
-          <div className="flex flex-wrap gap-1 max-w-[200px]">
-            {variants.length > 0 ? (
-              variants.map((v) => {
-                const attrs = v.attributeValues
-                  .map((av) => av.attributeValue.value)
-                  .join(", ");
-                return (
-                  <Badge key={v.id} variant="outline" className="text-[10px]">
-                    {attrs || `#${v.id.slice(0, 6)}`}
-                  </Badge>
-                );
-              })
-            ) : (
-              <span className="text-xs text-muted-foreground">—</span>
-            )}
-          </div>
-        );
-      },
-    },
+    // {
+    //   id: "variants",
+    //   header: tp.variants,
+    //   cell: ({ row }) => {
+    //     const variants = row.original.variants;
+    //     if (!row.original.hasVariants) {
+    //       return <span className="text-xs text-muted-foreground">—</span>;
+    //     }
+    //     return (
+    //       <div className="flex flex-wrap gap-1 max-w-[200px]">
+    //         {variants.length > 0 ? (
+    //           variants.map((v) => {
+    //             const attrs = v.attributeValues
+    //               .map((av) => av.attributeValue.value)
+    //               .join(", ");
+    //             return (
+    //               <Badge key={v.id} variant="outline" className="text-[10px]">
+    //                 {attrs || `#${v.id.slice(0, 6)}`}
+    //               </Badge>
+    //             );
+    //           })
+    //         ) : (
+    //           <span className="text-xs text-muted-foreground">—</span>
+    //         )}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       id: "actions",
       cell: ({ row }) => (
