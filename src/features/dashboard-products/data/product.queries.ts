@@ -8,6 +8,8 @@ interface GetProductsParams {
   categoryId?: string;
   brandId?: string;
   isActive?: boolean;
+  from?: Date;
+  to?: Date;
 }
 
 export async function getProductsPage({
@@ -18,6 +20,8 @@ export async function getProductsPage({
   categoryId,
   brandId,
   isActive,
+  from,
+  to,
 }: GetProductsParams) {
   const where = {
     shopId,
@@ -27,6 +31,14 @@ export async function getProductsPage({
     ...(categoryId ? { categoryId } : {}),
     ...(brandId ? { brandId } : {}),
     ...(isActive !== undefined ? { isActive } : {}),
+    ...(from || to
+      ? {
+          createdAt: {
+            ...(from ? { gte: from } : {}),
+            ...(to ? { lte: to } : {}),
+          },
+        }
+      : {}),
   };
 
   const [data, total] = await Promise.all([

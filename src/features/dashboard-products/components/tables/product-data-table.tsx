@@ -29,6 +29,14 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ProductRow, getProductColumns } from "./product-columns";
 import { useShop } from "@/context/shop-context";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon, FilterIcon } from "@hugeicons/core-free-icons";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { ProductTableFilter } from "./product-table-filter";
 
 interface ProductDataTableProps {
   data: ProductRow[];
@@ -37,6 +45,11 @@ interface ProductDataTableProps {
   page: number;
   pageSize?: number;
   nameFilter: string;
+  categories?: { id: string; name: string }[];
+  statusFilter?: string;
+  categoryIdFilter?: string;
+  fromFilter?: string;
+  toFilter?: string;
 }
 
 export function ProductDataTable({
@@ -46,6 +59,11 @@ export function ProductDataTable({
   page,
   pageSize = 10,
   nameFilter,
+  categories = [],
+  statusFilter,
+  categoryIdFilter,
+  fromFilter,
+  toFilter,
 }: ProductDataTableProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -117,16 +135,58 @@ export function ProductDataTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <Input
-          placeholder={tc("filter_by_name")}
-          value={nameInput}
-          onChange={(e) => handleNameFilterChange(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button asChild>
-          <Link href="products/create">{tp("create_product")}</Link>
-        </Button>
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <InputGroup className="max-w-sm">
+            <InputGroupAddon>
+              <HugeiconsIcon icon={Search01Icon} size={18} />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder={tc("filter_by_name")}
+              value={nameInput}
+              onChange={(e) => handleNameFilterChange(e.target.value)}
+            />
+          </InputGroup>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <ProductTableFilter
+              categories={categories}
+              statusFilter={statusFilter}
+              categoryIdFilter={categoryIdFilter}
+              fromFilter={fromFilter}
+              toFilter={toFilter}
+              pushParams={pushParams}
+            />
+
+            {(statusFilter ||
+              categoryIdFilter ||
+              fromFilter ||
+              toFilter ||
+              nameFilter) && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setNameInput("");
+                  pushParams({
+                    name: "",
+                    status: "",
+                    categoryId: "",
+                    from: "",
+                    to: "",
+                    page: 0,
+                  });
+                }}
+              >
+                <HugeiconsIcon icon={FilterIcon} size={16} className="mr-2" />
+                Clear
+              </Button>
+            )}
+
+            <Button asChild>
+              <Link href="products/create">{tp("create_product")}</Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div

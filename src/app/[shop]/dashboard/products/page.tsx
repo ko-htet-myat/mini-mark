@@ -1,5 +1,8 @@
 import { ProductDataTable } from "@/features/dashboard-products/components/tables/product-data-table";
-import { getProductsPage } from "@/features/dashboard-products/data/product.queries";
+import {
+  getProductsPage,
+  getShopProductFormData,
+} from "@/features/dashboard-products/data/product.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 
@@ -11,6 +14,9 @@ interface DashboardProductsPageProps {
     name?: string;
     categoryId?: string;
     brandId?: string;
+    status?: string;
+    from?: string;
+    to?: string;
   }>;
 }
 
@@ -26,6 +32,14 @@ export default async function DashboardProductsPage({
   const nameFilter = sp.name ?? "";
   const categoryId = sp.categoryId ?? undefined;
   const brandId = sp.brandId ?? undefined;
+  const statusFilter = sp.status ?? undefined;
+
+  const from = sp.from ? new Date(sp.from) : undefined;
+  const to = sp.to ? new Date(sp.to) : undefined;
+  // If `to` is provided without time, make it end of the day
+  if (to) {
+    to.setHours(23, 59, 59, 999);
+  }
 
   const { data, total, pageCount } = await getProductsPage({
     shopId: shop.id,
@@ -34,7 +48,17 @@ export default async function DashboardProductsPage({
     nameFilter,
     categoryId,
     brandId,
+    isActive:
+      statusFilter === "active"
+        ? true
+        : statusFilter === "draft"
+          ? false
+          : undefined,
+    from,
+    to,
   });
+
+  const formData = await getShopProductFormData(shop.id);
 
   return (
     <div className="space-y-6">
@@ -45,6 +69,11 @@ export default async function DashboardProductsPage({
         total={total}
         page={page}
         nameFilter={nameFilter}
+        categories={formData.categories}
+        statusFilter={statusFilter}
+        categoryIdFilter={categoryId}
+        fromFilter={sp.from}
+        toFilter={sp.to}
       />
     </div>
   );
