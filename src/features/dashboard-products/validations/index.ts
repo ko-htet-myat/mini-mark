@@ -106,5 +106,9 @@ export const toggleProductStatusSchema = z.object({
   isActive: z.boolean(),
 });
 
+export const duplicateProductSchema = z.object({
+  id: z.string().min(1),
+});
+
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
