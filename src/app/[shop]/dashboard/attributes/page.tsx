@@ -1,5 +1,5 @@
-import { AttributeDataTable } from "@/features/attributes/components/attribute-data-table";
-import { getAttributesPage } from "@/features/attributes/data/attribute.queries";
+import { AttributeDataTable } from "@/features/dashboard-attributes/components/tables/attribute-data-table";
+import { getAttributesPage } from "@/features/dashboard-attributes/data/attribute.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 

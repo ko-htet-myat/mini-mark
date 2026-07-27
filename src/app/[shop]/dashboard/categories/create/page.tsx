@@ -1,5 +1,5 @@
-import { CreateCategoryForm } from "@/features/categories/components/create-category-form";
-import { getAllPotentialParents } from "@/features/categories/data/categories.queries";
+import { CreateCategoryForm } from "@/features/dashboard-categories/components/forms/create-category-form";
+import { getAllPotentialParents } from "@/features/dashboard-categories/data/categories.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function CreateCategoryPage({

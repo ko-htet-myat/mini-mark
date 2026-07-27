@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteBrand } from "@/features/brands/actions";
+import { deleteBrand } from "@/features/dashboard-brands/actions";
 import { useShop } from "@/context/shop-context";
 
 interface DeleteBrandButtonProps {

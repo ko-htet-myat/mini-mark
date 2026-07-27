@@ -1,4 +1,4 @@
-import { CreateBrandForm } from "@/features/brands/components/create-brand-form";
+import { CreateBrandForm } from "@/features/dashboard-brands/components/forms/create-brand-form";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function CreateBrandPage({

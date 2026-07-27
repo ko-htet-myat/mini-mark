@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { UpdateBrandForm } from "@/features/brands/components/edit-brand-form";
-import { DeleteBrandButton } from "@/features/brands/components/delete-brand-btn";
+import { UpdateBrandForm } from "@/features/dashboard-brands/components/forms/edit-brand-form";
+import { DeleteBrandButton } from "@/features/dashboard-brands/components/delete-brand-btn";
 
 export default async function EditBrandPage({
   params,

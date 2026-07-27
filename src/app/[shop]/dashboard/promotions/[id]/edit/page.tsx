@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { EditPromotionForm } from "@/features/promotions/components/edit-promotion-form";
-import { DeletePromotionButton } from "@/features/promotions/components/delete-promotion-btn";
+import { EditPromotionForm } from "@/features/dashboard-promotions/components/forms/edit-promotion-form";
+import { DeletePromotionButton } from "@/features/dashboard-promotions/components/delete-promotion-btn";
 
 export default async function EditPromotionPage({
   params,

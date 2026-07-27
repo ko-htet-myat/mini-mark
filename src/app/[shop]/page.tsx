@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { ShopHeader } from "@/features/shop/components/shop-header";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
-import { getShopCategories } from "@/features/categories/data/category.queries";
-import { getShopBrands } from "@/features/brands/data/brand.queries";
-import { getShopProducts } from "@/features/products/data/products.queries";
-import { CategoryList } from "@/features/categories/components/category-list";
-import { BrandList } from "@/features/brands/components/brand-list";
-import { ProductGrid } from "@/features/products/components/product-grid";
+import { getShopCategories } from "@/features/storefront-categories/data/category.queries";
+import { getShopBrands } from "@/features/storefront-brands/data/brand.queries";
+import { getShopProducts } from "@/features/storefront-products/data/products.queries";
+import { CategoryList } from "@/features/storefront-categories/components/category-list";
+import { BrandList } from "@/features/storefront-brands/components/brand-list";
+import { ProductGrid } from "@/features/storefront-products/components/product-grid";
 
 type PageProps = {
   params: Promise<{ shop: string }>;

@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-import { updateProductSchema } from "../validations";
-import { updateProduct } from "../actions";
+import { updateProductSchema } from "../../validations";
+import { updateProduct } from "../../actions";
 import { ProductFormFields } from "./product-form-fields";
 
 interface CategoryOption {

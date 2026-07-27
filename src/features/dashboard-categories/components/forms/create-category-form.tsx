@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslations } from "next-intl";
-import { CategoryFormValues, updateCategorySchema } from "../validations";
-import { updateCategory } from "../actions";
+import { createCategorySchema } from "../../validations";
+import { createCategory } from "../../actions";
 import { useShop } from "@/context/shop-context";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
@@ -28,38 +28,41 @@ interface ParentOption {
   parent?: { name: string } | null;
 }
 
-interface UpdateCategoryFormProps {
-  category: { id: string } & CategoryFormValues;
-  /** Available parent categories to pick from (all L1 or all L2, depending on level) */
+interface CreateCategoryFormProps {
+  shopId: string;
+  /** Pre-selected parentId (from query param) */
+  defaultParentId?: string;
+  /** Available parent categories to pick from */
   parentOptions: ParentOption[];
 }
 
-export function UpdateCategoryForm({
-  category,
+export function CreateCategoryForm({
+  shopId,
+  defaultParentId,
   parentOptions,
-}: UpdateCategoryFormProps) {
+}: CreateCategoryFormProps) {
   const router = useRouter();
   const { slug } = useShop();
   const tc = useTranslations("Common");
   const tcat = useTranslations("Categories");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    updateCategory.bind(null, { shop: slug }),
-    zodResolver(updateCategorySchema),
+    createCategory.bind(null, { shop: slug }),
+    zodResolver(createCategorySchema),
     {
       formProps: {
         defaultValues: {
-          id: category.id,
-          name: category.name ?? "",
-          slug: category.slug ?? "",
-          description: category.description ?? "",
-          imageUrl: category.imageUrl ?? "",
-          parentId: category.parentId ?? "",
+          shopId,
+          name: "",
+          slug: "",
+          description: "",
+          imageUrl: "",
+          parentId: defaultParentId ?? "",
         },
       },
       actionProps: {
         onSuccess: () => {
-          toast.success(tcat("category_updated"));
+          toast.success(tcat("category_created"));
           const parentId = form.getValues("parentId");
           router.push(
             `/${slug}/dashboard/categories${parentId ? `?parentId=${parentId}` : ""}`,
@@ -68,6 +71,18 @@ export function UpdateCategoryForm({
       },
     },
   );
+
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    form.setValue(
+      "slug",
+      e.target.value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-"),
+    );
+  }
 
   return (
     <form
@@ -105,7 +120,10 @@ export function UpdateCategoryForm({
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">{tc("name")}</Label>
-        <Input id="name" {...form.register("name")} />
+        <Input
+          id="name"
+          {...form.register("name", { onChange: handleNameChange })}
+        />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
             {form.formState.errors.name.message}
@@ -149,7 +167,7 @@ export function UpdateCategoryForm({
 
       <div className="flex items-center gap-4 mt-2">
         <Button type="submit" disabled={action.isPending} className="w-fit">
-          {action.isPending ? tc("saving") : tc("save")}
+          {action.isPending ? tc("saving") : tcat("create_category")}
         </Button>
         <Button
           type="button"

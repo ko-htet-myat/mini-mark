@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deletePromotion } from "@/features/promotions/actions";
+import { deletePromotion } from "@/features/dashboard-promotions/actions";
 import { useShop } from "@/context/shop-context";
 import { useTranslations } from "next-intl";
 

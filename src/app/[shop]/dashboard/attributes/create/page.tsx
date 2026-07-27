@@ -1,4 +1,4 @@
-import { CreateAttributeForm } from "@/features/attributes/components/create-attribute-form";
+import { CreateAttributeForm } from "@/features/dashboard-attributes/components/forms/create-attribute-form";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function CreateAttributePage({

@@ -142,6 +142,7 @@
     "has_variants_description": "Enable if this product has multiple variants (e.g. size, color)",
     "variants": "Variants",
     "add_variant": "Add Variant",
+    "edit_variant": "Edit Variant",
     "no_variants": "No variants found.",
     "attributes": "Attributes",
     "variant_image": "Variant Image",

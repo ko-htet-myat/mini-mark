@@ -10,44 +10,36 @@ import { Delete02Icon, Add01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateAttributeSchema } from "../validations";
-import { updateAttribute } from "../actions";
+import { createAttributeSchema } from "../../validations";
+import { createAttribute } from "../../actions";
 import { useShop } from "@/context/shop-context";
 
-interface EditAttributeFormProps {
-  attribute: {
-    id: string;
-    name: string;
-    slug: string;
-    values: { id: string; value: string }[];
-  };
+interface AttributeFormProps {
+  shopId: string;
 }
 
-export function EditAttributeForm({ attribute }: EditAttributeFormProps) {
+export function CreateAttributeForm({ shopId }: AttributeFormProps) {
   const tc = useTranslations("Common");
   const ta = useTranslations("Attributes");
   const router = useRouter();
-  const { slug: shopSlug } = useShop();
+  const { slug } = useShop();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    updateAttribute.bind(null, { shop: shopSlug }),
-    zodResolver(updateAttributeSchema),
+    createAttribute.bind(null, { shop: slug }),
+    zodResolver(createAttributeSchema),
     {
       formProps: {
         defaultValues: {
-          id: attribute.id,
-          name: attribute.name,
-          slug: attribute.slug,
-          values:
-            attribute.values.length > 0
-              ? attribute.values.map((v) => v.value)
-              : [""],
+          shopId,
+          name: "",
+          slug: "",
+          values: [""],
         },
       },
       actionProps: {
         onSuccess: () => {
-          toast.success(ta("attribute_updated"));
-          router.push(`/${shopSlug}/dashboard/attributes`);
+          toast.success(ta("attribute_created"));
+          router.push(`/${slug}/dashboard/attributes`);
         },
       },
     },
@@ -167,12 +159,12 @@ export function EditAttributeForm({ attribute }: EditAttributeFormProps) {
 
       <div className="flex items-center gap-4 mt-2">
         <Button type="submit" disabled={action.isPending} className="w-fit">
-          {action.isPending ? tc("saving") : tc("save")}
+          {action.isPending ? tc("saving") : ta("create_attribute")}
         </Button>
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/${shopSlug}/dashboard/attributes`)}
+          onClick={() => router.push(`/${slug}/dashboard/attributes`)}
           disabled={action.isPending}
         >
           {tc("cancel")}

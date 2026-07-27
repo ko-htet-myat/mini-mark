@@ -15,40 +15,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTranslations } from "next-intl";
-import { createCategorySchema } from "../validations";
-import { createCategory } from "../actions";
+import { Switch } from "@/components/ui/switch";
+import { createPromotionSchema } from "../../validations";
+import { createPromotion } from "../../actions";
 import { useShop } from "@/context/shop-context";
-import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
+import { useTranslations } from "next-intl";
 
-interface ParentOption {
-  id: string;
-  name: string;
-  parentId?: string | null;
-  parent?: { name: string } | null;
-}
-
-interface CreateCategoryFormProps {
+interface PromotionFormProps {
   shopId: string;
-  /** Pre-selected parentId (from query param) */
-  defaultParentId?: string;
-  /** Available parent categories to pick from */
-  parentOptions: ParentOption[];
 }
 
-export function CreateCategoryForm({
-  shopId,
-  defaultParentId,
-  parentOptions,
-}: CreateCategoryFormProps) {
+export function CreatePromotionForm({ shopId }: PromotionFormProps) {
   const router = useRouter();
   const { slug } = useShop();
   const tc = useTranslations("Common");
-  const tcat = useTranslations("Categories");
+  const tp = useTranslations("Promotions");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    createCategory.bind(null, { shop: slug }),
-    zodResolver(createCategorySchema),
+    createPromotion.bind(null, { shop: slug }),
+    zodResolver(createPromotionSchema),
     {
       formProps: {
         defaultValues: {
@@ -56,17 +41,16 @@ export function CreateCategoryForm({
           name: "",
           slug: "",
           description: "",
-          imageUrl: "",
-          parentId: defaultParentId ?? "",
+          discountType: "PERCENTAGE",
+          discountValue: 0,
+          code: "",
+          isActive: true,
         },
       },
       actionProps: {
         onSuccess: () => {
-          toast.success(tcat("category_created"));
-          const parentId = form.getValues("parentId");
-          router.push(
-            `/${slug}/dashboard/categories${parentId ? `?parentId=${parentId}` : ""}`,
-          );
+          toast.success(tp("promotion_created"));
+          router.push(`/${slug}/dashboard/promotions`);
         },
       },
     },
@@ -89,35 +73,6 @@ export function CreateCategoryForm({
       onSubmit={handleSubmitWithAction}
       className="flex flex-col gap-5 max-w-lg"
     >
-      {parentOptions.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="parentId">{tcat("parent_category")}</Label>
-          <Select
-            value={form.watch("parentId") || "none"}
-            onValueChange={(v) =>
-              form.setValue("parentId", v === "none" ? "" : v)
-            }
-          >
-            <SelectTrigger id="parentId">
-              <SelectValue placeholder={tcat("select_parent")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">{tcat("none_root_category")}</SelectItem>
-              {parentOptions.map((opt) => (
-                <SelectItem key={opt.id} value={opt.id}>
-                  {opt.parent ? `${opt.parent.name} → ${opt.name}` : opt.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {form.formState.errors.parentId && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.parentId.message}
-            </p>
-          )}
-        </div>
-      )}
-
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">{tc("name")}</Label>
         <Input
@@ -151,15 +106,59 @@ export function CreateCategoryForm({
         )}
       </div>
 
-      <ImageUploadField
-        label={tcat("image_url")}
-        folder={`${slug}/categories/images`}
-        value={form.watch("imageUrl") ?? ""}
-        onUploaded={(asset) =>
-          form.setValue("imageUrl", asset.url, { shouldDirty: true })
-        }
-        onRemoved={() => form.setValue("imageUrl", "", { shouldDirty: true })}
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="discountType">{tp("discount_type")}</Label>
+          <Select
+            onValueChange={(v) =>
+              form.setValue("discountType", v as "PERCENTAGE" | "FIXED_AMOUNT")
+            }
+            defaultValue={form.getValues("discountType")}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={tp("select_type")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="PERCENTAGE">{tp("percentage")}</SelectItem>
+              <SelectItem value="FIXED_AMOUNT">{tp("fixed_amount")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="discountValue">{tp("discount_value")}</Label>
+          <Input
+            id="discountValue"
+            type="number"
+            step="0.01"
+            {...form.register("discountValue")}
+          />
+          {form.formState.errors.discountValue && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.discountValue.message}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="code">{tp("promo_code")}</Label>
+        <Input id="code" {...form.register("code")} />
+        {form.formState.errors.code && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.code.message}
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 mt-2">
+        <Switch
+          id="isActive"
+          checked={form.watch("isActive")}
+          onCheckedChange={(checked) => form.setValue("isActive", checked)}
+        />
+        <Label htmlFor="isActive">{tp("active")}</Label>
+      </div>
 
       {action.result.serverError && (
         <p className="text-sm text-destructive">{action.result.serverError}</p>
@@ -167,12 +166,12 @@ export function CreateCategoryForm({
 
       <div className="flex items-center gap-4 mt-2">
         <Button type="submit" disabled={action.isPending} className="w-fit">
-          {action.isPending ? tc("saving") : tcat("create_category")}
+          {action.isPending ? tc("saving") : tp("create_promotion")}
         </Button>
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/${slug}/dashboard/categories`)}
+          onClick={() => router.push(`/${slug}/dashboard/promotions`)}
           disabled={action.isPending}
         >
           {tc("cancel")}

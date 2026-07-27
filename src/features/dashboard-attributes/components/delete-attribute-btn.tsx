@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteAttribute } from "@/features/attributes/actions";
+import { deleteAttribute } from "@/features/dashboard-attributes/actions";
 import { useShop } from "@/context/shop-context";
 
 interface DeleteAttributeButtonProps {

@@ -1,5 +1,5 @@
-import { ProductDataTable } from "@/features/products/components/product-data-table";
-import { getProductsPage } from "@/features/products/data/product.queries";
+import { ProductDataTable } from "@/features/dashboard-products/components/tables/product-data-table";
+import { getProductsPage } from "@/features/dashboard-products/data/product.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 

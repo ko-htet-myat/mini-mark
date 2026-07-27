@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { getAttributeById } from "@/features/attributes/data/attribute.queries";
-import { EditAttributeForm } from "@/features/attributes/components/edit-attribute-form";
-import { DeleteAttributeButton } from "@/features/attributes/components/delete-attribute-btn";
+import { getAttributeById } from "@/features/dashboard-attributes/data/attribute.queries";
+import { EditAttributeForm } from "@/features/dashboard-attributes/components/forms/edit-attribute-form";
+import { DeleteAttributeButton } from "@/features/dashboard-attributes/components/delete-attribute-btn";
 
 export default async function EditAttributePage({
   params,

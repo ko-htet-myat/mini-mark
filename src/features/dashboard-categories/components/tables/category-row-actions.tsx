@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -17,23 +16,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteAction } from "@/hooks/use-delete-action";
-import { deleteAttribute } from "@/features/attributes/actions";
+import { deleteCategory } from "@/features/dashboard-categories/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
-interface AttributeRowActionsProps {
-  attributeId: string;
-  attributeName: string;
+interface CategoryRowActionsProps {
+  categoryId: string;
+  categoryName: string;
+  /** Current depth level: 1, 2, or 3 */
+  level: number;
 }
 
-export function AttributeRowActions({
-  attributeId,
-  attributeName,
-}: AttributeRowActionsProps) {
-  const tc = useTranslations("Common");
-  const ta = useTranslations("Attributes");
+export function CategoryRowActions({
+  categoryId,
+  categoryName,
+  level,
+}: CategoryRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
+  const tc = useTranslations("Common");
+  const tcat = useTranslations("Categories");
 
   const {
     confirmOpen,
@@ -42,9 +45,9 @@ export function AttributeRowActions({
     confirmDelete,
     openConfirm,
   } = useDeleteAction({
-    action: deleteAttribute.bind(null, { shop: slug }),
-    successMessage: ta("attribute_deleted"),
-    errorMessage: ta("failed_delete_attribute"),
+    action: deleteCategory.bind(null, { shop: slug }),
+    successMessage: tcat("category_deleted"),
+    errorMessage: tcat("failed_delete_category"),
   });
 
   return (
@@ -57,7 +60,7 @@ export function AttributeRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`attributes/${attributeId}/edit`}>
+            <Link href={`categories/${categoryId}/edit`}>
               {" "}
               <HugeiconsIcon
                 icon={Edit03Icon}
@@ -83,9 +86,9 @@ export function AttributeRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={tc("confirm_delete_title", { name: attributeName })}
-        description={ta("delete_attribute_confirm_desc")}
-        onConfirm={() => confirmDelete(attributeId)}
+        title={tc("confirm_delete_title", { name: categoryName })}
+        description={tcat("delete_category_confirm_desc")}
+        onConfirm={() => confirmDelete(categoryId)}
         isPending={isExecuting}
       />
     </>

@@ -5,25 +5,6 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-## Workflow: Spec-driven development
-
-For any non-trivial change (new feature, API change, schema change):
-
-1. Do NOT write implementation code until a spec exists.
-2. Create /specs/<date>-<short-name>/spec.md — get explicit human
-   approval before proceeding.
-3. Create plan.md in the same folder — get explicit human approval
-   before writing code.
-4. Break the plan into tasks.md — small, checkable, testable units.
-5. Implement one task at a time. Mark it done in tasks.md as you go.
-6. If reality diverges from the plan mid-implementation, stop and
-   update plan.md — don't silently improvise.
-
-Trivial changes (typos, config tweaks, dependency bumps) can skip
-this and go straight to implementation.
-
-Never mark a task complete without running its associated tests.
-
 ## Application Building Context
 
 Read the following files in order before implementing

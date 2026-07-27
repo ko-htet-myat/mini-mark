@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Delete02Icon,
@@ -16,24 +17,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteAction } from "@/hooks/use-delete-action";
-import { deletePromotion } from "@/features/promotions/actions";
+import { deleteProduct } from "@/features/dashboard-products/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
-import { useTranslations } from "next-intl";
 
-interface PromotionRowActionsProps {
-  promotionId: string;
-  promotionName: string;
+interface ProductRowActionsProps {
+  productId: string;
+  productName: string;
 }
 
-export function PromotionRowActions({
-  promotionId,
-  promotionName,
-}: PromotionRowActionsProps) {
+export function ProductRowActions({
+  productId,
+  productName,
+}: ProductRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
   const tc = useTranslations("Common");
-  const tp = useTranslations("Promotions");
 
   const {
     confirmOpen,
@@ -42,9 +41,9 @@ export function PromotionRowActions({
     confirmDelete,
     openConfirm,
   } = useDeleteAction({
-    action: deletePromotion.bind(null, { shop: slug }),
-    successMessage: tp("promotion_deleted"),
-    errorMessage: tp("failed_delete_promotion"),
+    action: deleteProduct.bind(null, { shop: slug }),
+    successMessage: "Product deleted",
+    errorMessage: "Failed to delete product",
   });
 
   return (
@@ -57,7 +56,7 @@ export function PromotionRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`promotions/${promotionId}/edit`}>
+            <Link href={`products/${productId}/edit`}>
               <HugeiconsIcon icon={Edit03Icon} size={16} className="mr-1" />
               {tc("edit")}
             </Link>
@@ -78,9 +77,9 @@ export function PromotionRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={tc("confirm_delete_title", { name: promotionName })}
-        description={tp("delete_promotion_confirm_desc")}
-        onConfirm={() => confirmDelete(promotionId)}
+        title={tc("confirm_delete_title", { name: productName })}
+        description="This will permanently delete the product."
+        onConfirm={() => confirmDelete(productId)}
         isPending={isExecuting}
       />
     </>

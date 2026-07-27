@@ -17,22 +17,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteAction } from "@/hooks/use-delete-action";
-import { deleteProduct } from "@/features/products/actions";
+import { deleteBrand } from "@/features/dashboard-brands/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
 
-interface ProductRowActionsProps {
-  productId: string;
-  productName: string;
+interface BrandRowActionsProps {
+  brandId: string;
+  brandName: string;
 }
 
-export function ProductRowActions({
-  productId,
-  productName,
-}: ProductRowActionsProps) {
+export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
   const tc = useTranslations("Common");
+  const tb = useTranslations("Brands");
 
   const {
     confirmOpen,
@@ -41,9 +39,9 @@ export function ProductRowActions({
     confirmDelete,
     openConfirm,
   } = useDeleteAction({
-    action: deleteProduct.bind(null, { shop: slug }),
-    successMessage: "Product deleted",
-    errorMessage: "Failed to delete product",
+    action: deleteBrand.bind(null, { shop: slug }),
+    successMessage: tb("brand_deleted"),
+    errorMessage: tb("failed_delete_brand"),
   });
 
   return (
@@ -56,8 +54,13 @@ export function ProductRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`products/${productId}/edit`}>
-              <HugeiconsIcon icon={Edit03Icon} size={16} className="mr-1" />
+            <Link href={`brands/${brandId}/edit`}>
+              {" "}
+              <HugeiconsIcon
+                icon={Edit03Icon}
+                size={16}
+                className="mr-1"
+              />{" "}
               {tc("edit")}
             </Link>
           </DropdownMenuItem>
@@ -77,9 +80,9 @@ export function ProductRowActions({
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={tc("confirm_delete_title", { name: productName })}
-        description="This will permanently delete the product."
-        onConfirm={() => confirmDelete(productId)}
+        title={tc("confirm_delete_title", { name: brandName })}
+        description={tb("delete_brand_confirm_desc")}
+        onConfirm={() => confirmDelete(brandId)}
         isPending={isExecuting}
       />
     </>

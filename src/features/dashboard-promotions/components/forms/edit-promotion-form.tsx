@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { updatePromotionSchema } from "../validations";
-import { updatePromotion } from "../actions";
+import { updatePromotionSchema } from "../../validations";
+import { updatePromotion } from "../../actions";
 import { useShop } from "@/context/shop-context";
 import { useTranslations } from "next-intl";
 

@@ -1,5 +1,5 @@
-import { BrandDataTable } from "@/features/brands/components/brand-data-table";
-import { getBrandsPage } from "@/features/brands/data/brand.queries";
+import { BrandDataTable } from "@/features/dashboard-brands/components/tables/brand-data-table";
+import { getBrandsPage } from "@/features/dashboard-brands/data/brand.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 

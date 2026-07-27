@@ -9,42 +9,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { BrandFormValues, updateBrandSchema } from "../validations";
-import { updateBrand } from "../actions";
+import { createBrandSchema } from "../../validations";
+import { createBrand } from "../../actions";
 import { useShop } from "@/context/shop-context";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
 interface BrandFormProps {
-  brand?: { id: string } & BrandFormValues;
+  shopId: string;
 }
 
-export function UpdateBrandForm({ brand }: BrandFormProps) {
+export function CreateBrandForm({ shopId }: BrandFormProps) {
   const router = useRouter();
   const { slug } = useShop();
   const tc = useTranslations("Common");
   const tb = useTranslations("Brands");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    updateBrand.bind(null, { shop: slug }),
-    zodResolver(updateBrandSchema),
+    createBrand.bind(null, { shop: slug }),
+    zodResolver(createBrandSchema),
     {
       formProps: {
         defaultValues: {
-          id: brand?.id,
-          name: brand?.name ?? "",
-          slug: brand?.slug ?? "",
-          description: brand?.description ?? "",
-          logoUrl: brand?.logoUrl ?? "",
+          shopId,
+          name: "",
+          slug: "",
+          description: "",
+          logoUrl: "",
         },
       },
       actionProps: {
         onSuccess: () => {
-          toast.success(tb("brand_updated"));
+          toast.success(tb("brand_created"));
           router.push(`/${slug}/dashboard/brands`);
         },
       },
     },
   );
+
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    form.setValue(
+      "slug",
+      e.target.value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-"),
+    );
+  }
 
   return (
     <form
@@ -53,7 +65,10 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
     >
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">{tc("name")}</Label>
-        <Input id="name" {...form.register("name")} />
+        <Input
+          id="name"
+          {...form.register("name", { onChange: handleNameChange })}
+        />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
             {form.formState.errors.name.message}
@@ -97,7 +112,7 @@ export function UpdateBrandForm({ brand }: BrandFormProps) {
 
       <div className="flex items-center gap-4 mt-2">
         <Button type="submit" disabled={action.isPending} className="w-fit">
-          {action.isPending ? tc("saving") : tc("save")}
+          {action.isPending ? tc("saving") : tb("create_brand")}
         </Button>
         <Button
           type="button"

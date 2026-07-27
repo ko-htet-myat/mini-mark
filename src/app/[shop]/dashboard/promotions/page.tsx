@@ -1,5 +1,5 @@
-import { PromotionDataTable } from "@/features/promotions/components/promotion-data-table";
-import { getPromotionsPage } from "@/features/promotions/data/promotion.queries";
+import { PromotionDataTable } from "@/features/dashboard-promotions/components/tables/promotion-data-table";
+import { getPromotionsPage } from "@/features/dashboard-promotions/data/promotion.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 

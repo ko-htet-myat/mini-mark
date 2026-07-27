@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { UpdateCategoryForm } from "@/features/categories/components/edit-category-form";
-import { DeleteCategoryButton } from "@/features/categories/components/delete-category-btn";
-import { getAllPotentialParents } from "@/features/categories/data/categories.queries";
+import { UpdateCategoryForm } from "@/features/dashboard-categories/components/forms/edit-category-form";
+import { DeleteCategoryButton } from "@/features/dashboard-categories/components/delete-category-btn";
+import { getAllPotentialParents } from "@/features/dashboard-categories/data/categories.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function EditCategoryPage({

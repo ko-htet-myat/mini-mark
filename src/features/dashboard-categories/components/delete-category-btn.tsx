@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteCategory } from "@/features/categories/actions";
+import { deleteCategory } from "@/features/dashboard-categories/actions";
 import { useShop } from "@/context/shop-context";
 import { useTranslations } from "next-intl";
 

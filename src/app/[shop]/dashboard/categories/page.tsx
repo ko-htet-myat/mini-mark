@@ -1,8 +1,8 @@
-import { CategoryDataTable } from "@/features/categories/components/category-data-table";
+import { CategoryDataTable } from "@/features/dashboard-categories/components/tables/category-data-table";
 import {
   getCategoriesPage,
   getCategoryBreadcrumb,
-} from "@/features/categories/data/categories.queries";
+} from "@/features/dashboard-categories/data/categories.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { parsePagination } from "@/lib/parse-pagination";
 

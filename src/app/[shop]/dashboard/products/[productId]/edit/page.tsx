@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import { EditProductForm } from "@/features/products/components/edit-product-form";
+import { EditProductForm } from "@/features/dashboard-products/components/forms/edit-product-form";
 import {
   getProductById,
   getShopProductFormData,
-} from "@/features/products/data/product.queries";
+} from "@/features/dashboard-products/data/product.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 interface EditProductPageProps {

@@ -1,4 +1,4 @@
-import { CreatePromotionForm } from "@/features/promotions/components/create-promotion-form";
+import { CreatePromotionForm } from "@/features/dashboard-promotions/components/forms/create-promotion-form";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function CreatePromotionPage({

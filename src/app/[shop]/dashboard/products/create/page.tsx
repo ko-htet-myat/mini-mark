@@ -1,5 +1,5 @@
-import { CreateProductForm } from "@/features/products/components/create-product-form";
-import { getShopProductFormData } from "@/features/products/data/product.queries";
+import { CreateProductForm } from "@/features/dashboard-products/components/forms/create-product-form";
+import { getShopProductFormData } from "@/features/dashboard-products/data/product.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 interface CreateProductPageProps {

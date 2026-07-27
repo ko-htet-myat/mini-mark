@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Delete02Icon,
@@ -17,20 +16,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteAction } from "@/hooks/use-delete-action";
-import { deleteBrand } from "@/features/brands/actions";
+import { deletePromotion } from "@/features/dashboard-promotions/actions";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { useShop } from "@/context/shop-context";
+import { useTranslations } from "next-intl";
 
-interface BrandRowActionsProps {
-  brandId: string;
-  brandName: string;
+interface PromotionRowActionsProps {
+  promotionId: string;
+  promotionName: string;
 }
 
-export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
+export function PromotionRowActions({
+  promotionId,
+  promotionName,
+}: PromotionRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();
   const tc = useTranslations("Common");
-  const tb = useTranslations("Brands");
+  const tp = useTranslations("Promotions");
 
   const {
     confirmOpen,
@@ -39,9 +42,9 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
     confirmDelete,
     openConfirm,
   } = useDeleteAction({
-    action: deleteBrand.bind(null, { shop: slug }),
-    successMessage: tb("brand_deleted"),
-    errorMessage: tb("failed_delete_brand"),
+    action: deletePromotion.bind(null, { shop: slug }),
+    successMessage: tp("promotion_deleted"),
+    errorMessage: tp("failed_delete_promotion"),
   });
 
   return (
@@ -54,13 +57,8 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`brands/${brandId}/edit`}>
-              {" "}
-              <HugeiconsIcon
-                icon={Edit03Icon}
-                size={16}
-                className="mr-1"
-              />{" "}
+            <Link href={`promotions/${promotionId}/edit`}>
+              <HugeiconsIcon icon={Edit03Icon} size={16} className="mr-1" />
               {tc("edit")}
             </Link>
           </DropdownMenuItem>
@@ -80,9 +78,9 @@ export function BrandRowActions({ brandId, brandName }: BrandRowActionsProps) {
       <ConfirmDeleteDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={tc("confirm_delete_title", { name: brandName })}
-        description={tb("delete_brand_confirm_desc")}
-        onConfirm={() => confirmDelete(brandId)}
+        title={tc("confirm_delete_title", { name: promotionName })}
+        description={tp("delete_promotion_confirm_desc")}
+        onConfirm={() => confirmDelete(promotionId)}
         isPending={isExecuting}
       />
     </>
