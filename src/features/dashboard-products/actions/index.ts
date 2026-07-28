@@ -12,6 +12,19 @@ import {
 } from "../validations";
 import prisma from "@/lib/prisma";
 
+const serializeDecimal = (value: Prisma.Decimal | null): number | null =>
+  value != null ? Number(value) : null;
+
+const serializeProduct = <
+  T extends { price: Prisma.Decimal; compareAtPrice: Prisma.Decimal | null },
+>(
+  product: T,
+) => ({
+  ...product,
+  price: Number(product.price),
+  compareAtPrice: serializeDecimal(product.compareAtPrice),
+});
+
 export const createProduct = shopOwnerActionClient
   .inputSchema(createProductSchema)
   .action(async ({ parsedInput, ctx }) => {
@@ -60,15 +73,7 @@ export const createProduct = shopOwnerActionClient
       });
 
       revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-      return {
-        product: {
-          ...product,
-          price: Number(product.price),
-          compareAtPrice: product.compareAtPrice
-            ? Number(product.compareAtPrice)
-            : null,
-        },
-      };
+      return { product: serializeProduct(product) };
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -136,15 +141,7 @@ export const updateProduct = shopOwnerActionClient
 
       revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
       revalidatePath(`/${ctx.shop.slug}/dashboard/products/${id}/edit`);
-      return {
-        product: {
-          ...updated,
-          price: Number(updated.price),
-          compareAtPrice: updated.compareAtPrice
-            ? Number(updated.compareAtPrice)
-            : null,
-        },
-      };
+      return { product: serializeProduct(updated) };
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
@@ -161,30 +158,42 @@ export const updateProduct = shopOwnerActionClient
 export const deleteProduct = shopOwnerActionClient
   .inputSchema(deleteProductSchema)
   .action(async ({ parsedInput, ctx }) => {
-    await prisma.product.delete({
-      where: { id: parsedInput.id, shopId: ctx.shop.id },
-    });
-    revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-    return { success: true };
+    try {
+      await prisma.product.delete({
+        where: { id: parsedInput.id, shopId: ctx.shop.id },
+      });
+      revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
+      return { success: true };
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2025"
+      ) {
+        throw new Error("Product not found.");
+      }
+      throw err;
+    }
   });
 
 export const toggleProductStatus = shopOwnerActionClient
   .inputSchema(toggleProductStatusSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const updated = await prisma.product.update({
-      where: { id: parsedInput.id, shopId: ctx.shop.id },
-      data: { isActive: parsedInput.isActive },
-    });
-    revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-    return {
-      product: {
-        ...updated,
-        price: Number(updated.price),
-        compareAtPrice: updated.compareAtPrice
-          ? Number(updated.compareAtPrice)
-          : null,
-      },
-    };
+    try {
+      const updated = await prisma.product.update({
+        where: { id: parsedInput.id, shopId: ctx.shop.id },
+        data: { isActive: parsedInput.isActive },
+      });
+      revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
+      return { product: serializeProduct(updated) };
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2025"
+      ) {
+        throw new Error("Product not found.");
+      }
+      throw err;
+    }
   });
 
 export const duplicateProduct = shopOwnerActionClient
