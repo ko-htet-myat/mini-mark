@@ -1,20 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { FileSpreadsheetIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
 
 export interface ProductListFilters {
   name?: string;
   categoryId?: string;
   brandId?: string;
-  status?: "all" | "active" | "inactive";
+  status?: "all" | "active" | "draft";
   from?: string;
   to?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 interface ExportProductsButtonProps {
   shopSlug: string;
-  /** Pass the same filter state your product list/table is currently using. */
   filters?: ProductListFilters;
 }
 
@@ -23,10 +29,14 @@ function buildQueryString(filters: ProductListFilters = {}) {
   if (filters.name) params.set("name", filters.name);
   if (filters.categoryId) params.set("categoryId", filters.categoryId);
   if (filters.brandId) params.set("brandId", filters.brandId);
-  if (filters.status && filters.status !== "all")
+  if (filters.status && filters.status !== "all") {
     params.set("status", filters.status);
+  }
   if (filters.from) params.set("dateFrom", filters.from);
   if (filters.to) params.set("dateTo", filters.to);
+  if (filters.page !== undefined) params.set("page", String(filters.page));
+  if (filters.pageSize !== undefined)
+    params.set("pageSize", String(filters.pageSize));
   return params.toString();
 }
 
@@ -35,13 +45,16 @@ export function ExportProductsButton({
   filters,
 }: ExportProductsButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const t = useTranslations("Products");
 
   async function handleExport() {
     setIsExporting(true);
     try {
-      const qs = buildQueryString(filters);
-      const url = `/${shopSlug}/dashboard/products/export${qs ? `?${qs}` : ""}`;
-      const res = await fetch(url);
+      const params = buildQueryString(filters);
+      const url = `/api/exports/product?shop=${encodeURIComponent(shopSlug)}${
+        params ? `&${params}` : ""
+      }`;
+      const res = await fetch(url, { cache: "no-store" });
 
       if (!res.ok) {
         throw new Error("Export failed");
@@ -62,35 +75,23 @@ export function ExportProductsButton({
       link.remove();
       URL.revokeObjectURL(objectUrl);
     } catch {
-      toast.error("Couldn't export products. Please try again.");
+      toast.error(t("export_products_error"));
     } finally {
       setIsExporting(false);
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleExport}
-      disabled={isExporting}
-      className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium
-                 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-4 w-4"
+    <div className="flex items-center gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleExport}
+        disabled={isExporting}
       >
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="7 10 12 15 17 10" />
-        <line x1="12" y1="15" x2="12" y2="3" />
-      </svg>
-      {isExporting ? "Exporting…" : "Export to Excel"}
-    </button>
+        <HugeiconsIcon icon={FileSpreadsheetIcon} size={16} />
+        {t("export_products")}
+      </Button>
+    </div>
   );
 }

@@ -109,7 +109,8 @@
     "serial": "#",
     "logo": "လိုဂို",
     "banner": "ဘန်နာ",
-    "image": "ပုံ"
+    "image": "ပုံ",
+    "clear": "Clear"
   },
   "Products": {
     "section_basic_info": "အခြေခံအချက်အလက်",
@@ -149,7 +150,10 @@
     "optional": "ချန်လှပ်ထားနိုင်သည်",
     "remove": "ဖယ်ရှားမည်",
     "variant": "မျိုးကွဲ",
-    "variant_dialog_description": "ဤမျိုးကွဲအတွက် ထူးခြားသော SKU၊ စျေးနှုန်း၊ စတော့နှင့် အင်္ဂါရပ်ရွေးချယ်မှုများကို သတ်မှတ်ပါ။"
+    "variant_dialog_description": "ဤမျိုးကွဲအတွက် ထူးခြားသော SKU၊ စျေးနှုန်း၊ စတော့နှင့် အင်္ဂါရပ်ရွေးချယ်မှုများကို သတ်မှတ်ပါ။",
+    "export_products": "Export to Excel",
+    "exporting_products": "Exporting...",
+    "export_products_error": "Couldn't export products. Please try again."
   },
   "NotFound": {
     "page_not_found": "စာမျက်နှာမတွေ့ပါ",

@@ -1,9 +1,8 @@
 import ExcelJS from "exceljs";
 import type { PassThrough } from "node:stream";
 
-// Adjust to your actual generated Prisma client path.
-import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 
 const BATCH_SIZE = 1000;
 
@@ -11,16 +10,17 @@ export interface ProductExportFilters {
   name?: string;
   categoryId?: string;
   brandId?: string;
-  /** "all" (default) | "active" | "inactive" — mirrors the list's status filter */
-  status?: "all" | "active" | "inactive";
-  /** ISO date strings, inclusive, matching the list's date-range filter */
+  status?: "all" | "active" | "draft";
   dateFrom?: string;
   dateTo?: string;
+  limit?: number;
+  page?: number;
+  pageSize?: number;
 }
 
 const COLUMNS: Partial<ExcelJS.Column>[] = [
   { header: "Name", key: "name", width: 32 },
-  { header: "SKU", key: "sku", width: 16 },
+  { header: "SKU", key: "sku", width: 24 },
   { header: "Slug", key: "slug", width: 24 },
   { header: "Category", key: "category", width: 20 },
   { header: "Brand", key: "brand", width: 20 },
@@ -28,16 +28,16 @@ const COLUMNS: Partial<ExcelJS.Column>[] = [
     header: "Price",
     key: "price",
     width: 14,
-    style: { numFmt: '"$"#,##0.00' },
+    style: { numFmt: "#,##0.00" },
   },
   {
     header: "Compare-at Price",
     key: "compareAtPrice",
     width: 18,
-    style: { numFmt: '"$"#,##0.00' },
+    style: { numFmt: "#,##0.00" },
   },
   { header: "Stock", key: "stock", width: 10 },
-  { header: "Active", key: "isActive", width: 10 },
+  { header: "Status", key: "status", width: 10 },
   {
     header: "Created At",
     key: "createdAt",
@@ -46,7 +46,6 @@ const COLUMNS: Partial<ExcelJS.Column>[] = [
   },
 ];
 
-/** Turns the export filter params into a Prisma where clause, scoped to the shop. */
 function buildWhere(
   shopId: string,
   filters: ProductExportFilters,
@@ -64,13 +63,12 @@ function buildWhere(
   }
   if (filters.status === "active") {
     where.isActive = true;
-  } else if (filters.status === "inactive") {
+  } else if (filters.status === "draft") {
     where.isActive = false;
   }
   if (filters.dateFrom || filters.dateTo) {
     where.createdAt = {
       ...(filters.dateFrom ? { gte: new Date(filters.dateFrom) } : {}),
-      // include the whole "to" day
       ...(filters.dateTo
         ? { lte: new Date(`${filters.dateTo}T23:59:59.999Z`) }
         : {}),
@@ -80,11 +78,19 @@ function buildWhere(
   return where;
 }
 
-/**
- * Streams a filtered products workbook for `shopId` directly into `output`.
- * Applies the same filters as the dashboard product list so the export
- * always matches what the user is currently looking at.
- */
+function getVariantSkuSummary(
+  variants: { sku: string | null }[],
+): string | null {
+  const skus = variants.map((variant) => variant.sku).filter(Boolean);
+  return skus.length > 0 ? skus.join(", ") : null;
+}
+
+function getAggregateStock(variants: { stock: number; isActive: boolean }[]) {
+  return variants
+    .filter((variant) => variant.isActive)
+    .reduce((sum, variant) => sum + variant.stock, 0);
+}
+
 export async function streamProductsWorkbook(
   shopId: string,
   output: PassThrough,
@@ -111,37 +117,41 @@ export async function streamProductsWorkbook(
   };
   headerRow.commit();
 
-  let cursor: string | undefined;
-  let rowNumber = 1; // header already written
+  let rowNumber = 1;
   let totalRows = 0;
+  const remaining = filters.limit ?? Infinity;
 
-  while (true) {
+  const isPaginated =
+    filters.page !== undefined && filters.pageSize !== undefined;
+
+  if (isPaginated) {
     const batch = await prisma.product.findMany({
       where,
-      take: BATCH_SIZE,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-      orderBy: { id: "asc" }, // stable order required for cursor pagination
+      skip: filters.page! * filters.pageSize!,
+      take: Math.min(filters.pageSize!, remaining),
+      orderBy: { createdAt: "desc" },
       include: {
         brand: { select: { name: true } },
         category: { select: { name: true } },
+        variants: { select: { sku: true, stock: true, isActive: true } },
       },
     });
-
-    if (batch.length === 0) break;
 
     for (const product of batch) {
       rowNumber++;
       const row = sheet.getRow(rowNumber);
       row.values = {
         name: product.name,
+        sku: getVariantSkuSummary(product.variants),
         slug: product.slug,
-        category: product.category?.name ?? "—",
-        brand: product.brand?.name ?? "—",
+        category: product.category?.name ?? "-",
+        brand: product.brand?.name ?? "-",
         price: Number(product.price),
         compareAtPrice: product.compareAtPrice
           ? Number(product.compareAtPrice)
           : null,
-        isActive: product.isActive ? "Yes" : "No",
+        stock: getAggregateStock(product.variants),
+        status: product.isActive ? "Active" : "Draft",
         createdAt: product.createdAt,
       };
       if (rowNumber % 2 === 0) {
@@ -154,9 +164,56 @@ export async function streamProductsWorkbook(
       row.commit();
     }
 
-    totalRows += batch.length;
-    cursor = batch[batch.length - 1].id;
-    if (batch.length < BATCH_SIZE) break; // last page
+    totalRows = batch.length;
+  } else {
+    let cursor: string | undefined;
+
+    while (totalRows < remaining) {
+      const batch = await prisma.product.findMany({
+        where,
+        take: Math.min(BATCH_SIZE, remaining - totalRows),
+        ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+        orderBy: { id: "asc" },
+        include: {
+          brand: { select: { name: true } },
+          category: { select: { name: true } },
+          variants: { select: { sku: true, stock: true, isActive: true } },
+        },
+      });
+
+      if (batch.length === 0) break;
+
+      for (const product of batch) {
+        rowNumber++;
+        const row = sheet.getRow(rowNumber);
+        row.values = {
+          name: product.name,
+          sku: getVariantSkuSummary(product.variants),
+          slug: product.slug,
+          category: product.category?.name ?? "-",
+          brand: product.brand?.name ?? "-",
+          price: Number(product.price),
+          compareAtPrice: product.compareAtPrice
+            ? Number(product.compareAtPrice)
+            : null,
+          stock: getAggregateStock(product.variants),
+          status: product.isActive ? "Active" : "Draft",
+          createdAt: product.createdAt,
+        };
+        if (rowNumber % 2 === 0) {
+          row.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFF9FAFB" },
+          };
+        }
+        row.commit();
+      }
+
+      totalRows += batch.length;
+      cursor = batch[batch.length - 1].id;
+      if (batch.length < BATCH_SIZE || totalRows >= remaining) break;
+    }
   }
 
   sheet.autoFilter = {
@@ -164,7 +221,6 @@ export async function streamProductsWorkbook(
     to: { row: 1, column: COLUMNS.length },
   };
 
-  // If filters produced zero rows, leave a friendly note rather than a blank sheet.
   if (totalRows === 0) {
     const emptyRow = sheet.getRow(2);
     emptyRow.getCell(1).value = "No products match the current filters.";

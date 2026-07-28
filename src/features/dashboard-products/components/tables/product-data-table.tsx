@@ -16,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -37,6 +36,10 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { ProductTableFilter } from "./product-table-filter";
+import {
+  ExportProductsButton,
+  type ProductListFilters,
+} from "../excel-export-btn";
 
 interface ProductDataTableProps {
   data: ProductRow[];
@@ -48,6 +51,7 @@ interface ProductDataTableProps {
   categories?: { id: string; name: string }[];
   statusFilter?: string;
   categoryIdFilter?: string;
+  brandIdFilter?: string;
   fromFilter?: string;
   toFilter?: string;
 }
@@ -62,6 +66,7 @@ export function ProductDataTable({
   categories = [],
   statusFilter,
   categoryIdFilter,
+  brandIdFilter,
   fromFilter,
   toFilter,
 }: ProductDataTableProps) {
@@ -89,6 +94,32 @@ export function ProductDataTable({
     [pathname, router, searchParams],
   );
 
+  const exportFilters = useMemo<ProductListFilters>(
+    () => ({
+      name: nameFilter || undefined,
+      categoryId: categoryIdFilter,
+      brandId: brandIdFilter,
+      status:
+        statusFilter === "active" || statusFilter === "draft"
+          ? statusFilter
+          : "all",
+      from: fromFilter,
+      to: toFilter,
+      page,
+      pageSize,
+    }),
+    [
+      brandIdFilter,
+      categoryIdFilter,
+      fromFilter,
+      nameFilter,
+      statusFilter,
+      toFilter,
+      page,
+      pageSize,
+    ],
+  );
+
   const columns = useMemo(
     () =>
       getProductColumns({
@@ -107,8 +138,8 @@ export function ProductDataTable({
           in_stock: tp("in_stock"),
           out_of_stock: tp("out_of_stock"),
           low_stock: tp("low_stock"),
-          variants: "Variants",
-          active: "Active",
+          variants: tp("variants"),
+          active: tp("is_active"),
           actions: "Actions",
         },
       }),
@@ -135,7 +166,7 @@ export function ProductDataTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-4 mb-4">
+      <div className="mb-4 flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <InputGroup className="max-w-sm">
             <InputGroupAddon>
@@ -177,10 +208,15 @@ export function ProductDataTable({
                   });
                 }}
               >
-                <HugeiconsIcon icon={FilterIcon} size={16} className="mr-2" />
-                Clear
+                <HugeiconsIcon icon={FilterIcon} size={16} className="" />
+                {tc("clear")}
               </Button>
             )}
+
+            <ExportProductsButton
+              shopSlug={shop.slug}
+              filters={exportFilters}
+            />
 
             <Button asChild>
               <Link href="products/create">{tp("create_product")}</Link>
@@ -191,7 +227,7 @@ export function ProductDataTable({
 
       <div
         className={`rounded-md border transition-opacity ${
-          isPending ? "opacity-60 pointer-events-none" : "opacity-100"
+          isPending ? "pointer-events-none opacity-60" : "opacity-100"
         }`}
       >
         <Table>
@@ -228,7 +264,7 @@ export function ProductDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No products found.
+                  {tc("no_results")}
                 </TableCell>
               </TableRow>
             )}

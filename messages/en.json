@@ -110,7 +110,8 @@
     "serial": "#",
     "logo": "Logo",
     "banner": "Banner",
-    "image": "Image"
+    "image": "Image",
+    "clear": "Clear"
   },
   "Products": {
     "section_basic_info": "Basic Information",
@@ -151,7 +152,10 @@
     "optional": "Optional",
     "remove": "Remove",
     "variant": "Variant",
-    "variant_dialog_description": "Configure this variant's unique SKU, price, stock, and attribute options."
+    "variant_dialog_description": "Configure this variant's unique SKU, price, stock, and attribute options.",
+    "export_products": "Export to Excel",
+    "exporting_products": "Exporting...",
+    "export_products_error": "Couldn't export products. Please try again."
   },
   "NotFound": {
     "page_not_found": "Page Not Found",

@@ -2,34 +2,40 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { PassThrough, Readable } from "node:stream";
 
-// Adjust these two imports to match your actual project paths.
+import { streamProductsWorkbook } from "@/features/dashboard-products/data/products-workbook-stream";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  ProductExportFilters,
-  streamProductsWorkbook,
-} from "@/features/dashboard-products/data/products-workbook-stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+import type { ProductExportFilters } from "@/features/dashboard-products/data/products-workbook-stream";
+
 function parseFilters(searchParams: URLSearchParams): ProductExportFilters {
   const status = searchParams.get("status");
+  const pageRaw = searchParams.get("page");
+  const pageSizeRaw = searchParams.get("pageSize");
+  const page = pageRaw ? Number(pageRaw) : undefined;
+  const pageSize = pageSizeRaw ? Number(pageSizeRaw) : undefined;
   return {
     name: searchParams.get("name") ?? undefined,
     categoryId: searchParams.get("categoryId") ?? undefined,
     brandId: searchParams.get("brandId") ?? undefined,
-    status: status === "active" || status === "inactive" ? status : "all",
+    status:
+      status === "active" || status === "draft" ? status : ("all" as const),
     dateFrom: searchParams.get("dateFrom") ?? undefined,
     dateTo: searchParams.get("dateTo") ?? undefined,
+    page: page !== undefined && page >= 0 ? page : undefined,
+    pageSize: pageSize && pageSize > 0 ? pageSize : undefined,
   };
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ shop: string }> },
-) {
-  const { shop: shopSlug } = await params;
+export async function GET(req: NextRequest) {
+  const shopSlug = req.nextUrl.searchParams.get("shop");
+
+  if (!shopSlug) {
+    return NextResponse.json({ error: "Shop is required" }, { status: 400 });
+  }
 
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
@@ -44,6 +50,7 @@ export async function GET(
   if (!shop) {
     return NextResponse.json({ error: "Shop not found" }, { status: 404 });
   }
+
   if (shop.ownerId !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

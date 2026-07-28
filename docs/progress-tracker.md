@@ -102,7 +102,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 - [ ] Admin dashboard (user management, shop oversight)
 - [ ] Password reset flow
-- [ ] Export to Excel (exceljs installed, not wired up)
+- [x] Product list Excel export (filtered dashboard export via exceljs)
 - [ ] AI features (ai SDK v7 installed, not integrated)
 
 ---
@@ -122,6 +122,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 | Date       | Change                                                                                                                      |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-28 | Added filtered Excel export to the dashboard product list table                                                             |
 | 2026-07-28 | Fixed production build type error in action test setup by aligning the mock Better Auth user with the installed `User` type |
 | 2026-07-28 | Fixed ESLint errors in action tests by replacing CommonJS mock imports and explicit `any` types; verified action tests pass |
 | 2026-07-22 | Initial `docs/` folder created with all 6 context files                                                                     |

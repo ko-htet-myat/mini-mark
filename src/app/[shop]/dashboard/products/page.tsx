@@ -68,10 +68,12 @@ export default async function DashboardProductsPage({
         pageCount={pageCount}
         total={total}
         page={page}
+        pageSize={pageSize}
         nameFilter={nameFilter}
         categories={formData.categories}
         statusFilter={statusFilter}
         categoryIdFilter={categoryId}
+        brandIdFilter={brandId}
         fromFilter={sp.from}
         toFilter={sp.to}
       />
