@@ -81,7 +81,7 @@ export function ProductRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`products/${productId}/edit`}>
+            <Link href={`/${slug}/dashboard/products/${productId}/edit`}>
               <HugeiconsIcon icon={Edit03Icon} size={16} className="mr-1" />
               {tc("edit")}
             </Link>

@@ -64,7 +64,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 - [x] Shop home page (`/{shop}`)
 - [x] Product listing
-- [x] Product detail page (`/{shop}/products/{productId}`)
+- [x] Product detail page (`/{shop}/products/{productId}`) — rewired to current schema (variants + attribute values), fixed type and data query
 - [x] Public footer (i18n-aware)
 
 ---
@@ -120,12 +120,13 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 ## Recent Changes
 
-| Date       | Change                                                                                                                      |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-28 | Added filtered Excel export to the dashboard product list table                                                             |
-| 2026-07-28 | Fixed production build type error in action test setup by aligning the mock Better Auth user with the installed `User` type |
-| 2026-07-28 | Fixed ESLint errors in action tests by replacing CommonJS mock imports and explicit `any` types; verified action tests pass |
-| 2026-07-22 | Initial `docs/` folder created with all 6 context files                                                                     |
-| �          | Products, categories, brands, attributes, promotions CRUD implemented                                                       |
-| �          | Subscription schema designed and migrated                                                                                   |
-| �          | Public storefront scaffolded                                                                                                |
+| Date       | Change                                                                                                                                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-28 | Added filtered Excel export to the dashboard product list table                                                                                                                                                                           |
+| 2026-07-28 | Fixed production build type error in action test setup by aligning the mock Better Auth user with the installed `User` type                                                                                                               |
+| 2026-07-28 | Fixed ESLint errors in action tests by replacing CommonJS mock imports and explicit `any` types; verified action tests pass                                                                                                               |
+| 2026-07-28 | Fixed public product detail page: updated `ProductDetailData` type, rewrote `getProductDetail` query to use variants with ProductVariantAttributeValue instead of old direct attributeValues, fixed purchase panel to use new type schema |
+| 2026-07-22 | Initial `docs/` folder created with all 6 context files                                                                                                                                                                                   |
+| �          | Products, categories, brands, attributes, promotions CRUD implemented                                                                                                                                                                     |
+| �          | Subscription schema designed and migrated                                                                                                                                                                                                 |
+| �          | Public storefront scaffolded                                                                                                                                                                                                              |
