@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import type { ProductDetailData, ProductAttributeGroup } from "../types";
+import type {
+  ProductDetailData,
+  ProductAttributeGroup,
+  ProductVariantItem,
+} from "../types";
 
 interface GetProductDetailParams {
   shopSlug: string;
@@ -33,6 +37,37 @@ export async function getProductDetail({
   });
 
   if (!product) return null;
+
+  const now = new Date();
+  const activePromotions = await prisma.promotion.findMany({
+    where: {
+      shop: { slug: shopSlug },
+      isActive: true,
+      OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+      AND: [
+        { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+        {
+          OR: [
+            { products: { some: { id: productId } } },
+            ...(product.categoryId
+              ? [{ categories: { some: { id: product.categoryId } } }]
+              : []),
+            ...(product.brandId
+              ? [{ brands: { some: { id: product.brandId } } }]
+              : []),
+          ],
+        },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      discountType: true,
+      discountValue: true,
+      slug: true,
+    },
+  });
 
   const activeVariants = product.variants;
 
@@ -70,11 +105,23 @@ export async function getProductDetail({
     }
   }
 
+  const variants: ProductVariantItem[] = activeVariants.map((v) => ({
+    id: v.id,
+    sku: v.sku,
+    price: v.price ? Number(v.price) : null,
+    compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+    stock: v.stock,
+    status: v.status,
+    imageUrl: v.imageUrl,
+    attributeValueIds: v.attributeValues.map((av) => av.attributeValue.id),
+  }));
+
   return {
     id: product.id,
     name: product.name,
     slug: product.slug,
     description: product.description,
+    youtubeUrl: product.youtubeUrl,
     price: Number(product.price),
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
@@ -84,11 +131,14 @@ export async function getProductDetail({
     isActive: product.isActive,
     hasVariants: product.hasVariants,
     stock,
+    createdAt: product.createdAt.toISOString(),
     brand: product.brand
       ? {
           id: product.brand.id,
           name: product.brand.name,
           slug: product.brand.slug,
+          description: product.brand.description,
+          logoUrl: product.brand.logoUrl,
         }
       : null,
     category: product.category
@@ -106,5 +156,14 @@ export async function getProductDetail({
         }
       : null,
     attributeGroups: Array.from(groupsByAttributeId.values()),
+    variants,
+    promotions: activePromotions.map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      discountType: p.discountType,
+      discountValue: Number(p.discountValue),
+      slug: p.slug,
+    })),
   };
 }

@@ -155,7 +155,8 @@
     "variant_dialog_description": "Configure this variant's unique SKU, price, stock, and attribute options.",
     "export_products": "Export to Excel",
     "exporting_products": "Exporting...",
-    "export_products_error": "Couldn't export products. Please try again."
+    "export_products_error": "Couldn't export products. Please try again.",
+    "save_changes": "Save changes"
   },
   "NotFound": {
     "page_not_found": "Page Not Found",

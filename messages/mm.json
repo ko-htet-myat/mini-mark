@@ -153,7 +153,8 @@
     "variant_dialog_description": "ဤမျိုးကွဲအတွက် ထူးခြားသော SKU၊ စျေးနှုန်း၊ စတော့နှင့် အင်္ဂါရပ်ရွေးချယ်မှုများကို သတ်မှတ်ပါ။",
     "export_products": "Export to Excel",
     "exporting_products": "Exporting...",
-    "export_products_error": "Couldn't export products. Please try again."
+    "export_products_error": "Couldn't export products. Please try again.",
+    "save_changes": "ပြောင်းလဲမှုများသိမ်းမည်"
   },
   "NotFound": {
     "page_not_found": "စာမျက်နှာမတွေ့ပါ",

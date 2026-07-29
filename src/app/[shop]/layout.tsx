@@ -1,4 +1,5 @@
 import { getShopBySlug } from "@/features/shop/data/get-shop";
+import { ShopProvider } from "@/context/shop-context";
 
 export default async function ShopLayout({
   params,
@@ -8,6 +9,20 @@ export default async function ShopLayout({
   children: React.ReactNode;
 }) {
   const { shop: slug } = await params;
-  await getShopBySlug(slug);
-  return <>{children}</>;
+  const shop = await getShopBySlug(slug);
+  return (
+    <ShopProvider
+      shop={{
+        id: shop.id,
+        slug: shop.slug,
+        name: shop.name,
+        ownerId: shop.ownerId,
+        logoUrl: shop.logoUrl,
+        bannerUrl: shop.bannerUrl,
+        currency: shop.currency,
+      }}
+    >
+      {children}
+    </ShopProvider>
+  );
 }

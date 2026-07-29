@@ -62,8 +62,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <QueryProvider>
-          <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages}>
+          <QueryProvider>
             <ThemeProvider
               attribute="class"
               defaultTheme="system"
@@ -75,8 +75,8 @@ export default async function RootLayout({
                 <Toaster richColors />
               </TooltipProvider>
             </ThemeProvider>
-          </NextIntlClientProvider>
-        </QueryProvider>
+          </QueryProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

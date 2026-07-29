@@ -1,8 +1,28 @@
 export interface ProductAttributeGroup {
   id: string;
-  name: string; // e.g. "Color", "Size"
+  name: string;
   slug: string;
   values: { id: string; value: string }[];
+}
+
+export interface ProductVariantItem {
+  id: string;
+  sku: string | null;
+  price: number | null;
+  compareAtPrice: number | null;
+  stock: number;
+  status: string;
+  imageUrl: string | null;
+  attributeValueIds: string[];
+}
+
+export interface ProductPromotion {
+  id: string;
+  name: string;
+  description: string | null;
+  discountType: string;
+  discountValue: number;
+  slug: string;
 }
 
 export interface ProductDetailData {
@@ -10,6 +30,7 @@ export interface ProductDetailData {
   name: string;
   slug: string;
   description: string | null;
+  youtubeUrl: string | null;
   price: number;
   compareAtPrice: number | null;
   imageUrl: string | null;
@@ -17,8 +38,15 @@ export interface ProductDetailData {
   isActive: boolean;
   hasVariants: boolean;
   stock: number;
+  createdAt: string;
 
-  brand: { id: string; name: string; slug: string } | null;
+  brand: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    logoUrl: string | null;
+  } | null;
   category: {
     id: string;
     name: string;
@@ -27,6 +55,8 @@ export interface ProductDetailData {
   } | null;
 
   attributeGroups: ProductAttributeGroup[];
+  variants: ProductVariantItem[];
+  promotions: ProductPromotion[];
 
   rating?: {
     average: number;

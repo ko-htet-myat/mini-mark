@@ -1,6 +1,6 @@
 # Progress Tracker � Mini Market Myanmar
 
-_Last updated: 2026-07-28_
+_Last updated: 2026-07-29_
 
 ---
 
@@ -122,6 +122,9 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 | Date       | Change                                                                                                                                                                                                                                    |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-29 | Fixed storefront variant selection so unavailable color/size combinations no longer fall back to aggregate stock and impossible options are disabled                                                                                      |
+| 2026-07-29 | Fixed storefront product detail hydration mismatch by making color swatch values resolve deterministically during server and client rendering                                                                                             |
+| 2026-07-29 | Reordered root client providers so `NextIntlClientProvider` wraps dashboard client state providers and preserves `useTranslations` context during client rendering fallback                                                               |
 | 2026-07-28 | Added filtered Excel export to the dashboard product list table                                                                                                                                                                           |
 | 2026-07-28 | Fixed production build type error in action test setup by aligning the mock Better Auth user with the installed `User` type                                                                                                               |
 | 2026-07-28 | Fixed ESLint errors in action tests by replacing CommonJS mock imports and explicit `any` types; verified action tests pass                                                                                                               |

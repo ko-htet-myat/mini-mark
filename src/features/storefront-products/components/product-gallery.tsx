@@ -27,10 +27,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             aria-label={`Show image ${index + 1} of ${productName}`}
             aria-current={index === activeIndex}
             className={cn(
-              "relative h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border bg-neutral-50 transition-colors",
+              "relative h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border bg-muted transition-colors",
               index === activeIndex
-                ? "border-neutral-900"
-                : "border-neutral-200 hover:border-neutral-400",
+                ? "border-foreground"
+                : "border-border hover:border-foreground/30",
             )}
           >
             <Image
@@ -45,7 +45,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       </div>
 
       {/* Main image */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-neutral-50">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-muted">
         <Image
           src={activeImage}
           alt={productName}
