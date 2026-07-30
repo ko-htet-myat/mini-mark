@@ -42,11 +42,12 @@ export function ProductGrid({
         <p className="text-sm text-muted-foreground">No products found.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <ProductCard
               key={product.id}
               shopSlug={shopSlug}
               product={product}
+              loading={index < 4 ? "eager" : undefined}
               currency={currency}
             />
           ))}

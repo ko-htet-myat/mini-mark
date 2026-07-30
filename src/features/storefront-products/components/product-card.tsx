@@ -6,10 +6,12 @@ import { formatAmount } from "@/lib/format";
 export function ProductCard({
   shopSlug,
   product,
+  loading,
   currency = "MMK",
 }: {
   shopSlug: string;
   product: ShopProduct;
+  loading?: "lazy" | "eager";
   currency?: string;
 }) {
   const { price, compareAtPrice } = product;
@@ -26,6 +28,7 @@ export function ProductCard({
             src={product.imageUrl}
             alt={product.name}
             fill
+            loading={loading}
             sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw"
             className="object-cover transition-transform group-hover:scale-105"
           />
