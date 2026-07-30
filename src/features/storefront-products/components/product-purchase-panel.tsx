@@ -243,11 +243,14 @@ export function ProductPurchasePanel({
       )}
 
       <div className="mt-5 flex flex-wrap items-baseline gap-3">
-        <span className="text-2xl font-bold">
+        <span className="text-2xl font-bold" suppressHydrationWarning>
           {currencyFormatter.format(displayPrice)}
         </span>
         {displayCompareAtPrice && displayCompareAtPrice > displayPrice && (
-          <span className="text-lg text-muted-foreground line-through">
+          <span
+            className="text-lg text-muted-foreground line-through"
+            suppressHydrationWarning
+          >
             {currencyFormatter.format(displayCompareAtPrice)}
           </span>
         )}
@@ -262,7 +265,7 @@ export function ProductPurchasePanel({
               className="flex items-center gap-1 rounded-full bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
             >
               <HugeiconsIcon icon={SaleTag01Icon} size={14} />
-              {discountLabel}
+              <span suppressHydrationWarning>{discountLabel}</span>
             </Badge>
           );
         })}
