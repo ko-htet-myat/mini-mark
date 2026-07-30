@@ -139,6 +139,14 @@
   @media (width >= 40rem) {
     padding-inline: 2rem;
   }
+
+  @media (width>= 80rem) {
+    padding-inline: 3rem;
+  }
+
+  @media (width>=100rem) {
+    padding-inline: 5rem;
+  }
 }
 
 html[lang="mm"] {

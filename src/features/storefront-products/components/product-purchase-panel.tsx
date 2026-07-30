@@ -187,30 +187,32 @@ export function ProductPurchasePanel({
         </ol>
       </nav>
 
-      {product.brand && (
-        <Link
-          href={`/${shopSlug}/products?brand=${product.brand.slug}`}
-          className="mb-1 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          {product.brand.logoUrl ? (
-            <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded">
-              <Image
-                src={product.brand.logoUrl}
-                alt={product.brand.name}
-                fill
-                className="object-contain"
-              />
-            </div>
-          ) : null}
-          {product.brand.name}
-        </Link>
-      )}
+      <div className=" flex gap-3 align-items-center mb-3">
+        {product.brand && (
+          <Link
+            href={`/${shopSlug}/products?brand=${product.brand.slug}`}
+            className="mb-1 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            {product.brand.logoUrl ? (
+              <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded">
+                <Image
+                  src={product.brand.logoUrl}
+                  alt={product.brand.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            ) : null}
+            {product.brand.name}
+          </Link>
+        )}
 
-      {product.category && (
-        <Badge variant="secondary" className="mb-3 w-fit rounded-full">
-          {product.category.name}
-        </Badge>
-      )}
+        {/* {product.category && (
+          <Badge variant="secondary" className=" w-fit rounded-full">
+            {product.category.name}
+          </Badge>
+        )} */}
+      </div>
 
       <h1 className="text-3xl font-bold tracking-tight text-foreground">
         {product.name}
@@ -240,7 +242,7 @@ export function ProductPurchasePanel({
       )}
 
       <div className="mt-5 flex flex-wrap items-baseline gap-3">
-        <span className="text-3xl font-bold">
+        <span className="text-2xl font-bold">
           {currencyFormatter.format(displayPrice)}
         </span>
         {displayCompareAtPrice && displayCompareAtPrice > displayPrice && (

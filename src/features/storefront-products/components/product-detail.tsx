@@ -47,8 +47,8 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_420px]">
+    <div className="py-8">
+      <div className=" flex flex-col md:flex-row gap-5">
         <ProductGallery images={product.images} productName={product.name} />
         <ProductPurchasePanel
           shopSlug={shopSlug}
@@ -58,7 +58,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
         />
       </div>
 
-      <div className="mt-16 max-w-3xl border-t pt-8 space-y-10">
+      <div className="mt-16 border-t pt-8 space-y-10">
         {product.description && (
           <div>
             <h2 className="mb-3 text-lg font-semibold text-foreground">

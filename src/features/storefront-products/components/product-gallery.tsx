@@ -16,9 +16,20 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const activeImage = gallery[activeIndex];
 
   return (
-    <div className="flex gap-4">
+    <div className=" space-y-3">
+      {/* Main image */}
+      <div className="relative aspect-square w-full md:min-w-80 lg:min-w-100 overflow-hidden rounded-xl bg-muted">
+        <Image
+          src={activeImage}
+          alt={productName}
+          fill
+          priority
+          sizes="(min-width: 1024px) 520px, 100vw"
+          className="object-cover"
+        />
+      </div>
       {/* Thumbnail rail */}
-      <div className="flex flex-col gap-3">
+      <div className="flex gap-3">
         {gallery.map((image, index) => (
           <button
             key={image + index}
@@ -27,7 +38,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             aria-label={`Show image ${index + 1} of ${productName}`}
             aria-current={index === activeIndex}
             className={cn(
-              "relative h-[120px] w-[120px] shrink-0 overflow-hidden rounded-lg border bg-muted transition-colors",
+              "relative h-17.75 lg:h-22.75 w-17.75 lg:w-22.75 shrink-0 overflow-hidden rounded-lg border bg-muted transition-colors",
               index === activeIndex
                 ? "border-foreground"
                 : "border-border hover:border-foreground/30",
@@ -42,18 +53,6 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             />
           </button>
         ))}
-      </div>
-
-      {/* Main image */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-muted">
-        <Image
-          src={activeImage}
-          alt={productName}
-          fill
-          priority
-          sizes="(min-width: 1024px) 520px, 100vw"
-          className="object-cover"
-        />
       </div>
     </div>
   );
