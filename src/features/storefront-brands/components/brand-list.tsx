@@ -34,6 +34,7 @@ export function BrandList({
                   src={brand.logoUrl}
                   alt={brand.name}
                   fill
+                  sizes="64px"
                   className="object-contain p-2"
                 />
               ) : (

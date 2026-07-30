@@ -34,6 +34,7 @@ export function CategoryList({
                   src={category.imageUrl}
                   alt={category.name}
                   fill
+                  sizes="64px"
                   className="object-cover"
                 />
               ) : (

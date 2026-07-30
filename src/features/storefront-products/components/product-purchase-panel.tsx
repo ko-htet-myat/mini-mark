@@ -199,6 +199,7 @@ export function ProductPurchasePanel({
                   src={product.brand.logoUrl}
                   alt={product.brand.name}
                   fill
+                  sizes="20px"
                   className="object-contain"
                 />
               </div>

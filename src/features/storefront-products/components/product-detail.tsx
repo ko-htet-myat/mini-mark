@@ -103,6 +103,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
                     src={product.brand.logoUrl}
                     alt={product.brand.name}
                     fill
+                    sizes="48px"
                     className="object-contain p-1"
                   />
                 </div>
