@@ -19,7 +19,6 @@ import { createShopSchema } from "@/features/shop/validations/shop";
 
 export default function CreateShopPage() {
   const t = useTranslations("Onboarding");
-  const tc = useTranslations("Common");
   const router = useRouter();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(

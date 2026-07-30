@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { AttributeRowActions } from "./attribute-row-actions";
 

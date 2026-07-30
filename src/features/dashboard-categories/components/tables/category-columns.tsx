@@ -36,7 +36,6 @@ function DrillDownCell({ row, level }: { row: CategoryRow; level: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const tc = useTranslations("Common");
   const tc2 = useTranslations("Categories");
 
   if (level >= 3 || row._count.children === 0) {

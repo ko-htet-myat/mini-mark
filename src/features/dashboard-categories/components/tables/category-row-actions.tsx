@@ -31,7 +31,6 @@ interface CategoryRowActionsProps {
 export function CategoryRowActions({
   categoryId,
   categoryName,
-  level,
 }: CategoryRowActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { slug } = useShop();

@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { PromotionRowActions } from "./promotion-row-actions";
 import { Badge } from "@/components/ui/badge";
-import { useTranslations } from "next-intl";
 import { formatAmount } from "@/lib/format";
 
 export type PromotionRow = {

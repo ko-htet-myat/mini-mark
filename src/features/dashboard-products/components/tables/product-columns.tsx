@@ -40,14 +40,6 @@ function getAggregateStock(variants: ProductRow["variants"]): number {
     .reduce((sum, v) => sum + v.stock, 0);
 }
 
-function getAggregateStatus(
-  variants: ProductRow["variants"],
-): "IN_STOCK" | "OUT_OF_STOCK" {
-  const active = variants.filter((v) => v.isActive);
-  if (active.length === 0) return "OUT_OF_STOCK";
-  return active.every((v) => v.stock === 0) ? "OUT_OF_STOCK" : "IN_STOCK";
-}
-
 interface GetProductColumnsParams {
   page: number;
   pageSize: number;
