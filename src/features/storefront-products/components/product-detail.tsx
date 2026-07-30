@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlayIcon } from "@hugeicons/core-free-icons";
 import type { ProductDetailData } from "../types";
 import { ProductGallery } from "./product-gallery";
 import { ProductPurchasePanel } from "./product-purchase-panel";
+import { useCartStore } from "@/store/cart-store";
 
 interface ProductDetailProps {
   shopSlug: string;
@@ -26,24 +29,70 @@ function getYouTubeEmbedUrl(url: string) {
 }
 
 export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
+  const router = useRouter();
+  const addItem = useCartStore((s) => s.addItem);
+
   const youtubeEmbedUrl = product.youtubeUrl
     ? getYouTubeEmbedUrl(product.youtubeUrl)
     : null;
 
+  function buildCartItem(selection: {
+    productId: string;
+    quantity: number;
+    variantId: string | null;
+    attributeValueIds: string[];
+  }) {
+    const variant = product.variants.find((v) => v.id === selection.variantId);
+
+    let variantLabel = null;
+    if (selection.attributeValueIds.length > 0) {
+      const labels: string[] = [];
+      for (const valId of selection.attributeValueIds) {
+        for (const group of product.attributeGroups) {
+          const val = group.values.find((v) => v.id === valId);
+          if (val) labels.push(val.value);
+        }
+      }
+      variantLabel = labels.join(" / ");
+    }
+
+    const maxStock = variant ? variant.stock : product.stock;
+    const price = variant?.price ?? product.price;
+    const imageUrl =
+      variant?.imageUrl ?? product.imageUrl ?? product.images[0] ?? null;
+
+    return {
+      productId: selection.productId,
+      variantId: selection.variantId,
+      name: product.name,
+      variantLabel,
+      price,
+      imageUrl,
+      quantity: selection.quantity,
+      maxStock,
+    };
+  }
+
   function handleAddToCart(selection: {
     productId: string;
     quantity: number;
+    variantId: string | null;
     attributeValueIds: string[];
   }) {
-    console.log("add to cart", selection);
+    const item = buildCartItem(selection);
+    addItem(shopSlug, item);
+    toast.success("Added to cart");
   }
 
   function handleBuyItNow(selection: {
     productId: string;
     quantity: number;
+    variantId: string | null;
     attributeValueIds: string[];
   }) {
-    console.log("buy it now", selection);
+    const item = buildCartItem(selection);
+    addItem(shopSlug, item);
+    router.push(`/${shopSlug}/cart`);
   }
 
   return (

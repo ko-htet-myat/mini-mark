@@ -90,6 +90,7 @@ export function PromotionDataTable({
     [page, pageSize, shop.currency, tc, tp],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

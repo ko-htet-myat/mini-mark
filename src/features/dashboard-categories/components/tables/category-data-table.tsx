@@ -103,6 +103,7 @@ export function CategoryDataTable({
     [page, pageSize, level, tc, tcat],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
