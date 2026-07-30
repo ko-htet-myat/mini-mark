@@ -10,11 +10,11 @@ export function variantMatchesSelection(
   variant: VariantSelectionItem,
   selectedAttributeValueIds: string[],
 ) {
-  return (
-    selectedAttributeValueIds.length > 0 &&
-    selectedAttributeValueIds.every((id) =>
-      variant.attributeValueIds.includes(id),
-    )
+  if (selectedAttributeValueIds.length === 0) {
+    return variant.attributeValueIds.length === 0;
+  }
+  return selectedAttributeValueIds.every((id) =>
+    variant.attributeValueIds.includes(id),
   );
 }
 

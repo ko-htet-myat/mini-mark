@@ -28,7 +28,7 @@ export function ProductCard({
             src={product.imageUrl}
             alt={product.name}
             fill
-            loading={loading}
+            priority={loading === "eager"}
             sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw"
             className="object-cover transition-transform group-hover:scale-105"
           />
