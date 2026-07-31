@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShopProduct } from "../data/products.queries";
+import { cn } from "@/lib/utils";
+import type { ShopProduct } from "../data/products.queries";
 import { formatAmount } from "@/lib/format";
 
 export function ProductCard({
@@ -8,11 +9,13 @@ export function ProductCard({
   product,
   loading,
   currency = "MMK",
+  variant = "grid",
 }: {
   shopSlug: string;
   product: ShopProduct;
   loading?: "lazy" | "eager";
   currency?: string;
+  variant?: "grid" | "list";
 }) {
   const { price, compareAtPrice } = product;
   const onSale = compareAtPrice !== null && compareAtPrice > price;
@@ -20,9 +23,21 @@ export function ProductCard({
   return (
     <Link
       href={`/${shopSlug}/products/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-lg border bg-background"
+      className={cn(
+        "group flex overflow-hidden rounded-lg border bg-background",
+        variant === "grid"
+          ? "flex-col"
+          : "flex-row items-stretch sm:items-center",
+      )}
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-muted">
+      <div
+        className={cn(
+          "relative shrink-0 overflow-hidden bg-muted",
+          variant === "grid"
+            ? "aspect-square w-full"
+            : "aspect-square w-28 sm:w-40",
+        )}
+      >
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -44,7 +59,12 @@ export function ProductCard({
         )}
       </div>
 
-      <div className="flex flex-col gap-1 p-3">
+      <div
+        className={cn(
+          "flex flex-1 flex-col gap-1 p-3",
+          variant === "list" && "sm:justify-center sm:p-4",
+        )}
+      >
         <h3 className="line-clamp-1 text-sm font-medium">{product.name}</h3>
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">

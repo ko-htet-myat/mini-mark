@@ -16,9 +16,9 @@ export function ShopHeader({
   currency,
 }: ShopHeaderProps) {
   return (
-    <div className="w-full">
+    <div className="w-full mt-4">
       {/* Banner */}
-      <div className="relative h-40 w-full overflow-hidden rounded-b-lg bg-muted sm:h-56 md:h-72">
+      <div className="relative h-40 w-full overflow-hidden rounded-lg bg-muted sm:h-56 md:h-72">
         {bannerUrl ? (
           <Image
             src={bannerUrl}
@@ -29,13 +29,13 @@ export function ShopHeader({
             className="object-cover"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-r from-muted to-muted/60" />
+          <div className="h-full w-full bg-linear-to-r from-muted to-muted/60" />
         )}
       </div>
 
       {/* Logo + name, overlapping the banner */}
-      <div className="relative flex items-end gap-4 px-6 -mt-5 sm:-mt-6">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-background bg-background sm:h-24 sm:w-24">
+      <div className="relative flex items-end gap-4 px-3 sm:px-6 -mt-4 sm:-mt-6">
+        <div className="relative h-18 w-18 shrink-0 overflow-hidden rounded-full border-4 border-background bg-background sm:h-24 sm:w-24">
           {logoUrl ? (
             <Image
               src={logoUrl}
@@ -53,7 +53,7 @@ export function ShopHeader({
 
         <div className="pb-2">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold sm:text-2xl">{name}</h1>
+            <h1 className="text-lg font-semibold sm:text-2xl">{name}</h1>
             {currency && (
               <span className="rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
                 {currency}

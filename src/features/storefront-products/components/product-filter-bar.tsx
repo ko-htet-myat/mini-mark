@@ -1,7 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { cn } from "@/lib/utils";
+import { ProductFilterSelect } from "./product-filter-select";
 
 type Category = {
   id: string;
@@ -27,18 +26,6 @@ type Props = {
   activeBrand?: string;
 };
 
-function buildFilterHref(
-  shopSlug: string,
-  params: Record<string, string | undefined>,
-): string {
-  const entries = Object.entries(params).filter(
-    ([, v]) => v !== undefined && v !== "",
-  ) as [string, string][];
-  const qs = new URLSearchParams(entries);
-  const search = qs.toString();
-  return `/${shopSlug}/products${search ? `?${search}` : ""}`;
-}
-
 export async function ProductFilterBar({
   shopSlug,
   categories,
@@ -52,129 +39,43 @@ export async function ProductFilterBar({
 
   return (
     <div className="space-y-4">
-      {/* Category chips */}
-      {categories.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {t("categories")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {/* "All" chip */}
-            <Link
-              href={buildFilterHref(shopSlug, {
-                brand: activeBrand,
-              })}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                !activeCategory
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-muted",
-              )}
-            >
-              {t("all")}
-            </Link>
+      <div className="flex flex-wrap items-start gap-4">
+        {categories.length > 0 && (
+          <ProductFilterSelect
+            shopSlug={shopSlug}
+            label={t("categories")}
+            paramKey="category"
+            otherParams={{ brand: activeBrand }}
+            options={categories.map((category) => ({
+              id: category.id,
+              name: category.name,
+              slug: category.slug,
+              imageUrl: category.imageUrl,
+              count: category._count.products,
+            }))}
+            activeValue={activeCategory}
+            allLabel={t("all")}
+          />
+        )}
 
-            {categories.map((cat) => {
-              const isActive = activeCategory === cat.slug;
-              return (
-                <Link
-                  key={cat.id}
-                  href={buildFilterHref(shopSlug, {
-                    category: isActive ? undefined : cat.slug,
-                    brand: activeBrand,
-                  })}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                    isActive
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  {cat.imageUrl && (
-                    <span className="relative h-4 w-4 shrink-0 overflow-hidden rounded-full">
-                      <Image
-                        src={cat.imageUrl}
-                        alt=""
-                        fill
-                        sizes="16px"
-                        className="object-cover"
-                      />
-                    </span>
-                  )}
-                  {cat.name}
-                  <span
-                    className={cn(
-                      "rounded-full px-1 text-[10px]",
-                      isActive
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    {cat._count.products}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Brand chips */}
-      {brands.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {t("brands")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {/* "All" chip */}
-            <Link
-              href={buildFilterHref(shopSlug, {
-                category: activeCategory,
-              })}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                !activeBrand
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-muted",
-              )}
-            >
-              {t("all")}
-            </Link>
-
-            {brands.map((brand) => {
-              const isActive = activeBrand === brand.slug;
-              return (
-                <Link
-                  key={brand.id}
-                  href={buildFilterHref(shopSlug, {
-                    category: activeCategory,
-                    brand: isActive ? undefined : brand.slug,
-                  })}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                    isActive
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  {brand.logoUrl && (
-                    <span className="relative h-4 w-4 shrink-0 overflow-hidden rounded-sm">
-                      <Image
-                        src={brand.logoUrl}
-                        alt=""
-                        fill
-                        sizes="16px"
-                        className="object-contain"
-                      />
-                    </span>
-                  )}
-                  {brand.name}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
+        {brands.length > 0 && (
+          <ProductFilterSelect
+            shopSlug={shopSlug}
+            label={t("brands")}
+            paramKey="brand"
+            otherParams={{ category: activeCategory }}
+            options={brands.map((brand) => ({
+              id: brand.id,
+              name: brand.name,
+              slug: brand.slug,
+              imageUrl: brand.logoUrl,
+              count: brand._count.products,
+            }))}
+            activeValue={activeBrand}
+            allLabel={t("all")}
+          />
+        )}
+      </div>
 
       {/* Clear all filters */}
       {hasFilters && (

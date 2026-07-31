@@ -342,6 +342,8 @@
     "brands": "Brands",
     "no_products": "No products found.",
     "clear_filters": "Clear filters",
+    "grid_view": "Grid view",
+    "list_view": "List view",
     "back_to_shop": "Back to shop",
     "previous": "Previous",
     "next": "Next",

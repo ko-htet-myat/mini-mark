@@ -19,7 +19,7 @@ export function CategoryList({
   if (categories.length === 0) return null;
 
   return (
-    <section className="px-6 py-6">
+    <section className=" py-6">
       <h2 className="mb-3 text-lg font-semibold">Categories</h2>
       <div className="flex gap-4 overflow-x-auto pb-2">
         {categories.map((category) => (

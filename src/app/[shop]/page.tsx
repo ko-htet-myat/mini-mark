@@ -35,7 +35,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
   ]);
 
   return (
-    <main>
+    <main className=" container">
       <ShopHeader
         name={shop.name}
         description={shop.description}

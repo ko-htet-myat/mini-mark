@@ -19,7 +19,7 @@ export function BrandList({
   if (brands.length === 0) return null;
 
   return (
-    <section className="px-6 py-6">
+    <section className=" pb-6">
       <h2 className="mb-3 text-lg font-semibold">Brands</h2>
       <div className=" grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
         {brands.map((brand) => (
