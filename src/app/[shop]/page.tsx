@@ -5,7 +5,8 @@ import { getShopCategories } from "@/features/storefront-categories/data/categor
 import { getShopBrands } from "@/features/storefront-brands/data/brand.queries";
 import { getShopProducts } from "@/features/storefront-products/data/products.queries";
 import { CategoryList } from "@/features/storefront-categories/components/category-list";
-import { BrandList } from "@/features/storefront-brands/components/brand-list";
+// import { BrandList } from "@/features/storefront-brands/components/brand-list";
+import { FashionHero } from "@/features/shop/components/fashion-hero";
 import { ProductGrid } from "@/features/storefront-products/components/product-grid";
 
 type PageProps = {
@@ -43,8 +44,9 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
         bannerUrl={shop.bannerUrl}
         currency={shop.currency}
       />
+
       <CategoryList shopSlug={shop.slug} categories={categories} />
-      <BrandList shopSlug={shop.slug} brands={brands} />
+      {/* <BrandList shopSlug={shop.slug} brands={brands} /> */}
       <ProductGrid
         shopSlug={shop.slug}
         products={productsResult.products}
@@ -53,6 +55,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
         searchParams={{ category, brand }}
         currency={shop.currency}
       />
+      <FashionHero shopSlug={shop.slug} />
     </main>
   );
 }

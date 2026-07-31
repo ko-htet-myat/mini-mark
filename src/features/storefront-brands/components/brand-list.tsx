@@ -21,12 +21,12 @@ export function BrandList({
   return (
     <section className=" pb-6">
       <h2 className="mb-3 text-lg font-semibold">Brands</h2>
-      <div className=" grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
+      <div className=" grid gap-4 grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-10">
         {brands.map((brand) => (
           <Link
             key={brand.id}
             href={`/${shopSlug}/products?brand=${brand.slug}`}
-            className="flex w-24 shrink-0 flex-col items-center gap-2 text-center"
+            className="flex w-full sm:w-24 shrink-0 flex-col items-center gap-2 text-center"
           >
             <div className="relative h-16 w-16 overflow-hidden rounded-lg border bg-background">
               {brand.logoUrl ? (

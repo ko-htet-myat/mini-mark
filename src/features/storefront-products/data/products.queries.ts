@@ -65,6 +65,10 @@ export async function getShopProducts({
       ...p,
       price: p.price.toNumber(),
       compareAtPrice: p.compareAtPrice ? p.compareAtPrice.toNumber() : null,
+      variants: p.variants.map((v) => ({
+        ...v,
+        price: v.price ? v.price.toNumber() : null,
+      })),
       stock: totalStock,
       status: allOutOfStock ? ("OUT_OF_STOCK" as const) : ("IN_STOCK" as const),
       imageUrl: p.imageUrl,

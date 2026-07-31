@@ -20,13 +20,13 @@ export function CategoryList({
 
   return (
     <section className=" py-6">
-      <h2 className="mb-3 text-lg font-semibold">Categories</h2>
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <h2 className="mb-3 sm:text-lg font-semibold">Browse By Category</h2>
+      <div className="grid gap-4 grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-10">
         {categories.map((category) => (
           <Link
             key={category.id}
             href={`/${shopSlug}/products?category=${category.slug}`}
-            className="flex w-24 shrink-0 flex-col items-center gap-2 text-center"
+            className="flex w-20 sm:w-24 shrink-0 flex-col items-center gap-2 text-center"
           >
             <div className="relative h-16 w-16 overflow-hidden rounded-full bg-muted">
               {category.imageUrl ? (
@@ -35,7 +35,7 @@ export function CategoryList({
                   alt={category.name}
                   fill
                   sizes="64px"
-                  className="object-cover"
+                  className="object-cover p-2"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm font-medium text-muted-foreground">
@@ -46,9 +46,9 @@ export function CategoryList({
             <span className="text-xs font-medium leading-tight">
               {category.name}
             </span>
-            <span className="text-[10px] text-muted-foreground">
+            {/* <span className="text-[10px] text-muted-foreground">
               {category._count.products}
-            </span>
+            </span> */}
           </Link>
         ))}
       </div>
