@@ -234,7 +234,7 @@
     "failed_delete_category": "Failed to delete category.",
     "delete_category_confirm_desc": "This will permanently delete the category and all its subcategories.",
     "parent_category": "Parent Category (Optional)",
-    "select_parent": "Select a parent\u2026",
+    "select_parent": "Select a parent…",
     "none_root_category": "None (Root Category)",
     "image_url": "Image URL",
     "categories_breadcrumb": "Categories",
@@ -310,5 +310,29 @@
   "Metadata": {
     "site_title": "Mini Market Myanmar",
     "site_description": "Your one-stop destination for all daily needs in Myanmar."
+  },
+  "Cart": {
+    "title": "Your cart",
+    "open_cart": "Open cart",
+    "empty_title": "Your cart is empty.",
+    "empty_description": "Add products from the shop to see them here.",
+    "continue_shopping": "Continue shopping",
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout",
+    "view_cart": "View cart",
+    "order_summary": "Order Summary",
+    "shipping": "Shipping",
+    "free": "Free",
+    "add_coupon_code": "Add coupon code",
+    "each": "each",
+    "remove_item": "Remove item",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "added_to_cart": "Added to cart",
+    "back_to_shop": "Back to shop"
   }
 }

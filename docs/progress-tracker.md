@@ -1,6 +1,6 @@
 # Progress Tracker � Mini Market Myanmar
 
-_Last updated: 2026-07-29_
+_Last updated: 2026-07-31_
 
 ---
 
@@ -72,7 +72,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 ## In Progress
 
 - [ ] Settings feature � shop profile editing components
-- [ ] Public storefront cart (`/{shop}/cart`)
+- [x] Public storefront cart (`/{shop}/cart`)
 
 ---
 
@@ -95,7 +95,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 ### Public Storefront
 
-- [ ] Cart functionality (add/remove items, quantity)
+- [x] Cart functionality (add/remove items, quantity)
 - [ ] Shops directory page (`/shops`)
 
 ### Other
@@ -122,6 +122,8 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 | Date       | Change                                                                                                                                                                                                                                    |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-31 | Added a back-to-shop link on the public cart detail page                                                                                                                                                                                  |
+| 2026-07-31 | Added a floating public storefront cart button with item count, drawer preview, cart quantity controls, checkout link, and full cart navigation                                                                                           |
 | 2026-07-29 | Fixed storefront variant selection so unavailable color/size combinations no longer fall back to aggregate stock and impossible options are disabled                                                                                      |
 | 2026-07-29 | Fixed storefront product detail hydration mismatch by making color swatch values resolve deterministically during server and client rendering                                                                                             |
 | 2026-07-29 | Reordered root client providers so `NextIntlClientProvider` wraps dashboard client state providers and preserves `useTranslations` context during client rendering fallback                                                               |

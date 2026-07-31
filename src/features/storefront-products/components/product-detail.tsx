@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlayIcon } from "@hugeicons/core-free-icons";
 import type { ProductDetailData } from "../types";
@@ -30,6 +31,7 @@ function getYouTubeEmbedUrl(url: string) {
 
 export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
   const router = useRouter();
+  const t = useTranslations("Cart");
   const addItem = useCartStore((s) => s.addItem);
 
   const youtubeEmbedUrl = product.youtubeUrl
@@ -81,7 +83,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
   }) {
     const item = buildCartItem(selection);
     addItem(shopSlug, item);
-    toast.success("Added to cart");
+    toast.success(t("added_to_cart"));
   }
 
   function handleBuyItNow(selection: {
@@ -92,7 +94,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
   }) {
     const item = buildCartItem(selection);
     addItem(shopSlug, item);
-    router.push(`/${shopSlug}/cart`);
+    router.push(`/${shopSlug}/cart/create-order`);
   }
 
   return (

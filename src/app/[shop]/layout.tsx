@@ -1,5 +1,6 @@
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { ShopProvider } from "@/context/shop-context";
+import { FloatingCartButton } from "@/features/cart/components/floating-cart-button";
 
 export default async function ShopLayout({
   params,
@@ -23,6 +24,7 @@ export default async function ShopLayout({
       }}
     >
       {children}
+      <FloatingCartButton shopSlug={shop.slug} />
     </ShopProvider>
   );
 }
