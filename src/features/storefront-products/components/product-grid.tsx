@@ -9,10 +9,12 @@ type ProductGridProps = {
   totalPages: number;
   searchParams?: Record<string, string | undefined>;
   currency?: string;
+  /** Base path for pagination links. Defaults to shop home anchor. */
+  basePath?: string;
 };
 
 function buildPageHref(
-  shopSlug: string,
+  basePath: string,
   page: number,
   searchParams?: Record<string, string | undefined>,
 ) {
@@ -23,7 +25,7 @@ function buildPageHref(
     ][],
   );
   params.set("page", String(page));
-  return `/${shopSlug}#products?${params.toString()}`;
+  return `${basePath}?${params.toString()}`;
 }
 
 export function ProductGrid({
@@ -33,7 +35,10 @@ export function ProductGrid({
   totalPages,
   searchParams,
   currency,
+  basePath,
 }: ProductGridProps) {
+  const resolvedBasePath = basePath ?? `/${shopSlug}#products`;
+
   return (
     <section id="products" className="px-6 py-6">
       <h2 className="mb-3 text-lg font-semibold">Products</h2>
@@ -58,7 +63,7 @@ export function ProductGrid({
         <div className="mt-6 flex items-center justify-center gap-2">
           {page > 1 && (
             <Link
-              href={buildPageHref(shopSlug, page - 1, searchParams)}
+              href={buildPageHref(resolvedBasePath, page - 1, searchParams)}
               className="text-sm underline"
             >
               Previous
@@ -69,7 +74,7 @@ export function ProductGrid({
           </span>
           {page < totalPages && (
             <Link
-              href={buildPageHref(shopSlug, page + 1, searchParams)}
+              href={buildPageHref(resolvedBasePath, page + 1, searchParams)}
               className="text-sm underline"
             >
               Next

@@ -334,5 +334,17 @@
     "increase_quantity": "Increase quantity",
     "added_to_cart": "Added to cart",
     "back_to_shop": "Back to shop"
+  },
+  "Storefront": {
+    "products_title": "Products",
+    "all": "All",
+    "categories": "Categories",
+    "brands": "Brands",
+    "no_products": "No products found.",
+    "clear_filters": "Clear filters",
+    "back_to_shop": "Back to shop",
+    "previous": "Previous",
+    "next": "Next",
+    "page_of": "Page {page} of {total}"
   }
 }
