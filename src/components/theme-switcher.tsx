@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 export function ModeToggle() {
   const { setTheme } = useTheme();
+  const t = useTranslations("UI");
 
   return (
     <DropdownMenu>
@@ -29,18 +31,18 @@ export function ModeToggle() {
             icon={Moon}
             className="absolute  scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
           />
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only">{t("toggle_theme")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
+          {t("light")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          {t("dark")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+          {t("system")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ProductDataTable } from "@/features/dashboard-products/components/tables/product-data-table";
 import {
   getProductsPage,
@@ -24,6 +25,7 @@ export default async function DashboardProductsPage({
   params,
   searchParams,
 }: DashboardProductsPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const sp = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -62,7 +64,7 @@ export default async function DashboardProductsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t("products")}</h1>
       <ProductDataTable
         data={data}
         pageCount={pageCount}

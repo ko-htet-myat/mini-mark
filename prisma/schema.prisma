@@ -538,3 +538,50 @@ model Invoice {
   @@unique([orderId, invoiceNumber])
   @@map("invoice")
 }
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+enum AuditAction {
+  // Subscription request lifecycle
+  SUBSCRIPTION_REQUEST_APPROVED
+  SUBSCRIPTION_REQUEST_REJECTED
+  // Payment bookkeeping
+  PAYMENT_RECORDED
+  // Subscription lifecycle
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_EXPIRED
+  // Shop management
+  SHOP_CREATED
+  SHOP_UPDATED
+  SHOP_DELETED
+}
+
+enum AuditEntityType {
+  SUBSCRIPTION_REQUEST
+  PAYMENT_RECORD
+  SUBSCRIPTION
+  SHOP
+}
+
+/// Append-only event log — never update or delete rows.
+/// No FK to User or Shop so logs survive deletions.
+/// actorName is snapshotted at write time.
+model AuditLog {
+  id         String          @id @default(cuid())
+  actorId    String          // user who performed the action
+  actorName  String          // snapshot of user.name at write time
+  action     AuditAction
+  entityType AuditEntityType
+  entityId   String          // PK of the affected record
+  shopId     String?         // null for platform-level actions
+  metadata   Json?           // typed payload per action, stored as JSON
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([shopId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_log")
+}

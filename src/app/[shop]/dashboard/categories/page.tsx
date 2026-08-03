@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { CategoryDataTable } from "@/features/dashboard-categories/components/tables/category-data-table";
 import {
   getCategoriesPage,
@@ -21,6 +22,7 @@ export default async function CategoriesPage({
   params,
   searchParams,
 }: CategoriesPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const sp = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -49,7 +51,7 @@ export default async function CategoriesPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Categories</h1>
+      <h1 className="text-2xl font-semibold">{t("categories")}</h1>
       <CategoryDataTable
         data={data}
         pageCount={pageCount}

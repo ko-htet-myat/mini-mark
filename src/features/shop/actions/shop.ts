@@ -4,6 +4,7 @@ import { authClient } from "@/lib/safe-action";
 import { returnValidationErrors } from "next-safe-action";
 import prisma from "@/lib/prisma";
 import { createShopSchema } from "../validations/shop";
+import { writeAuditLog } from "@/lib/audit";
 
 export const createShopAction = authClient
   .inputSchema(createShopSchema)
@@ -25,13 +26,27 @@ export const createShopAction = authClient
       });
     }
 
-    const shop = await prisma.shop.create({
-      data: {
-        name: parsedInput.name,
-        slug: parsedInput.slug,
-        currency: parsedInput.currency,
-        ownerId: user.id,
-      },
+    const shop = await prisma.$transaction(async (tx) => {
+      const created = await tx.shop.create({
+        data: {
+          name: parsedInput.name,
+          slug: parsedInput.slug,
+          currency: parsedInput.currency,
+          ownerId: user.id,
+        },
+      });
+
+      await writeAuditLog(tx, {
+        actorId: user.id,
+        actorName: user.name,
+        action: "SHOP_CREATED",
+        entityId: created.id,
+        shopId: created.id,
+        shopSlug: created.slug,
+        shopName: created.name,
+      });
+
+      return created;
     });
 
     return { shop };

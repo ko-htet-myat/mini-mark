@@ -19,6 +19,7 @@ import { createShopSchema } from "@/features/shop/validations/shop";
 
 export default function CreateShopPage() {
   const t = useTranslations("Onboarding");
+  const uiT = useTranslations("UI");
   const router = useRouter();
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
@@ -98,11 +99,11 @@ export default function CreateShopPage() {
               <SelectValue placeholder={t("currency")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="MMK">MMK</SelectItem>
-              <SelectItem value="USD">USD</SelectItem>
-              <SelectItem value="JPY">JPY</SelectItem>
-              <SelectItem value="KRW">KRW</SelectItem>
-              <SelectItem value="THB">THB</SelectItem>
+              <SelectItem value="MMK">{uiT("currencies.MMK")}</SelectItem>
+              <SelectItem value="USD">{uiT("currencies.USD")}</SelectItem>
+              <SelectItem value="JPY">{uiT("currencies.JPY")}</SelectItem>
+              <SelectItem value="KRW">{uiT("currencies.KRW")}</SelectItem>
+              <SelectItem value="THB">{uiT("currencies.THB")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

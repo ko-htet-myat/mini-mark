@@ -199,66 +199,82 @@ export const toggleProductStatus = shopOwnerActionClient
 export const duplicateProduct = shopOwnerActionClient
   .inputSchema(duplicateProductSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const original = await prisma.product.findUnique({
-      where: { id: parsedInput.id, shopId: ctx.shop.id },
-      include: {
-        variants: {
-          include: {
-            attributeValues: true,
+    try {
+      const original = await prisma.product.findUnique({
+        where: { id: parsedInput.id, shopId: ctx.shop.id },
+        include: {
+          variants: {
+            include: {
+              attributeValues: true,
+            },
           },
+          promotions: true,
         },
-        promotions: true,
-      },
-    });
+      });
 
-    if (!original) {
-      throw new Error("Product not found");
-    }
+      if (!original) {
+        throw new Error("Product not found");
+      }
 
-    const timestamp = Date.now().toString().slice(-4);
-    const newSlug = `${original.slug}-copy-${timestamp}`;
-    const newName = `${original.name} (Copy)`;
+      const timestamp = Date.now().toString().slice(-4);
+      const newSlug = `${original.slug}-copy-${timestamp}`;
+      const newName = `${original.name} (Copy)`;
 
-    const duplicated = await prisma.product.create({
-      data: {
-        shopId: original.shopId,
-        name: newName,
-        slug: newSlug,
-        description: original.description,
-        price: original.price,
-        compareAtPrice: original.compareAtPrice,
-        imageUrl: original.imageUrl,
-        youtubeUrl: original.youtubeUrl,
-        isActive: false,
-        hasVariants: original.hasVariants,
-        categoryId: original.categoryId,
-        brandId: original.brandId,
-        variants: original.hasVariants
-          ? {
-              create: original.variants.map((v) => ({
-                sku: v.sku ? `${v.sku}-copy-${timestamp}` : null,
-                price: v.price,
-                compareAtPrice: v.compareAtPrice,
-                stock: v.stock,
-                imageUrl: v.imageUrl,
-                isActive: v.isActive,
-                attributeValues: {
-                  create: v.attributeValues.map((av) => ({
-                    attributeValueId: av.attributeValueId,
-                  })),
-                },
-              })),
-            }
-          : undefined,
-        promotions:
-          original.promotions.length > 0
+      const duplicated = await prisma.product.create({
+        data: {
+          shopId: original.shopId,
+          name: newName,
+          slug: newSlug,
+          description: original.description,
+          price: original.price,
+          compareAtPrice: original.compareAtPrice,
+          imageUrl: original.imageUrl,
+          youtubeUrl: original.youtubeUrl,
+          isActive: false,
+          hasVariants: original.hasVariants,
+          categoryId: original.categoryId,
+          brandId: original.brandId,
+          variants: original.hasVariants
             ? {
-                connect: original.promotions.map((p) => ({ id: p.id })),
+                create: original.variants.map((v) => ({
+                  sku: v.sku ? `${v.sku}-copy-${timestamp}` : null,
+                  price: v.price,
+                  compareAtPrice: v.compareAtPrice,
+                  stock: v.stock,
+                  imageUrl: v.imageUrl,
+                  isActive: v.isActive,
+                  attributeValues: {
+                    create: v.attributeValues.map((av) => ({
+                      attributeValueId: av.attributeValueId,
+                    })),
+                  },
+                })),
               }
             : undefined,
-      },
-    });
+          promotions:
+            original.promotions.length > 0
+              ? {
+                  connect: original.promotions.map((p) => ({ id: p.id })),
+                }
+              : undefined,
+        },
+      });
 
-    revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
-    return { success: true, newProductId: duplicated.id };
+      revalidatePath(`/${ctx.shop.slug}/dashboard/products`);
+      return { success: true, newProductId: duplicated.id };
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2002"
+      ) {
+        throw new Error("A product with this slug already exists.");
+      }
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2025"
+      ) {
+        throw new Error("Product not found.");
+      }
+      throw err;
+    }
   });

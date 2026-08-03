@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PromotionDataTable } from "@/features/dashboard-promotions/components/tables/promotion-data-table";
 import { getPromotionsPage } from "@/features/dashboard-promotions/data/promotion.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
@@ -12,6 +13,7 @@ export default async function PromotionsPage({
   params,
   searchParams,
 }: PromotionsPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const searchParamKeys = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -34,7 +36,7 @@ export default async function PromotionsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Promotions</h1>
+      <h1 className="text-2xl font-semibold">{t("promotions")}</h1>
       <PromotionDataTable
         data={serializedData}
         pageCount={pageCount}

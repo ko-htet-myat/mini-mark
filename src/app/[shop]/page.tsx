@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { ShopHeader } from "@/features/shop/components/shop-header";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 import { getShopCategories } from "@/features/storefront-categories/data/category.queries";
-import { getShopBrands } from "@/features/storefront-brands/data/brand.queries";
+// import { getShopBrands } from "@/features/storefront-brands/data/brand.queries";
 import { getShopProducts } from "@/features/storefront-products/data/products.queries";
 import { CategoryList } from "@/features/storefront-categories/components/category-list";
 // import { BrandList } from "@/features/storefront-brands/components/brand-list";
@@ -24,9 +24,9 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const [categories, brands, productsResult] = await Promise.all([
+  const [categories, productsResult] = await Promise.all([
     getShopCategories(shop.id),
-    getShopBrands(shop.id),
+    // getShopBrands(shop.id),
     getShopProducts({
       shopId: shop.id,
       page,

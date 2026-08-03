@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { BrandDataTable } from "@/features/dashboard-brands/components/tables/brand-data-table";
 import { getBrandsPage } from "@/features/dashboard-brands/data/brand.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
@@ -12,6 +13,7 @@ export default async function BrandsPage({
   params,
   searchParams,
 }: BrandsPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const searchParamKeys = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -28,7 +30,7 @@ export default async function BrandsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Brands</h1>
+      <h1 className="text-2xl font-semibold">{t("brands")}</h1>
       <BrandDataTable
         data={data}
         pageCount={pageCount}

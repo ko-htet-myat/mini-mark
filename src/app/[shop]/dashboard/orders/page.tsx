@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { OrdersDataTable } from "@/features/dashboard-orders/components/tables/orders-data-table";
 import { getOrders } from "@/features/dashboard-orders/data/orders.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
@@ -19,6 +20,7 @@ export default async function OrdersPage({
   params,
   searchParams,
 }: OrdersPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const sp = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -40,7 +42,7 @@ export default async function OrdersPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Orders</h1>
+      <h1 className="text-2xl font-semibold">{t("orders")}</h1>
       <OrdersDataTable
         data={data.map((order) => ({
           id: order.id,

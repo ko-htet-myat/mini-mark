@@ -9,11 +9,18 @@ type SafeActionMiddlewareArgs = {
 const { mockGetSession, mockPrisma, setMockAuth, getMockAuth } = vi.hoisted(
   () => {
     let __auth: MockAuth = null;
+    const _mockPrisma = {
+      shop: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+      auditLog: { create: vi.fn() },
+      $transaction: vi.fn(),
+    };
+    _mockPrisma.$transaction.mockImplementation(
+      async (cb: (tx: typeof _mockPrisma) => unknown) => cb(_mockPrisma),
+    );
+
     return {
       mockGetSession: vi.fn(),
-      mockPrisma: {
-        shop: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-      },
+      mockPrisma: _mockPrisma,
       setMockAuth: (auth: MockAuth) => {
         __auth = auth;
       },

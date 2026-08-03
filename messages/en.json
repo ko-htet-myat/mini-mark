@@ -348,5 +348,22 @@
     "previous": "Previous",
     "next": "Next",
     "page_of": "Page {page} of {total}"
+  },
+  "UI": {
+    "toggle_theme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "more": "More",
+    "close": "Close",
+    "sidebar": "Sidebar",
+    "toggle_sidebar": "Toggle Sidebar",
+    "currencies": {
+      "MMK": "MMK",
+      "USD": "USD",
+      "JPY": "JPY",
+      "KRW": "KRW",
+      "THB": "THB"
+    }
   }
 }

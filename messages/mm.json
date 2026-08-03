@@ -346,5 +346,22 @@
     "previous": "ရှေ့",
     "next": "နောက်",
     "page_of": "စာမျက်နှာ {page} ၏ {total}"
+  },
+  "UI": {
+    "toggle_theme": "အပြင်အဆင်ပြောင်းမည်",
+    "light": "အလင်း",
+    "dark": "အမှောင်",
+    "system": "စနစ်",
+    "more": "ပိုမို",
+    "close": "ပိတ်မည်",
+    "sidebar": "ဘေးဘား",
+    "toggle_sidebar": "ဘေးဘားဖွင့်/ပိတ်မည်",
+    "currencies": {
+      "MMK": "ကျပ် (MMK)",
+      "USD": "ဒေါ်လာ (USD)",
+      "JPY": "ယန်း (JPY)",
+      "KRW": "ဝမ် (KRW)",
+      "THB": "ဘတ် (THB)"
+    }
   }
 }

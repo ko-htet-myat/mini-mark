@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { AttributeDataTable } from "@/features/dashboard-attributes/components/tables/attribute-data-table";
 import { getAttributesPage } from "@/features/dashboard-attributes/data/attribute.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
@@ -12,6 +13,7 @@ export default async function AttributesPage({
   params,
   searchParams,
 }: AttributesPageProps) {
+  const t = await getTranslations("sidebar");
   const { shop: slug } = await params;
   const searchParamKeys = await searchParams;
   const shop = await getShopBySlug(slug);
@@ -28,7 +30,7 @@ export default async function AttributesPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Attributes</h1>
+      <h1 className="text-2xl font-semibold">{t("attributes")}</h1>
       <AttributeDataTable
         data={data}
         pageCount={pageCount}
