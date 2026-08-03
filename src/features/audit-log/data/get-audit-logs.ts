@@ -27,7 +27,7 @@ export async function getAuditLogs(params: GetAuditLogsParams = {}) {
     ...(params.shopId ? { shopId: params.shopId } : {}),
   };
 
-  const [data, total] = await prisma.$transaction([
+  const [data, total] = await Promise.all([
     prisma.auditLog.findMany({
       where,
       orderBy: { createdAt: "desc" },
