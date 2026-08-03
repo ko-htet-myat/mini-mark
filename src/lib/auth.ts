@@ -2,6 +2,7 @@ import { APIError, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
 import { nextCookies } from "better-auth/next-js";
+import { env } from "@/env";
 
 import disposableDomains from "disposable-email-domains";
 
@@ -9,7 +10,7 @@ const blockedDomains = new Set(disposableDomains);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: env.BETTER_AUTH_URL,
   databaseHooks: {
     user: {
       create: {
@@ -34,8 +35,8 @@ export const auth = betterAuth({
   emailAndPassword: { enabled: true, requireEmailVerification: true },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
   session: {
@@ -48,6 +49,6 @@ export const auth = betterAuth({
     window: 60,
     max: 5,
   },
-  trustedOrigins: [process.env.NEXT_PUBLIC_BASE_URL!],
+  trustedOrigins: [env.NEXT_PUBLIC_BASE_URL],
   plugins: [nextCookies()],
 });

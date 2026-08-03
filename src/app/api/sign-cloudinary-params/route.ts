@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
 import { getSession } from "@/lib/get-session";
+import { env } from "@/env";
 
 // ⚠️ Reference only — you already have this route per FEATURES.md. Merge
 // this in only if yours doesn't yet: (a) require a session, or (b) accept a
@@ -21,14 +22,14 @@ export async function POST(req: NextRequest) {
 
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
-    process.env.CLOUDINARY_API_SECRET!,
+    env.CLOUDINARY_API_SECRET,
   );
 
   return NextResponse.json({
     signature,
     timestamp,
-    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    apiKey: env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    cloudName: env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     folder,
   });
 }
