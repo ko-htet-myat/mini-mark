@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export function FashionHero({ shopSlug }: { shopSlug: string }) {
   return (
-    <section className="mt-8 mb-12 rounded-2xl bg-[#fafafaf2] px-5 sm:px-8 py-5 lg:px-16 overflow-hidden relative border border-gray-100">
+    <section className="mt-8 mb-12 rounded-2xl bg-[#fafafae5] px-5 sm:px-8 py-5 lg:px-16 overflow-hidden relative border border-gray-100">
       <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
         <div className="max-w-xl">
           <h2 className=" text-lg sm:text-2xl md:text-4xl font-bold tracking-tight text-gray-900">
