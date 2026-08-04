@@ -1,8 +1,7 @@
 allowBuilds:
-  '@parcel/watcher': true
-  '@prisma/engines': set this to true or false
-  '@swc/core': true
-  better-sqlite3: true
+  "@parcel/watcher": true
+  "@prisma/engines": set this to true or false
+  "@swc/core": true
   esbuild: set this to true or false
   prisma: set this to true or false
   sharp: true
@@ -11,3 +10,8 @@ minimumReleaseAgeExclude:
   - "@ai-sdk/gateway@4.0.19"
   - "@ai-sdk/provider-utils@5.0.9"
   - ai@7.0.26
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - "@prisma/client"
+  - prisma
+  - esbuild
