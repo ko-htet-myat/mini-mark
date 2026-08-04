@@ -18,7 +18,7 @@ const CURRENCY_LOCALE_MAP: Record<string, string> = {
 };
 
 function getCurrencyFormatter(currency: string) {
-  return new Intl.NumberFormat(CURRENCY_LOCALE_MAP[currency] ?? "en-US", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
   });
