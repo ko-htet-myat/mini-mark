@@ -13,16 +13,17 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { useShop } from "@/context/shop-context";
 import { useCart } from "@/features/cart/hooks/use-cart";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const CURRENCY_LOCALE_MAP: Record<string, string> = {
   USD: "en-US",
@@ -46,6 +47,7 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
   const { hydrated, items, itemCount, subtotal, updateQuantity, removeItem } =
     useCart(shopSlug);
   const formatter = getCurrencyFormatter(currency);
+  const isMobile = useIsMobile();
 
   if (
     !hydrated ||
@@ -55,8 +57,8 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
     return null;
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
+    <Drawer direction={isMobile ? "bottom" : "right"}>
+      <DrawerTrigger asChild>
         <Button
           type="button"
           size="icon"
@@ -70,14 +72,14 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
             </span>
           )}
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-[92vw] gap-0 p-0 sm:max-w-md">
-        <SheetHeader className="border-b px-5 py-4">
-          <SheetTitle className="flex items-center gap-2 text-lg">
+      </DrawerTrigger>
+      <DrawerContent className=" w-full gap-0 p-0 sm:max-w-md">
+        <DrawerHeader className="border-b px-5 py-4">
+          <DrawerTitle className="flex items-center gap-2 text-lg">
             <HugeiconsIcon icon={ShoppingCart01Icon} size={20} />
             {t("title")}
-          </SheetTitle>
-        </SheetHeader>
+          </DrawerTitle>
+        </DrawerHeader>
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
@@ -90,11 +92,11 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
             <p className="mt-1 text-sm text-muted-foreground">
               {t("empty_description")}
             </p>
-            <SheetClose asChild>
+            <DrawerClose asChild>
               <Button asChild className="mt-6">
                 <Link href={`/${shopSlug}`}>{t("continue_shopping")}</Link>
               </Button>
-            </SheetClose>
+            </DrawerClose>
           </div>
         ) : (
           <>
@@ -191,29 +193,29 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
               </div>
             </div>
 
-            <SheetFooter className="border-t bg-background px-5 py-4">
+            <DrawerFooter className="border-t bg-background px-5 py-4">
               <div className="mb-2 flex items-center justify-between text-base">
                 <span className="font-medium">{t("subtotal")}</span>
                 <span className="font-semibold" suppressHydrationWarning>
                   {formatter.format(subtotal)}
                 </span>
               </div>
-              <SheetClose asChild>
+              <DrawerClose asChild>
                 <Button asChild className="w-full">
                   <Link href={`/${shopSlug}/cart/create-order`}>
                     {t("checkout")}
                   </Link>
                 </Button>
-              </SheetClose>
-              <SheetClose asChild>
+              </DrawerClose>
+              <DrawerClose asChild>
                 <Button asChild variant="outline" className="w-full">
                   <Link href={`/${shopSlug}/cart`}>{t("view_cart")}</Link>
                 </Button>
-              </SheetClose>
-            </SheetFooter>
+              </DrawerClose>
+            </DrawerFooter>
           </>
         )}
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
