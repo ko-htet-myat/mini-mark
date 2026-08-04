@@ -62,91 +62,95 @@ export function CartList({ shopSlug }: { shopSlug: string }) {
           {items.map((item) => (
             <div
               key={`${item.productId}-${item.variantId}`}
-              className="grid grid-cols-1 md:grid-cols-[3fr_1fr_1fr_1fr_auto] gap-6 md:gap-4 items-center py-6"
+              className="flex flex-col md:grid md:grid-cols-[3fr_1fr_1fr_1fr_auto] gap-4 items-start md:items-center py-6 relative"
             >
               {/* Product Info */}
-              <div className="flex items-center gap-6">
-                <div className="w-24 h-24 flex items-center justify-center shrink-0 p-2 relative">
+              <div className="flex items-start md:items-center gap-4 md:gap-6 w-full md:w-auto">
+                <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center shrink-0 p-2 relative">
                   {item.imageUrl ? (
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
                       fill
-                      sizes="96px"
+                      sizes="(max-width: 768px) 80px, 96px"
                       className="object-contain"
                     />
                   ) : (
                     <div className="w-full h-full bg-muted" />
                   )}
                 </div>
-                <div>
+                <div className="flex-1 pr-8 md:pr-0">
                   <div className="text-base font-medium text-foreground mb-1">
                     {item.name}
                   </div>
                   {item.variantLabel && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground mb-2 md:mb-0">
                       {item.variantLabel}
                     </div>
                   )}
+                  {/* Price for mobile inside product info */}
+                  <div className="md:hidden text-sm font-medium mt-1">
+                    {formatter.format(item.price)}
+                  </div>
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="text-left md:text-center text-sm md:text-base font-medium">
-                <span className="md:hidden text-muted-foreground mr-2 font-normal">
-                  {t("price")}:
-                </span>
+              {/* Price (Desktop) */}
+              <div className="hidden md:block text-center text-base font-medium">
                 {formatter.format(item.price)}
               </div>
 
-              {/* Quantity */}
-              <div className="flex justify-start md:justify-center">
-                <div className="flex items-center bg-muted rounded-full px-3 py-1.5">
-                  <button
-                    onClick={() =>
-                      updateQuantity(
-                        item.productId,
-                        item.variantId,
-                        item.quantity - 1,
-                      )
-                    }
-                    className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={t("decrease_quantity")}
-                  >
-                    <HugeiconsIcon icon={Minus} size={14} />
-                  </button>
-                  <span className="w-8 text-center text-sm font-medium">
-                    {item.quantity}
+              {/* Quantity & Total Wrapper */}
+              <div className="flex items-center justify-between w-full md:contents mt-2 md:mt-0">
+                {/* Quantity */}
+                <div className="flex justify-start md:justify-center">
+                  <div className="flex items-center bg-muted rounded-full px-3 py-1.5">
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.variantId,
+                          item.quantity - 1,
+                        )
+                      }
+                      className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={t("decrease_quantity")}
+                    >
+                      <HugeiconsIcon icon={Minus} size={14} />
+                    </button>
+                    <span className="w-8 text-center text-sm font-medium">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.variantId,
+                          item.quantity + 1,
+                        )
+                      }
+                      className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={t("increase_quantity")}
+                    >
+                      <HugeiconsIcon icon={Plus} size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="text-right md:text-center text-sm md:text-base font-medium">
+                  <span className="md:hidden text-muted-foreground mr-2 font-normal">
+                    {t("total")}:
                   </span>
-                  <button
-                    onClick={() =>
-                      updateQuantity(
-                        item.productId,
-                        item.variantId,
-                        item.quantity + 1,
-                      )
-                    }
-                    className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={t("increase_quantity")}
-                  >
-                    <HugeiconsIcon icon={Plus} size={14} />
-                  </button>
+                  {formatter.format(item.price * item.quantity)}
                 </div>
               </div>
 
-              {/* Total */}
-              <div className="text-left md:text-center text-sm md:text-base font-medium">
-                <span className="md:hidden text-muted-foreground mr-2 font-normal">
-                  {t("total")}:
-                </span>
-                {formatter.format(item.price * item.quantity)}
-              </div>
-
               {/* Remove */}
-              <div className="flex justify-end absolute md:relative right-4 md:right-0 mt-[-60px] md:mt-0">
+              <div className="absolute top-6 right-0 md:relative md:top-auto md:right-auto md:flex md:justify-end">
                 <button
                   onClick={() => removeItem(item.productId, item.variantId)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-full bg-muted md:bg-transparent text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
                   aria-label={t("remove_item")}
                 >
                   <HugeiconsIcon icon={Cancel} size={14} />
