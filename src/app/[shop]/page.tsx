@@ -36,7 +36,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
   ]);
 
   return (
-    <main className=" container">
+    <main>
       <ShopHeader
         name={shop.name}
         description={shop.description}
@@ -45,17 +45,19 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
         currency={shop.currency}
       />
 
-      <CategoryList shopSlug={shop.slug} categories={categories} />
-      {/* <BrandList shopSlug={shop.slug} brands={brands} /> */}
-      <ProductGrid
-        shopSlug={shop.slug}
-        products={productsResult.products}
-        page={productsResult.page}
-        totalPages={productsResult.totalPages}
-        searchParams={{ category, brand }}
-        currency={shop.currency}
-      />
-      <FashionHero shopSlug={shop.slug} />
+      <section className=" container">
+        <CategoryList shopSlug={shop.slug} categories={categories} />
+        {/* <BrandList shopSlug={shop.slug} brands={brands} /> */}
+        <ProductGrid
+          shopSlug={shop.slug}
+          products={productsResult.products}
+          page={productsResult.page}
+          totalPages={productsResult.totalPages}
+          searchParams={{ category, brand }}
+          currency={shop.currency}
+        />
+        <FashionHero shopSlug={shop.slug} />
+      </section>
     </main>
   );
 }
