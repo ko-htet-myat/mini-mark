@@ -34,7 +34,7 @@ export function ShopHeader({
       </div>
 
       {/* Logo + name, overlapping the banner */}
-      <div className=" container relative flex items-end gap-4 -mt-4 sm:-mt-6">
+      <div className=" container relative flex items-end gap-4 -mt-3 sm:-mt-6">
         <div className="relative h-18 w-18 shrink-0 overflow-hidden rounded-full border-4 border-background bg-background sm:h-24 sm:w-24">
           {logoUrl ? (
             <Image
@@ -54,11 +54,11 @@ export function ShopHeader({
         <div className="pb-2">
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-semibold sm:text-2xl">{name}</h1>
-            {currency && (
+            {/* {currency && (
               <span className="rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
                 {currency}
               </span>
-            )}
+            )} */}
           </div>
           {description && (
             <p className="text-sm text-muted-foreground line-clamp-2">

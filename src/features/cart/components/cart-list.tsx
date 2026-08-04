@@ -8,21 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useShop } from "@/context/shop-context";
+import { getCurrencyFormatter } from "@/lib/utils";
 
-const CURRENCY_LOCALE_MAP: Record<string, string> = {
-  USD: "en-US",
-  MMK: "my-MM",
-  JPY: "ja-JP",
-  KRW: "ko-KR",
-  THB: "th-TH",
-};
-
-function getCurrencyFormatter(currency: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  });
-}
 export function CartList({ shopSlug }: { shopSlug: string }) {
   const t = useTranslations("Cart");
   const { currency } = useShop();

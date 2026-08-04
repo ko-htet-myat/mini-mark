@@ -95,7 +95,7 @@ export function ProductGrid({
   return (
     <section id="products" className=" pb-6">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">{t("products_title")}</h2>
+        <h2 className="sm:text-lg font-semibold">{t("products_title")}</h2>
         <div className="flex items-center rounded-md border bg-background p-0.5">
           <button
             type="button"

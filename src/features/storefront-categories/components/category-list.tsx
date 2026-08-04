@@ -25,7 +25,7 @@ export function CategoryList({
   if (categories.length === 0) return null;
 
   return (
-    <section className=" py-6">
+    <section className=" py-7">
       <h2 className="mb-3 sm:text-lg font-semibold">Browse By Category</h2>
       <Swiper
         slidesPerView={3}

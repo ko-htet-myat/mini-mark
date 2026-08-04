@@ -13,7 +13,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, getCurrencyFormatter } from "@/lib/utils";
 import { useShop } from "@/context/shop-context";
 import type { ProductDetailData } from "../types";
 import {
@@ -37,22 +37,6 @@ interface ProductPurchasePanelProps {
     variantId: string | null;
     attributeValueIds: string[];
   }) => void;
-}
-
-const CURRENCY_LOCALE_MAP: Record<string, string> = {
-  USD: "en-US",
-  MMK: "my-MM",
-  JPY: "ja-JP",
-  KRW: "ko-KR",
-  THB: "th-TH",
-};
-
-function getCurrencyFormatter(currency: string) {
-  const locale = CURRENCY_LOCALE_MAP[currency] ?? "en-US";
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-  });
 }
 
 const fallbackSwatchColor = "#d4d4d4";

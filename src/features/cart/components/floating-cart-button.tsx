@@ -23,22 +23,8 @@ import {
 } from "@/components/ui/drawer";
 import { useShop } from "@/context/shop-context";
 import { useCart } from "@/features/cart/hooks/use-cart";
+import { getCurrencyFormatter } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-const CURRENCY_LOCALE_MAP: Record<string, string> = {
-  USD: "en-US",
-  MMK: "my-MM",
-  JPY: "ja-JP",
-  KRW: "ko-KR",
-  THB: "th-TH",
-};
-
-function getCurrencyFormatter(currency: string) {
-  return new Intl.NumberFormat(CURRENCY_LOCALE_MAP[currency] ?? "en-US", {
-    style: "currency",
-    currency,
-  });
-}
 
 export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
   const t = useTranslations("Cart");
