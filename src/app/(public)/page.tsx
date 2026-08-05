@@ -11,7 +11,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-5">
-          <h2 className="text-2xl">{t("title")}</h2>
+          <h2 className="text-2xl lg:text-4xl">{t("title")}</h2>
           <div className="flex gap-4 mt-5 justify-center">
             <Link
               href="/sign-up"
