@@ -91,6 +91,7 @@ describe("createShopAction", () => {
     name: "My Shop",
     slug: "my-shop",
     currency: "MMK" as const,
+    shopCategory: "FASHION" as const,
   };
 
   it("creates a shop and returns it", async () => {
@@ -155,6 +156,7 @@ describe("updateShopAction", () => {
   const validInput = {
     name: "Updated Shop",
     currency: "USD" as const,
+    shopCategory: "FASHION" as const,
     description: "A great shop",
     contactPhones: [],
   };
