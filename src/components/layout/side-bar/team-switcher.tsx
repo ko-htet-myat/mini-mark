@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 
 export function TeamSwitcher() {
   const shop = useShop();
-  const t = useTranslations("Shop");
+  const tUi = useTranslations("UI");
   console.log(shop);
 
   return (
@@ -40,8 +40,12 @@ export function TeamSwitcher() {
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate font-semibold">{shop.name}</span>
-                <span className="truncate text-sm opacity-75">
-                  {t("mini_mark")}
+                <span className="truncate text-xs opacity-75">
+                  {/* {t("mini_mark")} */}
+                  {shop.shopCategory
+                    ? // @ts-expect-error - Next-Intl strictly types translation keys based on the schema, dynamic keys cannot be statically resolved
+                      tUi(`categories.${shop.shopCategory}`)
+                    : null}
                 </span>
               </div>
             </SidebarMenuButton>

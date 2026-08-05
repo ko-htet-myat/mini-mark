@@ -281,6 +281,7 @@
   "Settings": {
     "shop_name": "ဆိုင်အမည်",
     "currency": "ငွေကြေး",
+    "category": "ဆိုင်အမျိုးအစား",
     "description": "ဖော်ပြချက်",
     "contact_email": "ဆက်သွယ်ရန်အီးမေးလ်",
     "contact_phones": "ဆက်သွယ်ရန်ဖုန်းနံပါတ်များ",
@@ -291,9 +292,12 @@
   },
   "Onboarding": {
     "create_shop": "ဆိုင်ဖန်တီးပါ",
-    "pick_name_url": "သင့်ဆိုင်၏အမည်နှင့် လိပ်စာကို ရွေးချယ်ပါ။",
+    "pick_name_url": "သင့်ဆိုင်၏အမည်၊ လိပ်စာနှင့် အမျိုးအစားကို ရွေးချယ်ပါ။",
     "shop_name": "ဆိုင်အမည်",
     "shop_url": "ဆိုင်လိပ်စာ",
+    "currency": "ငွေကြေး",
+    "category": "ဆိုင်အမျိုးအစား",
+    "category_placeholder": "အမျိုးအစားရွေးချယ်ပါ",
     "shop_name_placeholder": "Jane's Pottery",
     "shop_url_placeholder": "janes-pottery",
     "creating_shop": "ဆိုင်ဖန်တီးနေသည်...",
@@ -362,6 +366,22 @@
       "JPY": "ယန်း (JPY)",
       "KRW": "ဝမ် (KRW)",
       "THB": "ဘတ် (THB)"
+    },
+    "categories": {
+      "RESTAURANT": "စားသောက်ဆိုင်",
+      "RETAIL": "လက်လီဆိုင်",
+      "ELECTRONICS": "အီလက်ထရောနစ်ပစ္စည်း",
+      "FASHION": "ဖက်ရှင်",
+      "GROCERY": "မုန့်ဆိုင်",
+      "LIQUOR_STORE": "အရက်ဆိုင်",
+      "BEAUTY": "အလှအပ",
+      "HEALTH": "ကျန်းမာရေး",
+      "HOME_GARDEN": "အိမ်နှင့်ဥယျာဉ်",
+      "SPORTS": "အားကစား",
+      "BOOKS_STATIONERY": "စာအုပ်နှင့်စာရေးကိရိယာ",
+      "AUTOMOTIVE": "ယာဉ်ဆိုင်ရာ",
+      "SERVICES": "ဝန်ဆောင်မှု",
+      "OTHER": "အခြား"
     }
   }
 }

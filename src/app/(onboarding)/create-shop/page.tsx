@@ -16,6 +16,9 @@ import {
 import { useTranslations } from "next-intl";
 import { createShopAction } from "@/features/shop/actions/shop";
 import { createShopSchema } from "@/features/shop/validations/shop";
+import { ShopCategoryType } from "@/generated/prisma/enums";
+
+const SHOP_CATEGORIES = Object.values(ShopCategoryType);
 
 export default function CreateShopPage() {
   const t = useTranslations("Onboarding");
@@ -27,7 +30,12 @@ export default function CreateShopPage() {
     zodResolver(createShopSchema),
     {
       formProps: {
-        defaultValues: { name: "", slug: "", currency: "MMK" },
+        defaultValues: {
+          name: "",
+          slug: "",
+          currency: "MMK",
+          shopCategory: undefined,
+        },
       },
       actionProps: {
         onSuccess: ({ data }) => {
@@ -47,12 +55,23 @@ export default function CreateShopPage() {
       </div>
 
       <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-4">
+        {/* Shop name */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="name">{t("shop_name")}</Label>
           <Input
             id="name"
             placeholder={t("shop_name_placeholder")}
             {...form.register("name")}
+            onChange={(e) => {
+              form.register("name").onChange(e);
+              if (!form.formState.dirtyFields.slug) {
+                const generatedSlug = e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/(^-|-$)/g, "");
+                form.setValue("slug", generatedSlug, { shouldValidate: true });
+              }
+            }}
           />
           {form.formState.errors.name && (
             <p className="text-sm text-destructive">
@@ -61,6 +80,7 @@ export default function CreateShopPage() {
           )}
         </div>
 
+        {/* Shop URL */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="slug">{t("shop_url")}</Label>
           <div className="flex items-center rounded-md border px-3 text-sm text-muted-foreground">
@@ -84,6 +104,36 @@ export default function CreateShopPage() {
           )}
         </div>
 
+        {/* Category */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="shopCategory">{t("category")}</Label>
+          <Select
+            value={form.watch("shopCategory") ?? ""}
+            onValueChange={(value) =>
+              form.setValue("shopCategory", value as ShopCategoryType, {
+                shouldValidate: true,
+              })
+            }
+          >
+            <SelectTrigger id="shopCategory">
+              <SelectValue placeholder={t("category_placeholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {SHOP_CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {uiT(`categories.${cat}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {form.formState.errors.shopCategory && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.shopCategory.message}
+            </p>
+          )}
+        </div>
+
+        {/* Currency */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="currency">{t("currency")}</Label>
           <Select
@@ -108,7 +158,6 @@ export default function CreateShopPage() {
           </Select>
         </div>
 
-        {/* Non-field errors (e.g. "Not authenticated", "You already have a shop") */}
         {action.result.serverError && (
           <p className="text-sm text-destructive">
             {action.result.serverError}

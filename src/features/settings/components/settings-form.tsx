@@ -20,7 +20,10 @@ import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
 import { updateShopSchema } from "@/features/shop/validations/edit";
 import { Shop } from "@/generated/prisma/client";
+import { ShopCategoryType } from "@/generated/prisma/enums";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
+
+const SHOP_CATEGORIES = Object.values(ShopCategoryType);
 
 export function SettingsForm({ shop }: { shop: Shop }) {
   const ts = useTranslations("Settings");
@@ -34,6 +37,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
         defaultValues: {
           name: shop.name,
           currency: shop.currency,
+          shopCategory: shop.shopCategory,
           description: shop.description ?? "",
           contactEmail: shop.contactEmail ?? "",
           contactPhones:
@@ -104,6 +108,34 @@ export function SettingsForm({ shop }: { shop: Shop }) {
             <SelectItem value="THB">THB</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="shopCategory">{ts("category")}</Label>
+        <Select
+          value={form.watch("shopCategory") ?? ""}
+          onValueChange={(value) =>
+            form.setValue("shopCategory", value as ShopCategoryType, {
+              shouldDirty: true,
+            })
+          }
+        >
+          <SelectTrigger id="shopCategory">
+            <SelectValue placeholder={ts("category")} />
+          </SelectTrigger>
+          <SelectContent>
+            {SHOP_CATEGORIES.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat.replace(/_/g, " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.shopCategory && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.shopCategory.message}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">

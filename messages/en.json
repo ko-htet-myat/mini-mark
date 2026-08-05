@@ -282,6 +282,7 @@
   "Settings": {
     "shop_name": "Shop name",
     "currency": "Currency",
+    "category": "Shop category",
     "description": "Description",
     "contact_email": "Contact email",
     "contact_phones": "Contact phone numbers",
@@ -292,9 +293,11 @@
   },
   "Onboarding": {
     "create_shop": "Create your shop",
-    "pick_name_url": "Pick a name and URL for your storefront.",
+    "pick_name_url": "Pick a name, URL, and category for your storefront.",
     "shop_name": "Shop name",
     "currency": "Currency",
+    "category": "Shop category",
+    "category_placeholder": "Select a category",
     "shop_url": "Shop URL",
     "shop_name_placeholder": "Jane's Pottery",
     "shop_url_placeholder": "janes-pottery",
@@ -364,6 +367,22 @@
       "JPY": "JPY",
       "KRW": "KRW",
       "THB": "THB"
+    },
+    "categories": {
+      "RESTAURANT": "Restaurant",
+      "RETAIL": "Retail",
+      "ELECTRONICS": "Electronics",
+      "FASHION": "Fashion",
+      "GROCERY": "Grocery",
+      "LIQUOR_STORE": "Liquor Store",
+      "BEAUTY": "Beauty",
+      "HEALTH": "Health",
+      "HOME_GARDEN": "Home & Garden",
+      "SPORTS": "Sports",
+      "BOOKS_STATIONERY": "Books & Stationery",
+      "AUTOMOTIVE": "Automotive",
+      "SERVICES": "Services",
+      "OTHER": "Other"
     }
   }
 }

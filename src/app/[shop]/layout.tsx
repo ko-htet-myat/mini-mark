@@ -21,6 +21,7 @@ export default async function ShopLayout({
         logoUrl: shop.logoUrl,
         bannerUrl: shop.bannerUrl,
         currency: shop.currency,
+        shopCategory: shop.shopCategory,
       }}
     >
       {children}
