@@ -17,6 +17,7 @@ interface ShopCardData {
   logoUrl: string | null;
   bannerUrl: string | null;
   currency: string;
+  shopCategory: string;
 }
 
 interface ShopGridProps {
@@ -126,13 +127,13 @@ export function ShopGrid({
                   <h3 className="font-medium truncate group-hover:underline">
                     {shop.name}
                   </h3>
-                  {shop.description && (
+                  {/* {shop.description && (
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {shop.description}
                     </p>
-                  )}
+                  )} */}
                   <span className="text-xs text-muted-foreground">
-                    {shop.currency}
+                    {shop.shopCategory}
                   </span>
                 </div>
               </div>

@@ -26,6 +26,7 @@ export async function getShopsPage({
         logoUrl: true,
         bannerUrl: true,
         currency: true,
+        shopCategory: true,
       },
       orderBy: { createdAt: "desc" },
       skip: page * pageSize,

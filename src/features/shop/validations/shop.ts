@@ -34,7 +34,9 @@ export const createShopSchema = z.object({
       message: "This slug is reserved, please choose another",
     }),
   currency: z.nativeEnum(Currency).default("MMK"),
-  shopCategory: z.nativeEnum(ShopCategoryType),
+  shopCategory: z.nativeEnum(ShopCategoryType, {
+    error: "Please select a valid category",
+  }),
 });
 
 export type CreateShopInput = z.infer<typeof createShopSchema>;

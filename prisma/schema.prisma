@@ -116,7 +116,7 @@ model Shop {
   contactEmail         String?
   currency             Currency              @default(MMK)
   contactPhones        String[]              @default([])
-  shopCategory        ShopCategoryType
+  shopCategory         ShopCategoryType
   ownerId              String                @unique
   owner                User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt            DateTime              @default(now())

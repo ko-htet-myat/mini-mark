@@ -115,7 +115,7 @@ export default function CreateShopPage() {
               })
             }
           >
-            <SelectTrigger id="shopCategory">
+            <SelectTrigger id="shopCategory" className="w-full">
               <SelectValue placeholder={t("category_placeholder")} />
             </SelectTrigger>
             <SelectContent>
@@ -145,7 +145,7 @@ export default function CreateShopPage() {
               )
             }
           >
-            <SelectTrigger id="currency">
+            <SelectTrigger id="currency" className="w-full">
               <SelectValue placeholder={t("currency")} />
             </SelectTrigger>
             <SelectContent>
