@@ -2,7 +2,7 @@ import Image from "next/image";
 
 type ShopHeaderProps = {
   name: string;
-  description?: string | null;
+  category?: string | null;
   logoUrl?: string | null;
   bannerUrl?: string | null;
   currency?: string;
@@ -10,7 +10,7 @@ type ShopHeaderProps = {
 
 export function ShopHeader({
   name,
-  description,
+  category,
   logoUrl,
   bannerUrl,
 }: ShopHeaderProps) {
@@ -59,9 +59,9 @@ export function ShopHeader({
               </span>
             )} */}
           </div>
-          {description && (
+          {category && (
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {description}
+              {category}
             </p>
           )}
         </div>

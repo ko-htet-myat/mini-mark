@@ -39,10 +39,10 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
     <main>
       <ShopHeader
         name={shop.name}
-        description={shop.description}
         logoUrl={shop.logoUrl}
         bannerUrl={shop.bannerUrl}
         currency={shop.currency}
+        category={shop.shopCategory}
       />
 
       <section className=" container">
