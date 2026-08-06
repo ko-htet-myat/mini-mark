@@ -7,11 +7,13 @@ const optionalNumber = (schema: z.ZodNumber) =>
     return isNaN(num) ? undefined : num;
   }, schema.optional());
 
+// ─── Variant ─────────────────────────────────────────────────────────────────
+
 const variantAttributeValueSchema = z.object({
   attributeValueId: z.string().min(1),
 });
 
-const variantSchema = z.object({
+export const variantSchema = z.object({
   id: z.string().optional(),
   sku: z
     .string()
@@ -35,6 +37,24 @@ const variantSchema = z.object({
   isActive: z.boolean().default(true),
   attributeValues: z.array(variantAttributeValueSchema).default([]),
 });
+
+export type VariantInput = z.infer<typeof variantSchema>;
+
+// ─── Add-ons (RESTAURANT only) ────────────────────────────────────────────────
+
+const addonOptionSchema = z.object({
+  name: z.string().trim().min(1, "Option name is required"),
+  price: z.coerce.number().min(0, "Price can't be negative").default(0),
+});
+
+const addonGroupSchema = z.object({
+  groupName: z.string().trim().min(1, "Group name is required"),
+  minSelect: z.coerce.number().int().min(0).default(0),
+  maxSelect: z.coerce.number().int().min(1).default(1),
+  options: z.array(addonOptionSchema).default([{ name: "", price: 0 }]),
+});
+
+// ─── Product schemas ──────────────────────────────────────────────────────────
 
 export const createProductSchema = z.object({
   shopId: z.string().min(1),
@@ -90,7 +110,11 @@ export const createProductSchema = z.object({
   hasVariants: z.boolean().default(false),
   variants: z.array(variantSchema).default([]),
 
-  promotionIds: z.array(z.string()).default([]),
+  // ELECTRONICS / AUTOMOTIVE / HOME_GARDEN / BEAUTY
+  specifications: z.record(z.string(), z.string()).optional(),
+
+  // RESTAURANT only
+  addons: z.array(addonGroupSchema).default([]),
 });
 
 export const updateProductSchema = createProductSchema.extend({

@@ -25,6 +25,19 @@ export interface ProductPromotion {
   slug: string;
 }
 
+export interface ProductAddonGroup {
+  groupName: string;
+  minSelect: number;
+  maxSelect: number;
+  options: ProductAddonOption[];
+}
+
+export interface ProductAddonOption {
+  name: string;
+  /** Extra price on top of the base product price */
+  price: number;
+}
+
 export interface ProductDetailData {
   id: string;
   name: string;
@@ -57,6 +70,12 @@ export interface ProductDetailData {
   attributeGroups: ProductAttributeGroup[];
   variants: ProductVariantItem[];
   promotions: ProductPromotion[];
+
+  /** Key-value technical specs (ELECTRONICS, AUTOMOTIVE, HOME_GARDEN, BEAUTY) */
+  specifications: Record<string, string> | null;
+
+  /** Restaurant add-on / modifier groups (RESTAURANT) */
+  addons: ProductAddonGroup[] | null;
 
   rating?: {
     average: number;

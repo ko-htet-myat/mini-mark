@@ -4,11 +4,11 @@ import { makeMockSession, makeMockShop } from "./setup";
 type MockAuth = { user: { id: string } } | null;
 type MockShop = { slug: string; ownerId: string } | null;
 type SafeActionMiddlewareArgs = {
-  next: (args: { ctx: Record<string, unknown> }) => unknown;
+  next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
 };
 type ShopOwnerMiddlewareArgs = SafeActionMiddlewareArgs & {
-  bindArgsClientInputs: [{ shop: string }];
+  bindArgsClientInputs: unknown[];
 };
 const {
   mockPrisma,
@@ -246,6 +246,7 @@ describe("updateProduct", () => {
   };
 
   it("updates a product", async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ shopId: "test-shop-id" });
     mockPrisma.productVariant.deleteMany.mockResolvedValue({ count: 0 });
     mockPrisma.product.update.mockResolvedValue({
       ...baseProduct,
@@ -258,6 +259,7 @@ describe("updateProduct", () => {
   });
 
   it("syncs variants during update", async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ shopId: "test-shop-id" });
     mockPrisma.productVariant.deleteMany.mockResolvedValue({ count: 2 });
     mockPrisma.product.update.mockResolvedValue({
       ...baseProduct,
@@ -374,7 +376,7 @@ describe("duplicateProduct", () => {
       variants: [
         {
           sku: "OG-SKU",
-          price: { toNumber: () => 15 },
+          price: makeMockDecimal(15),
           compareAtPrice: null,
           stock: 10,
           imageUrl: null,

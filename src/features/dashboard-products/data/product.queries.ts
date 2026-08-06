@@ -63,14 +63,6 @@ export async function getProductsPage({
             },
           },
         },
-        promotions: {
-          select: {
-            id: true,
-            name: true,
-            discountType: true,
-            discountValue: true,
-          },
-        },
       },
     }),
     prisma.product.count({ where }),
@@ -112,12 +104,6 @@ export async function getProductsPage({
         },
       })),
     })),
-    promotions: product.promotions.map((p) => ({
-      id: p.id,
-      name: p.name,
-      discountType: p.discountType,
-      discountValue: Number(p.discountValue),
-    })),
   }));
 
   return { data: formattedData, total, pageCount: Math.ceil(total / pageSize) };
@@ -142,7 +128,6 @@ export async function getProductById(id: string, shopId: string) {
           },
         },
       },
-      promotions: { select: { id: true, name: true } },
     },
   });
 
@@ -154,6 +139,16 @@ export async function getProductById(id: string, shopId: string) {
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
+    // specifications and addons come through as-is (Json | null → unknown)
+    specifications: product.specifications as Record<string, string> | null,
+    addons: product.addons as
+      | {
+          groupName: string;
+          minSelect: number;
+          maxSelect: number;
+          options: { name: string; price: number }[];
+        }[]
+      | null,
     variants: product.variants.map((v) => ({
       id: v.id,
       sku: v.sku,
@@ -175,8 +170,9 @@ export async function getProductById(id: string, shopId: string) {
   };
 }
 
+/** Form data for product create/edit — categories, brands, attributes only (no promotions). */
 export async function getShopProductFormData(shopId: string) {
-  const [categories, brands, attributes, promotions] = await Promise.all([
+  const [categories, brands, attributes] = await Promise.all([
     prisma.category.findMany({
       where: { shopId },
       select: {
@@ -202,19 +198,7 @@ export async function getShopProductFormData(shopId: string) {
       },
       orderBy: { name: "asc" },
     }),
-    prisma.promotion.findMany({
-      where: { shopId, isActive: true },
-      select: { id: true, name: true, discountType: true, discountValue: true },
-      orderBy: { name: "asc" },
-    }),
   ]);
 
-  const formattedPromotions = promotions.map((p) => ({
-    id: p.id,
-    name: p.name,
-    discountType: p.discountType,
-    discountValue: Number(p.discountValue),
-  }));
-
-  return { categories, brands, attributes, promotions: formattedPromotions };
+  return { categories, brands, attributes };
 }

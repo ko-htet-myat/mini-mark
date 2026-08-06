@@ -4,11 +4,11 @@ import { makeMockSession, makeMockShop } from "./setup";
 type MockAuth = { user: { id: string } } | null;
 type MockShop = { slug: string; ownerId: string } | null;
 type SafeActionMiddlewareArgs = {
-  next: (args: { ctx: Record<string, unknown> }) => unknown;
+  next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
 };
 type ShopOwnerMiddlewareArgs = SafeActionMiddlewareArgs & {
-  bindArgsClientInputs: [{ shop: string }];
+  bindArgsClientInputs: unknown[];
 };
 const {
   mockPrisma,

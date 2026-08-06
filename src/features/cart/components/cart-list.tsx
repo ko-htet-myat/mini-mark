@@ -48,7 +48,7 @@ export function CartList({ shopSlug }: { shopSlug: string }) {
         <div className="divide-y divide-border/60">
           {items.map((item) => (
             <div
-              key={`${item.productId}-${item.variantId}`}
+              key={item.id}
               className="flex flex-col md:grid md:grid-cols-[3fr_1fr_1fr_1fr_auto] gap-4 items-start md:items-center py-6 relative"
             >
               {/* Product Info */}
@@ -93,13 +93,7 @@ export function CartList({ shopSlug }: { shopSlug: string }) {
                 <div className="flex justify-start md:justify-center">
                   <div className="flex items-center bg-muted rounded-full px-3 py-1.5">
                     <button
-                      onClick={() =>
-                        updateQuantity(
-                          item.productId,
-                          item.variantId,
-                          item.quantity - 1,
-                        )
-                      }
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                       aria-label={t("decrease_quantity")}
                     >
@@ -109,13 +103,7 @@ export function CartList({ shopSlug }: { shopSlug: string }) {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() =>
-                        updateQuantity(
-                          item.productId,
-                          item.variantId,
-                          item.quantity + 1,
-                        )
-                      }
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                       aria-label={t("increase_quantity")}
                     >
@@ -136,7 +124,7 @@ export function CartList({ shopSlug }: { shopSlug: string }) {
               {/* Remove */}
               <div className="absolute top-6 right-0 md:relative md:top-auto md:right-auto md:flex md:justify-end">
                 <button
-                  onClick={() => removeItem(item.productId, item.variantId)}
+                  onClick={() => removeItem(item.id)}
                   className="w-7 h-7 flex items-center justify-center rounded-full bg-muted md:bg-transparent text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
                   aria-label={t("remove_item")}
                 >

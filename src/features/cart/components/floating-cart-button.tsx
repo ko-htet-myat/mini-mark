@@ -89,10 +89,7 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
             <div className="flex-1 overflow-y-auto px-5">
               <div className="divide-y">
                 {items.map((item) => (
-                  <div
-                    key={`${item.productId}-${item.variantId}`}
-                    className="flex gap-4 py-4"
-                  >
+                  <div key={item.id} className="flex gap-4 py-4">
                     <div className="relative h-18 w-18 shrink-0 overflow-hidden rounded-md bg-muted">
                       {item.imageUrl ? (
                         <Image
@@ -118,9 +115,7 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
                         </div>
                         <button
                           type="button"
-                          onClick={() =>
-                            removeItem(item.productId, item.variantId)
-                          }
+                          onClick={() => removeItem(item.id)}
                           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
                           aria-label={t("remove_item")}
                         >
@@ -132,11 +127,7 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
                           <button
                             type="button"
                             onClick={() =>
-                              updateQuantity(
-                                item.productId,
-                                item.variantId,
-                                item.quantity - 1,
-                              )
+                              updateQuantity(item.id, item.quantity - 1)
                             }
                             className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
                             aria-label={t("decrease_quantity")}
@@ -149,11 +140,7 @@ export function FloatingCartButton({ shopSlug }: { shopSlug: string }) {
                           <button
                             type="button"
                             onClick={() =>
-                              updateQuantity(
-                                item.productId,
-                                item.variantId,
-                                item.quantity + 1,
-                              )
+                              updateQuantity(item.id, item.quantity + 1)
                             }
                             className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
                             aria-label={t("increase_quantity")}

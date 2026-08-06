@@ -21,6 +21,7 @@ import {
   getAvailableStockForSelection,
   hasVariantForSelection,
 } from "../utils/variant-selection";
+import { ProductAddons, type SelectedAddon } from "./product-addons";
 
 interface ProductPurchasePanelProps {
   shopSlug: string;
@@ -30,12 +31,14 @@ interface ProductPurchasePanelProps {
     quantity: number;
     variantId: string | null;
     attributeValueIds: string[];
+    selectedAddons?: SelectedAddon[];
   }) => void;
   onBuyItNow?: (selection: {
     productId: string;
     quantity: number;
     variantId: string | null;
     attributeValueIds: string[];
+    selectedAddons?: SelectedAddon[];
   }) => void;
 }
 
@@ -74,13 +77,21 @@ function isColorGroup(group: { slug: string; name: string }) {
   return group.slug === "color" || group.name.toLowerCase() === "color";
 }
 
+/** Shop categories that show a spec table below variants */
+const SPECS_CATEGORIES = new Set([
+  "ELECTRONICS",
+  "AUTOMOTIVE",
+  "HOME_GARDEN",
+  "BEAUTY",
+]);
+
 export function ProductPurchasePanel({
   shopSlug,
   product,
   onAddToCart,
   onBuyItNow,
 }: ProductPurchasePanelProps) {
-  const { currency } = useShop();
+  const { currency, shopCategory } = useShop();
   const currencyFormatter = useMemo(
     () => getCurrencyFormatter(currency),
     [currency],
@@ -99,6 +110,10 @@ export function ProductPurchasePanel({
 
   const [quantity, setQuantity] = useState(1);
 
+  // Addon extra price (RESTAURANT only — Option B)
+  const [addonExtraTotal, setAddonExtraTotal] = useState(0);
+  const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
+
   const selectedAttrValueIds = useMemo(
     () => Object.values(selectedAttributes).filter((id) => id !== ""),
     [selectedAttributes],
@@ -113,11 +128,14 @@ export function ProductPurchasePanel({
     selectedAttrValueIds,
     product.stock,
   );
-  const outOfStock = availableStock <= 0;
-  const maxQuantity = Math.min(availableStock, 99) || 1;
+  const outOfStock = product.hasVariants ? availableStock <= 0 : false;
+  const maxQuantity = product.hasVariants
+    ? Math.min(availableStock, 99) || 1
+    : 99;
 
-  const displayPrice =
+  const basePrice =
     matchedVariant?.price != null ? matchedVariant.price : product.price;
+  const displayPrice = basePrice + addonExtraTotal;
   const displayCompareAtPrice =
     matchedVariant?.compareAtPrice ?? product.compareAtPrice;
 
@@ -127,13 +145,25 @@ export function ProductPurchasePanel({
       quantity,
       variantId: matchedVariant?.id ?? null,
       attributeValueIds: selectedAttrValueIds,
+      selectedAddons,
     }),
-    [product.id, quantity, matchedVariant, selectedAttrValueIds],
+    [
+      product.id,
+      quantity,
+      matchedVariant,
+      selectedAttrValueIds,
+      selectedAddons,
+    ],
   );
 
   function selectAttribute(groupId: string, valueId: string) {
     setSelectedAttributes((prev) => ({ ...prev, [groupId]: valueId }));
     setQuantity(1);
+  }
+
+  function handleAddonChange(addons: SelectedAddon[], extra: number) {
+    setSelectedAddons(addons);
+    setAddonExtraTotal(extra);
   }
 
   const breadcrumb = [
@@ -151,6 +181,12 @@ export function ProductPurchasePanel({
         }
       : null,
   ].filter((c): c is { label: string; href: string } => Boolean(c));
+
+  const isRestaurant = shopCategory === "RESTAURANT";
+  const hasSpecs =
+    SPECS_CATEGORIES.has(shopCategory) &&
+    product.specifications &&
+    Object.keys(product.specifications).length > 0;
 
   return (
     <div className="flex w-full max-w-md flex-col">
@@ -191,12 +227,6 @@ export function ProductPurchasePanel({
             {product.brand.name}
           </Link>
         )}
-
-        {/* {product.category && (
-          <Badge variant="secondary" className=" w-fit rounded-full">
-            {product.category.name}
-          </Badge>
-        )} */}
       </div>
 
       <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -230,7 +260,7 @@ export function ProductPurchasePanel({
         <span className="text-2xl font-bold" suppressHydrationWarning>
           {currencyFormatter.format(displayPrice)}
         </span>
-        {displayCompareAtPrice && displayCompareAtPrice > displayPrice && (
+        {displayCompareAtPrice && displayCompareAtPrice > basePrice && (
           <span
             className="text-lg text-muted-foreground line-through"
             suppressHydrationWarning
@@ -256,12 +286,52 @@ export function ProductPurchasePanel({
       </div>
 
       <div className="mt-6 flex flex-col gap-6">
-        {groups.map((group) => {
-          if (isColorGroup(group)) {
+        {/* ── Variant attribute selectors (non-restaurant shops) ───────────── */}
+        {!isRestaurant &&
+          groups.map((group) => {
+            if (isColorGroup(group)) {
+              return (
+                <div key={group.id}>
+                  <p className="mb-2 text-sm font-medium">Available Color</p>
+                  <div className="flex gap-2">
+                    {group.values.map((v) => {
+                      const isUnavailable = !hasVariantForSelection(
+                        product.variants,
+                        selectedAttributes,
+                        group.id,
+                        v.id,
+                      );
+
+                      return (
+                        <button
+                          key={v.id}
+                          type="button"
+                          title={v.value}
+                          aria-label={`Select color ${v.value}`}
+                          aria-pressed={selectedAttributes[group.id] === v.id}
+                          disabled={isUnavailable}
+                          onClick={() => selectAttribute(group.id, v.id)}
+                          className={cn(
+                            "h-8 w-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-35",
+                            selectedAttributes[group.id] === v.id
+                              ? "border-foreground ring-2 ring-offset-2 ring-offset-background ring-foreground/20"
+                              : "border-border",
+                          )}
+                          style={{ backgroundColor: swatchColor(v.value) }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div key={group.id}>
-                <p className="mb-2 text-sm font-medium">Available Color</p>
-                <div className="flex gap-2">
+                <p className="mb-2 text-sm font-medium text-muted-foreground">
+                  {group.name}
+                </p>
+                <div className="flex flex-wrap gap-2">
                   {group.values.map((v) => {
                     const isUnavailable = !hasVariantForSelection(
                       product.variants,
@@ -274,64 +344,39 @@ export function ProductPurchasePanel({
                       <button
                         key={v.id}
                         type="button"
-                        title={v.value}
-                        aria-label={`Select color ${v.value}`}
                         aria-pressed={selectedAttributes[group.id] === v.id}
                         disabled={isUnavailable}
                         onClick={() => selectAttribute(group.id, v.id)}
                         className={cn(
-                          "h-8 w-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-35",
+                          "flex h-10 min-w-[44px] items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-35",
                           selectedAttributes[group.id] === v.id
-                            ? "border-foreground ring-2 ring-offset-2 ring-offset-background ring-foreground/20"
-                            : "border-border",
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border text-muted-foreground hover:border-foreground/30",
                         )}
-                        style={{ backgroundColor: swatchColor(v.value) }}
-                      />
+                      >
+                        {v.value}
+                      </button>
                     );
                   })}
                 </div>
               </div>
             );
-          }
+          })}
 
-          return (
-            <div key={group.id}>
-              <p className="mb-2 text-sm font-medium text-muted-foreground">
-                {group.name}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {group.values.map((v) => {
-                  const isUnavailable = !hasVariantForSelection(
-                    product.variants,
-                    selectedAttributes,
-                    group.id,
-                    v.id,
-                  );
+        {/* ── Restaurant add-on selector ───────────────────────────────────── */}
+        {isRestaurant && product.addons && product.addons.length > 0 && (
+          <div>
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              Customise your order
+            </p>
+            <ProductAddons
+              addons={product.addons}
+              onChange={handleAddonChange}
+            />
+          </div>
+        )}
 
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      aria-pressed={selectedAttributes[group.id] === v.id}
-                      disabled={isUnavailable}
-                      onClick={() => selectAttribute(group.id, v.id)}
-                      className={cn(
-                        "flex h-10 min-w-[44px] items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-35",
-                        selectedAttributes[group.id] === v.id
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border text-muted-foreground hover:border-foreground/30",
-                      )}
-                    >
-                      {v.value}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Quantity */}
+        {/* ── Quantity ────────────────────────────────────────────────────── */}
         <div>
           <p className="mb-2 text-sm font-medium ">Quantity</p>
           <div className="flex items-center gap-4">
@@ -358,7 +403,35 @@ export function ProductPurchasePanel({
         </div>
       </div>
 
-      {/* SKU + Stock count */}
+      {/* ── Inline spec table (ELECTRONICS / AUTOMOTIVE / HOME_GARDEN / BEAUTY) */}
+      {hasSpecs && (
+        <div className="mt-6 rounded-lg border">
+          <table className="w-full text-sm">
+            <tbody>
+              {Object.entries(product.specifications!).map(
+                ([key, value], i) => (
+                  <tr
+                    key={key}
+                    className={cn(
+                      "flex",
+                      i % 2 === 0 ? "bg-muted/40" : "bg-background",
+                    )}
+                  >
+                    <td className="w-2/5 shrink-0 px-4 py-2.5 font-medium text-foreground">
+                      {key}
+                    </td>
+                    <td className="flex-1 px-4 py-2.5 text-muted-foreground">
+                      {value}
+                    </td>
+                  </tr>
+                ),
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── SKU + Stock count ────────────────────────────────────────────── */}
       <div className="mt-6 flex items-center gap-4 text-sm">
         {matchedVariant?.sku && (
           <span className="text-muted-foreground">
@@ -368,18 +441,19 @@ export function ProductPurchasePanel({
             </span>
           </span>
         )}
-        {!outOfStock ? (
-          <span className="text-green-600 dark:text-green-400">
-            {availableStock <= 5
-              ? `Only ${availableStock} left in stock`
-              : `${availableStock} in stock`}
-          </span>
-        ) : (
-          <span className="text-destructive">Out of stock</span>
-        )}
+        {product.hasVariants &&
+          (!outOfStock ? (
+            <span className="text-green-600 dark:text-green-400">
+              {availableStock <= 5
+                ? `Only ${availableStock} left in stock`
+                : `${availableStock} in stock`}
+            </span>
+          ) : (
+            <span className="text-destructive">Out of stock</span>
+          ))}
       </div>
 
-      {/* CTAs */}
+      {/* ── CTAs ────────────────────────────────────────────────────────── */}
       <div className="mt-3 flex gap-3">
         <Button
           size="lg"

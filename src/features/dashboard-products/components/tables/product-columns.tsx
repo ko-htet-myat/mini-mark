@@ -31,7 +31,6 @@ export type ProductRow = {
       };
     }[];
   }[];
-  promotions: { id: string; name: string }[];
 };
 
 function getAggregateStock(variants: ProductRow["variants"]): number {

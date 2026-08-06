@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { EditProductForm } from "@/features/dashboard-products/components/forms/edit-product-form";
+import ProductFormWizard from "@/features/dashboard-products/components/forms/product-form-wizard";
 import {
   getProductById,
   getShopProductFormData,
@@ -16,11 +16,10 @@ export default async function EditProductPage({
   const { shop: shopSlug, productId } = await params;
   const shop = await getShopBySlug(shopSlug);
 
-  const [product, { categories, brands, attributes, promotions }] =
-    await Promise.all([
-      getProductById(productId, shop.id),
-      getShopProductFormData(shop.id),
-    ]);
+  const [product, { categories, brands, attributes }] = await Promise.all([
+    getProductById(productId, shop.id),
+    getShopProductFormData(shop.id),
+  ]);
 
   if (!product) {
     notFound();
@@ -28,46 +27,61 @@ export default async function EditProductPage({
 
   const initialData = {
     id: product.id,
+    shopId: shop.id,
     name: product.name,
     slug: product.slug,
-    description: product.description,
-    price: Number(product.price),
-    compareAtPrice: product.compareAtPrice
-      ? Number(product.compareAtPrice)
-      : null,
-    imageUrl: product.imageUrl,
-    youtubeUrl: product.youtubeUrl,
+    description: product.description ?? "",
+    price: product.price,
+    compareAtPrice: product.compareAtPrice ?? undefined,
+    imageUrl: product.imageUrl ?? "",
+    youtubeUrl: product.youtubeUrl ?? "",
     isActive: product.isActive,
     hasVariants: product.hasVariants,
-    categoryId: product.categoryId,
-    brandId: product.brandId,
+    categoryId: product.categoryId ?? "",
+    brandId: product.brandId ?? "",
+    // Pre-populate specs and addons from DB
+    specifications:
+      (product.specifications as Record<string, string> | null) ?? {},
+    addons:
+      (product.addons as
+        | {
+            groupName: string;
+            minSelect: number;
+            maxSelect: number;
+            options: { name: string; price: number }[];
+          }[]
+        | null) ?? [],
     variants: product.variants.map((v) => ({
       id: v.id,
-      sku: v.sku,
-      price: v.price,
-      compareAtPrice: v.compareAtPrice,
+      sku: v.sku ?? "",
+      price: v.price ?? undefined,
+      compareAtPrice: v.compareAtPrice ?? undefined,
       stock: v.stock,
-      imageUrl: v.imageUrl,
+      imageUrl: v.imageUrl ?? "",
       isActive: v.isActive,
       attributeValues: v.attributeValues.map((av) => ({
         attributeValueId: av.attributeValueId,
-        attributeValue: av.attributeValue,
       })),
     })),
-    promotionIds: product.promotions.map((p) => p.id),
   };
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <h1 className="text-2xl font-bold tracking-tight">Edit Product</h1>
-      <EditProductForm
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Edit Product</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Update the details for{" "}
+          <span className="font-medium">{product.name}</span>.
+        </p>
+      </div>
+      <ProductFormWizard
         shopId={shop.id}
         shopSlug={shop.slug}
-        currency={shop.currency}
+        shopCategory={shop.shopCategory}
         categories={categories}
         brands={brands}
         attributes={attributes}
-        promotions={promotions}
+        mode="edit"
         initialData={initialData}
       />
     </div>

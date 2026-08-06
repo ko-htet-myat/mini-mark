@@ -10,7 +10,10 @@ import { PlayIcon } from "@hugeicons/core-free-icons";
 import type { ProductDetailData } from "../types";
 import { ProductGallery } from "./product-gallery";
 import { ProductPurchasePanel } from "./product-purchase-panel";
+import { ProductSpecs } from "./product-specs";
 import { useCartStore } from "@/store/cart-store";
+import { useShop } from "@/context/shop-context";
+import type { SelectedAddon } from "./product-addons";
 
 interface ProductDetailProps {
   shopSlug: string;
@@ -29,20 +32,35 @@ function getYouTubeEmbedUrl(url: string) {
   return null;
 }
 
+/** Shop categories that show the standalone full-width spec table in the detail section */
+const SPECS_CATEGORIES = new Set([
+  "ELECTRONICS",
+  "AUTOMOTIVE",
+  "HOME_GARDEN",
+  "BEAUTY",
+]);
+
 export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
   const router = useRouter();
   const t = useTranslations("Cart");
+  const { shopCategory } = useShop();
   const addItem = useCartStore((s) => s.addItem);
 
   const youtubeEmbedUrl = product.youtubeUrl
     ? getYouTubeEmbedUrl(product.youtubeUrl)
     : null;
 
+  const showDetailSpecs =
+    SPECS_CATEGORIES.has(shopCategory) &&
+    product.specifications &&
+    Object.keys(product.specifications).length > 0;
+
   function buildCartItem(selection: {
     productId: string;
     quantity: number;
     variantId: string | null;
     attributeValueIds: string[];
+    selectedAddons?: SelectedAddon[];
   }) {
     const variant = product.variants.find((v) => v.id === selection.variantId);
 
@@ -58,12 +76,33 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
       variantLabel = labels.join(" / ");
     }
 
-    const maxStock = variant ? variant.stock : product.stock;
-    const price = variant?.price ?? product.price;
+    // Append selected addon names to the variant label if present
+    if (selection.selectedAddons && selection.selectedAddons.length > 0) {
+      const addonLabel = selection.selectedAddons
+        .map((a) => a.option.name)
+        .join(", ");
+      variantLabel = variantLabel
+        ? `${variantLabel} · ${addonLabel}`
+        : addonLabel;
+    }
+
+    const addonExtra = (selection.selectedAddons ?? []).reduce(
+      (sum, a) => sum + a.option.price,
+      0,
+    );
+
+    const maxStock = product.hasVariants
+      ? variant
+        ? variant.stock
+        : product.stock
+      : 99;
+    const basePrice = variant?.price ?? product.price;
+    const price = basePrice + addonExtra;
     const imageUrl =
       variant?.imageUrl ?? product.imageUrl ?? product.images[0] ?? null;
 
     return {
+      id: `${selection.productId}-${selection.variantId}-${variantLabel ?? ""}`,
       productId: selection.productId,
       variantId: selection.variantId,
       name: product.name,
@@ -80,6 +119,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
     quantity: number;
     variantId: string | null;
     attributeValueIds: string[];
+    selectedAddons?: SelectedAddon[];
   }) {
     const item = buildCartItem(selection);
     addItem(shopSlug, item);
@@ -91,6 +131,7 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
     quantity: number;
     variantId: string | null;
     attributeValueIds: string[];
+    selectedAddons?: SelectedAddon[];
   }) {
     const item = buildCartItem(selection);
     addItem(shopSlug, item);
@@ -119,6 +160,11 @@ export function ProductDetail({ shopSlug, product }: ProductDetailProps) {
               {product.description}
             </p>
           </div>
+        )}
+
+        {/* Full-width spec table in the detail section for ELECTRONICS / AUTOMOTIVE / HOME_GARDEN / BEAUTY */}
+        {showDetailSpecs && (
+          <ProductSpecs specifications={product.specifications!} />
         )}
 
         {youtubeEmbedUrl && (

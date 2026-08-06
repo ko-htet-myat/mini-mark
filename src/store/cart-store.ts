@@ -8,23 +8,13 @@ type CartStore = {
   shopSlug: string | null;
   items: CartItem[];
   addItem: (shopSlug: string, item: CartItem) => void;
-  removeItem: (productId: string, variantId: string | null) => void;
-  updateQuantity: (
-    productId: string,
-    variantId: string | null,
-    quantity: number,
-  ) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   subtotal: () => number;
 };
 
-function sameLine(
-  a: { productId: string; variantId: string | null },
-  productId: string,
-  variantId: string | null,
-) {
-  return a.productId === productId && a.variantId === variantId;
-}
+// sameLine removed
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -41,12 +31,10 @@ export const useCartStore = create<CartStore>()(
         }
 
         set((s) => {
-          const existing = s.items.find((i) =>
-            sameLine(i, item.productId, item.variantId),
-          );
+          const existing = s.items.find((i) => i.id === item.id);
           const items = existing
             ? s.items.map((i) =>
-                sameLine(i, item.productId, item.variantId)
+                i.id === item.id
                   ? {
                       ...i,
                       quantity: Math.min(
@@ -62,16 +50,16 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (productId, variantId) =>
+      removeItem: (id) =>
         set((s) => ({
-          items: s.items.filter((i) => !sameLine(i, productId, variantId)),
+          items: s.items.filter((i) => i.id !== id),
         })),
 
-      updateQuantity: (productId, variantId, quantity) =>
+      updateQuantity: (id, quantity) =>
         set((s) => ({
           items: s.items
             .map((i) =>
-              sameLine(i, productId, variantId)
+              i.id === id
                 ? {
                     ...i,
                     quantity: Math.max(1, Math.min(quantity, i.maxStock)),

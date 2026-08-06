@@ -13,7 +13,6 @@ export function ShopHeader({
   description,
   logoUrl,
   bannerUrl,
-  currency,
 }: ShopHeaderProps) {
   return (
     <div className="w-full">

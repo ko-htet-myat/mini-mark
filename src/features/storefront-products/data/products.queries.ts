@@ -58,8 +58,9 @@ export async function getShopProducts({
   const products = rawProducts.map((p) => {
     const activeVariants = p.variants.filter((v) => v.isActive);
     const totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
-    const allOutOfStock =
-      activeVariants.length > 0 && activeVariants.every((v) => v.stock === 0);
+    const allOutOfStock = p.hasVariants
+      ? activeVariants.length > 0 && activeVariants.every((v) => v.stock === 0)
+      : false;
 
     return {
       ...p,

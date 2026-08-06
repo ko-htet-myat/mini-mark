@@ -4,11 +4,11 @@ import { makeMockSession, makeMockShop } from "./setup";
 type MockAuth = { user: { id: string } } | null;
 type MockShop = { slug: string; ownerId: string } | null;
 type SafeActionMiddlewareArgs = {
-  next: (args: { ctx: Record<string, unknown> }) => unknown;
+  next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
 };
 type ShopOwnerMiddlewareArgs = SafeActionMiddlewareArgs & {
-  bindArgsClientInputs: [{ shop: string }];
+  bindArgsClientInputs: unknown[];
 };
 const {
   mockPrisma,
@@ -162,8 +162,11 @@ describe("createAttribute", () => {
     const result = await createAttribute.bind(
       null,
       BIND,
-    )({ ...validInput, values: [] });
-    expect(result.validationErrors?.values?._errors).toBeDefined();
+    )({
+      ...validInput,
+      values: [],
+    });
+    expect(result.validationErrors?.values).toBeDefined();
   });
 
   it("returns server error on duplicate slug", async () => {

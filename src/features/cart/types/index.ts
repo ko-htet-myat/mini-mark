@@ -1,4 +1,5 @@
 export type CartItem = {
+  id: string;
   productId: string;
   variantId: string | null;
   name: string;

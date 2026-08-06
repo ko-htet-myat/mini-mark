@@ -3,7 +3,7 @@ import { makeMockSession } from "./setup";
 
 type MockAuth = { user: { id: string } } | null;
 type SafeActionMiddlewareArgs = {
-  next: (args: { ctx: Record<string, unknown> }) => unknown;
+  next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
 };
 const { mockGetSession, mockPrisma, setMockAuth, getMockAuth } = vi.hoisted(

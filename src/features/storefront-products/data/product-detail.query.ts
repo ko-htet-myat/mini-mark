@@ -3,6 +3,7 @@ import type {
   ProductDetailData,
   ProductAttributeGroup,
   ProductVariantItem,
+  ProductAddonGroup,
 } from "../types";
 
 interface GetProductDetailParams {
@@ -20,7 +21,22 @@ export async function getProductDetail({
       isActive: true,
       shop: { slug: shopSlug },
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      youtubeUrl: true,
+      price: true,
+      compareAtPrice: true,
+      imageUrl: true,
+      isActive: true,
+      hasVariants: true,
+      createdAt: true,
+      categoryId: true,
+      brandId: true,
+      specifications: true,
+      addons: true,
       brand: true,
       category: { include: { parent: true } },
       variants: {
@@ -116,6 +132,18 @@ export async function getProductDetail({
     attributeValueIds: v.attributeValues.map((av) => av.attributeValue.id),
   }));
 
+  // Safely cast JSON fields to typed shapes
+  const specifications =
+    product.specifications &&
+    typeof product.specifications === "object" &&
+    !Array.isArray(product.specifications)
+      ? (product.specifications as Record<string, string>)
+      : null;
+
+  const addons = Array.isArray(product.addons)
+    ? (product.addons as unknown as ProductAddonGroup[])
+    : null;
+
   return {
     id: product.id,
     name: product.name,
@@ -165,5 +193,7 @@ export async function getProductDetail({
       discountValue: Number(p.discountValue),
       slug: p.slug,
     })),
+    specifications,
+    addons,
   };
 }
