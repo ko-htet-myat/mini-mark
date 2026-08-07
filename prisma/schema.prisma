@@ -107,16 +107,23 @@ enum ShopCategoryType {
 }
 
 model Shop {
-  id                   String                @id @default(cuid())
-  slug                 String                @unique
-  name                 String
-  description          String?
-  logoUrl              String?
-  bannerUrl            String?
-  contactEmail         String?
-  currency             Currency              @default(MMK)
-  contactPhones        String[]              @default([])
-  shopCategory         ShopCategoryType
+  id            String           @id @default(cuid())
+  slug          String           @unique
+  name          String
+  description   String?
+  logoUrl       String?
+  bannerUrl     String?
+  contactEmail  String?
+  currency      Currency         @default(MMK)
+  contactPhones String[]         @default([])
+  shopCategory  ShopCategoryType
+
+  // 📍 Location
+  region   String?
+  division String?
+  township String?
+  address  String?
+
   ownerId              String                @unique
   owner                User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt            DateTime              @default(now())

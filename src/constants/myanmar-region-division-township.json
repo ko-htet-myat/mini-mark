@@ -1,0 +1,702 @@
+[
+  {
+    "region": "Magway Region",
+    "divisions": [
+      {
+        "division": "Gangaw",
+        "townships": ["Gangaw", "Kyaukhtu", "Saw", "Tilin"]
+      },
+      {
+        "division": "Magway",
+        "townships": [
+          "Chauck",
+          "Magway",
+          "Myothit",
+          "Natmauk",
+          "Taungdwingyi",
+          "Yenangyaung"
+        ]
+      },
+      {
+        "division": "Minbu",
+        "townships": ["Minbu", "Ngape", "Pwintbyu", "Salin", "Sidoktaya"]
+      },
+      {
+        "division": "Pakokku",
+        "townships": ["Myaing", "Pakokku", "Pauk", "Seikphyu", "Yesagyo"]
+      },
+      {
+        "division": "Thayet",
+        "townships": [
+          "Aunglan",
+          "Kamma",
+          "Mindon",
+          "Minhla",
+          "Sinbaungwe",
+          "Thayet"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Mandalay Region",
+    "divisions": [
+      {
+        "division": "Kyaukse",
+        "townships": ["Kyaukse", "Myittha", "Sintgaing", "Tada-U"]
+      },
+      {
+        "division": "Mandalay",
+        "townships": [
+          "Amarapura",
+          "Aungmyethazan",
+          "Chanayethazan",
+          "Chanmyathazi",
+          "Mahaaungmye",
+          "Patheingyi",
+          "Pyigyidagun"
+        ]
+      },
+      {
+        "division": "Meiktila",
+        "townships": ["Mahlaing", "Meiktila", "Thazi", "Wundwin"]
+      },
+      {
+        "division": "Myingyan",
+        "townships": ["Myingyan", "Natogyi", "Nganzun", "Thaungtha"]
+      },
+      {
+        "division": "Nyaung-U",
+        "townships": ["Kyaukpadaung", "Ngathayauk", "Nyaung-U"]
+      },
+      {
+        "division": "Pyinoolwin",
+        "townships": [
+          "Madaya",
+          "Mogok",
+          "Pyinoolwin",
+          "Singu",
+          "Tagaung",
+          "Thabeikkyin"
+        ]
+      },
+      {
+        "division": "Yamethin",
+        "townships": ["Pyawbwe", "Yamethin"]
+      }
+    ]
+  },
+  {
+    "region": "Naypyidaw Union Territory",
+    "divisions": [
+      {
+        "division": "Dekkhina(South Naypyidaw)",
+        "townships": ["Dekkhinathiri", "Lewe", "Pyinmana", "Zabuthiri"]
+      },
+      {
+        "division": "Ottara(North Naypyidaw)",
+        "townships": ["Ottarathiri", "Pobbathiri", "Tatkon", "Zeyarthiri"]
+      }
+    ]
+  },
+  {
+    "region": "Kayah State",
+    "divisions": [
+      {
+        "division": "Bawlakhe",
+        "townships": ["Bawlakhe", "Hpasawng", "Mese", "Ywathit"]
+      },
+      {
+        "division": "Loikaw",
+        "townships": ["Demoso", "Hpruso", "Loikaw", "Shadaw"]
+      }
+    ]
+  },
+  {
+    "region": "Shan State",
+    "divisions": [
+      {
+        "division": "Kengtung",
+        "townships": [
+          "Kengtung",
+          "Mine Pauk",
+          "Minelar",
+          "Mong Khet",
+          "Mong La",
+          "Mong Yang"
+        ]
+      },
+      {
+        "division": "Mong Hpayak",
+        "townships": ["Mineyu", "Mong Hpayak", "Mong Yawng"]
+      },
+      {
+        "division": "Mong Hsat",
+        "townships": [
+          "Minekoke",
+          "Monehta",
+          "Mong Hsat",
+          "Mong Ping",
+          "Mong Tong",
+          "Ponparkyin",
+          "Tontar"
+        ]
+      },
+      {
+        "division": "Tachileik",
+        "townships": ["Kyaing Lap", "Tachileik", "Talay"]
+      },
+      {
+        "division": "Kunlong",
+        "townships": ["Kunlong"]
+      },
+      {
+        "division": "Kyaukme",
+        "townships": [
+          "Hsipaw",
+          "Kyaukme",
+          "Mantong",
+          "Minelon",
+          "Minengaw",
+          "Namhsan",
+          "Namtu",
+          "Nawnghkio"
+        ]
+      },
+      {
+        "division": "Lashio",
+        "townships": ["Hsenwi", "Lashio", "Mongyai", "Tangyan"]
+      },
+      {
+        "division": "Laukkaing",
+        "townships": ["Chinshwehaw", "Konkyan", "Laukkaing", "Mawhtike"]
+      },
+      {
+        "division": "Mu Se",
+        "townships": [
+          "Kutkai",
+          "Manhero",
+          "Monekoe",
+          "Mu Se",
+          "Namhkam",
+          "Pansai",
+          "Tamoenye"
+        ]
+      },
+      {
+        "division": "Hopang",
+        "townships": ["Hopang", "Mongmao", "Namtit", "Pangwaun", "Panlong"]
+      },
+      {
+        "division": "Matman",
+        "townships": ["Man Kan", "Matman", "Namphan", "Pangsang Township (Pan"]
+      },
+      {
+        "division": "Mongmit",
+        "townships": ["Mabein", "Mongmit"]
+      },
+      {
+        "division": "Langkho",
+        "townships": [
+          "Homane",
+          "Kengtaung",
+          "Langkho",
+          "Mawkmai",
+          "Mong Nai",
+          "Mong Pan"
+        ]
+      },
+      {
+        "division": "Loilen",
+        "townships": [
+          "Karli",
+          "Kholan",
+          "Kunhing",
+          "Kyethi",
+          "Lai-Hka",
+          "Loilen",
+          "Minenaung",
+          "Minesan",
+          "Mong Hsu",
+          "Mong Kung",
+          "Nansang",
+          "Panglong"
+        ]
+      },
+      {
+        "division": "Taunggyi",
+        "townships": [
+          "Hopong",
+          "Hsi Hseng",
+          "Indaw",
+          "Kalaw",
+          "Kyauktalongyi",
+          "Lawksawk",
+          "Naungtayar",
+          "Nyaungshwe",
+          "Pekon",
+          "Pingdaya",
+          "Pinlaung",
+          "Taunggyi",
+          "Ywangan"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Ayeyarwady Region",
+    "divisions": [
+      {
+        "division": "Hinthada",
+        "townships": [
+          "Hinthada",
+          "Ingapu",
+          "Kyangin",
+          "Lemyethna",
+          "Myanaung",
+          "Zalun"
+        ]
+      },
+      {
+        "division": "Labutta",
+        "townships": ["Labutta", "Mawlamyinegyun", "Pyinsalu"]
+      },
+      {
+        "division": "Ma-ubin",
+        "townships": ["Danuphyu", "Ma-ubin", "Nyaungdon", "Pantanaw"]
+      },
+      {
+        "division": "Myaungmya",
+        "townships": ["Einme", "Myaungmya", "Wakema"]
+      },
+      {
+        "division": "Pathein",
+        "townships": [
+          "Hainggyikyun",
+          "Kangyidaunk",
+          "Kyaunggon",
+          "Kyonpyaw",
+          "Ngapudaw",
+          "Ngathaingchaung",
+          "Ngayokaung",
+          "Ngwehsaung",
+          "Pathein",
+          "Shwethaungyan",
+          "Thabaung",
+          "Yekyi"
+        ]
+      },
+      {
+        "division": "Pyapon",
+        "townships": ["Ahmar", "Bogale", "Dedaye", "Kyaiklat", "Pyapon"]
+      }
+    ]
+  },
+  {
+    "region": "Bago Region",
+    "divisions": [
+      {
+        "division": "Bago",
+        "townships": [
+          "Aungmyin",
+          "Bago",
+          "Daik-U",
+          "Hpayargyi",
+          "Intagaw",
+          "Kawa",
+          "Kyauktaga",
+          "Madauk",
+          "Nyaunglebin",
+          "Peinzalot",
+          "Penwegon",
+          "Pyuntaza",
+          "Shwegyin",
+          "Thanatpin",
+          "Waw"
+        ]
+      },
+      {
+        "division": "Taungoo",
+        "townships": [
+          "Kanyutkwin",
+          "Kaytumadi",
+          "Kyaukkyi",
+          "Kywebwe",
+          "Mone",
+          "Myohla",
+          "Natthangwin",
+          "Nyaungbinthar",
+          "Oktwin",
+          "Pyu",
+          "Swa",
+          "Tantabin",
+          "Taungoo",
+          "Thagara",
+          "Yaeni",
+          "Yedashe"
+        ]
+      },
+      {
+        "division": "Pyay",
+        "townships": [
+          "Innma",
+          "Okshipin",
+          "Padaung",
+          "Padigone",
+          "Paukkaung",
+          "Paungdale",
+          "Paungde",
+          "Pyay",
+          "Shwedaung",
+          "Sinmeswe",
+          "Thegon"
+        ]
+      },
+      {
+        "division": "Thayarwady",
+        "townships": [
+          "Gyobingauk",
+          "Letpadan",
+          "Minhla",
+          "Monyo",
+          "Nattalin",
+          "Okpho",
+          "Ooethegone",
+          "Sitkwin",
+          "Tapun",
+          "Tharrawaddy",
+          "Thonze",
+          "Zigon"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Yangon Region",
+    "divisions": [
+      {
+        "division": "East Yangon",
+        "townships": [
+          "Botataung",
+          "City",
+          "Dagon Seikkan",
+          "Dawbon",
+          "East Dagon",
+          "Mingala Taungnyunt",
+          "North Dagon",
+          "North Okkalapa",
+          "Pazundaung",
+          "South Dagon",
+          "South Okkalapa",
+          "Tamwe",
+          "Thaketa",
+          "Thingangyun",
+          "Yankin"
+        ]
+      },
+      {
+        "division": "North Yangon",
+        "townships": [
+          "City",
+          "Hlaingthaya",
+          "Hlegu",
+          "Hmawbi",
+          "Htantabin",
+          "Insein",
+          "Mingaladon",
+          "Rural",
+          "Shwepyitha",
+          "Taikkyi"
+        ]
+      },
+      {
+        "division": "South Yangon",
+        "townships": [
+          "City",
+          "Cocokyun",
+          "Dala",
+          "Kawhmu",
+          "Kayan",
+          "Kungyangon",
+          "Kyauktan",
+          "Rural",
+          "Seikkyi Kanaungto",
+          "Tada",
+          "Thanlyin",
+          "Thongwa",
+          "Twante"
+        ]
+      },
+      {
+        "division": "West Yangon(Downtown)",
+        "townships": [
+          "Ahlon",
+          "Bahan",
+          "City",
+          "Dagon",
+          "Hlaing",
+          "Kamayut",
+          "Kyauktada",
+          "Kyimyindaing",
+          "Lanmadaw",
+          "Latha",
+          "Mayangon",
+          "Pabedan",
+          "Sanchaung",
+          "Seikkan"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Kachin State",
+    "divisions": [
+      {
+        "division": "Bhamo",
+        "townships": [
+          "Bhamo",
+          "Dotphoneyan",
+          "Lwegel",
+          "Mansi",
+          "Momauk",
+          "Myohla",
+          "Shwegu"
+        ]
+      },
+      {
+        "division": "Mohnyin",
+        "townships": ["Hopin", "Hpakant", "Kamine", "Mogaung", "Mohnyin"]
+      },
+      {
+        "division": "Myitkyina",
+        "townships": [
+          "Chipwi",
+          "Hsadone",
+          "Hsawlaw",
+          "Hsinbo",
+          "Injangyang",
+          "Kanpaikti",
+          "Myitkyina",
+          "Panwa",
+          "Shinbwayyan",
+          "Tanai",
+          "Waingmaw"
+        ]
+      },
+      {
+        "division": "Putao",
+        "townships": [
+          "Kawnglanghpu",
+          "Machanbaw",
+          "Nogmung",
+          "Pannandin",
+          "Putao",
+          "Sumprabum"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Sagaing Region",
+    "divisions": [
+      {
+        "division": "Hkamti",
+        "townships": [
+          "Donhee",
+          "Hkamti",
+          "Homalin",
+          "Htanparkway",
+          "Lahe",
+          "Leshi Township (Lay",
+          "Mobaingluk",
+          "Nanyun",
+          "Pansaung",
+          "Sonemara"
+        ]
+      },
+      {
+        "division": "Kanbalu",
+        "townships": ["Kanbalu", "Kyunhla", "Taze", "Ye-U"]
+      },
+      {
+        "division": "Kale",
+        "townships": ["Kale", "Kalewa", "Mingin"]
+      },
+      {
+        "division": "Katha",
+        "townships": [
+          "Banmauk",
+          "Indaw",
+          "Katha",
+          "Kawlin",
+          "Pinlebu",
+          "Tigyaing",
+          "Wuntho"
+        ]
+      },
+      {
+        "division": "Mawlaik",
+        "townships": ["Mawlaik", "Paungbyin"]
+      },
+      {
+        "division": "Monywa",
+        "townships": ["Ayadaw", "Budalin", "Chaung-U", "Monywa"]
+      },
+      {
+        "division": "Sagaing",
+        "townships": ["Myaung", "Myinmu", "Sagaing"]
+      },
+      {
+        "division": "Shwebo",
+        "townships": ["Khin-U", "Kyaukmyaung", "Shwebo", "Tabayin", "Wetlet"]
+      },
+      {
+        "division": "Tamu",
+        "townships": ["Khampat", "Myothit", "Tamu"]
+      },
+      {
+        "division": "Yinmabin",
+        "townships": ["Kani", "Pale", "Salingyi", "Yinmabin"]
+      }
+    ]
+  },
+  {
+    "region": "Kayin State",
+    "divisions": [
+      {
+        "division": "Hpa-an",
+        "townships": [
+          "Bawgali",
+          "Hlaignbwe",
+          "Hpa-an",
+          "Leiktho",
+          "Paingkyon",
+          "Shan Ywathit",
+          "Thandaunggyi"
+        ]
+      },
+      {
+        "division": "Hpapun",
+        "townships": ["Hpapun", "Kamamaung"]
+      },
+      {
+        "division": "Kawkareik",
+        "townships": ["Kawkareik", "Kyaidon", "Kyain Seikgyi", "Payarthonezu"]
+      },
+      {
+        "division": "Myawaddy",
+        "townships": ["Myawaddy", "Sugali", "Wawlaymyaing"]
+      }
+    ]
+  },
+  {
+    "region": "Mon State",
+    "divisions": [
+      {
+        "division": "Mawlamyine",
+        "townships": [
+          "Chaungzon",
+          "Khawzar",
+          "Kyaikkhami",
+          "Kyaikmaraw",
+          "Lamine",
+          "Mawlamyine",
+          "Mudon",
+          "Thanbyuzayat",
+          "Ye"
+        ]
+      },
+      {
+        "division": "Thaton",
+        "townships": [
+          "Bilin",
+          "Kyaikto",
+          "Mottama",
+          "Paung",
+          "Suvannawadi",
+          "Thaton",
+          "Zingyeik"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Tanintharyi Region",
+    "divisions": [
+      {
+        "division": "Dawei",
+        "townships": [
+          "Dawei",
+          "Kaleinaung",
+          "Launglon",
+          "Myitta",
+          "Thayetchaung",
+          "Yebyu"
+        ]
+      },
+      {
+        "division": "Kawthoung",
+        "townships": [
+          "Bokpyin",
+          "Karathuri",
+          "Kawthoung",
+          "Khamaukgyi",
+          "Pyigyimandaing"
+        ]
+      },
+      {
+        "division": "Myeik",
+        "townships": ["Kyunsu", "Myeik", "Palauk", "Palaw", "Tanintharyi"]
+      }
+    ]
+  },
+  {
+    "region": "Chin State",
+    "divisions": [
+      {
+        "division": "Falam",
+        "townships": ["Cikha", "Falam", "Rikhuadal", "Tiddim", "Ton Zang"]
+      },
+      {
+        "division": "Hakha",
+        "townships": ["Hakha", "Htantlang"]
+      },
+      {
+        "division": "Mindat",
+        "townships": [
+          "Kanpetlet",
+          "Matupi",
+          "Mindat",
+          "Paletwa",
+          "Reazu",
+          "Sami"
+        ]
+      }
+    ]
+  },
+  {
+    "region": "Rakhine State",
+    "divisions": [
+      {
+        "division": "Kyaukpyu",
+        "townships": ["Ann", "Kyaukpyu", "Manaung", "Ramree"]
+      },
+      {
+        "division": "Maungdaw",
+        "townships": ["Buthidaung", "Maungdaw", "Taungpyoletwe"]
+      },
+      {
+        "division": "Sittwe",
+        "townships": ["Pauktaw", "Ponnagyun", "Rathedaung", "Sittwe"]
+      },
+      {
+        "division": "Thandwe",
+        "townships": ["Gaw", "Kyeintali", "Maei", "Thandwe", "Toungup"]
+      },
+      {
+        "division": "Mrauk-U",
+        "townships": ["Kyauktaw", "Minbya", "Mrauk-U", "Myebon"]
+      }
+    ]
+  }
+]
