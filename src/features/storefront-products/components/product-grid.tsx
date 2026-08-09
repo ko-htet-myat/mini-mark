@@ -8,6 +8,7 @@ import { GridViewIcon, ListViewIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "./product-card";
 import type { ShopProduct } from "../data/products.queries";
+import { useShop } from "@/context/shop-context";
 
 type ViewMode = "grid" | "list";
 
@@ -83,6 +84,7 @@ export function ProductGrid({
   currency,
   basePath,
 }: ProductGridProps) {
+  const { shopCategory } = useShop();
   const t = useTranslations("Storefront");
   const view = useSyncExternalStore(
     subscribeView,
@@ -95,7 +97,13 @@ export function ProductGrid({
   return (
     <section id="products" className=" pb-6">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="sm:text-lg font-semibold">{t("products_title")}</h2>
+        <h2 className="sm:text-lg font-semibold">
+          {shopCategory === "RESTAURANT" ? (
+            <>{t("menus_title")}</>
+          ) : (
+            <>{t("products_title")}</>
+          )}
+        </h2>
         <div className="flex items-center rounded-md border bg-background p-0.5">
           <button
             type="button"
@@ -142,7 +150,7 @@ export function ProductGrid({
         <div
           className={cn(
             view === "grid"
-              ? "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+              ? "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
               : "flex flex-col gap-4",
           )}
         >

@@ -56,7 +56,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
           searchParams={{ category, brand }}
           currency={shop.currency}
         />
-        <FashionHero shopSlug={shop.slug} />
+        <FashionHero shopSlug={shop.slug} shopCategory={shop.shopCategory} />
       </section>
     </main>
   );
