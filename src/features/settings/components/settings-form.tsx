@@ -44,7 +44,7 @@ export function SettingsForm({ shop }: { shop: SettingsShop }) {
   const tc = useTranslations("Common");
 
   const { form, action, handleSubmitWithAction } = useHookFormAction(
-    updateShopAction,
+    updateShopAction.bind(null, { shop: shop.slug }),
     zodResolver(updateShopSchema),
     {
       formProps: {

@@ -1,22 +1,16 @@
 "use server";
 
-import { actionClient } from "@/lib/safe-action";
+import { shopOwnerActionClient } from "@/lib/safe-action";
 import { updateShopSchema } from "../validations/edit";
-import { getSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { writeAuditLog } from "@/lib/audit";
 
-export const updateShopAction = actionClient
+export const updateShopAction = shopOwnerActionClient
   .inputSchema(updateShopSchema)
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    if (!session) throw new Error("Not authenticated");
-
-    const shop = await prisma.shop.findUnique({
-      where: { ownerId: session.user.id },
-    });
-    if (!shop) throw new Error("Shop not found");
+  .action(async ({ parsedInput, ctx }) => {
+    const shop = ctx.shop;
+    const user = ctx.auth.user;
 
     const updated = await prisma.$transaction(async (tx) => {
       const result = await tx.shop.update({
@@ -39,8 +33,8 @@ export const updateShopAction = actionClient
       });
 
       await writeAuditLog(tx, {
-        actorId: session.user.id,
-        actorName: session.user.name,
+        actorId: user.id,
+        actorName: user.name,
         action: "SHOP_UPDATED",
         entityId: result.id,
         shopId: result.id,

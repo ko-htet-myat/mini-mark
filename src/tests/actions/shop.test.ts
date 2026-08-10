@@ -46,6 +46,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/safe-action", async () => {
   const { createSafeActionClient } = await import("next-safe-action");
   const { redirect } = await import("next/navigation");
+  const { z } = await import("zod");
   const ac = createSafeActionClient({
     handleServerError: (e: unknown) => {
       if (e instanceof Error) return e.message;
@@ -61,6 +62,24 @@ vi.mock("@/lib/safe-action", async () => {
       }
       return next({ ctx: { ...ctx, auth: authData } });
     }),
+    shopOwnerActionClient: ac
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .bindArgsSchemas([z.object({ shop: z.string() })] as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .use(async ({ next, ctx, bindArgsClientInputs }: any) => {
+        const authData = getMockAuth();
+        if (!authData) {
+          redirect("/sign-in");
+        }
+        const [{ shop: shopSlug }] = bindArgsClientInputs;
+        const shop = await mockPrisma.shop.findUnique({
+          where: { slug: shopSlug },
+        });
+        if (!shop || shop.ownerId !== authData.user.id) {
+          throw new Error("Forbidden: you do not own this shop");
+        }
+        return next({ ctx: { ...ctx, auth: authData, shop } });
+      }),
   };
 });
 
@@ -204,7 +223,7 @@ describe("updateShopAction", () => {
       name: "Updated Shop",
     });
 
-    const result = await updateShopAction(validInput);
+    const result = await updateShopAction({ shop: "my-shop" }, validInput);
     expect(result.data?.shop.name).toBe("Updated Shop");
     expect(result.serverError).toBeUndefined();
   });
@@ -217,7 +236,7 @@ describe("updateShopAction", () => {
       ...validInput,
     });
 
-    await updateShopAction(validInput);
+    await updateShopAction({ shop: "my-shop" }, validInput);
 
     expect(mockPrisma.shop.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -239,7 +258,7 @@ describe("updateShopAction", () => {
       ...validInput,
     });
 
-    await updateShopAction(validInput);
+    await updateShopAction({ shop: "my-shop" }, validInput);
 
     expect(mockPrisma.shop.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -259,7 +278,7 @@ describe("updateShopAction", () => {
     });
     mockPrisma.shopOperatingHours.upsert.mockResolvedValue({});
 
-    await updateShopAction(validInput);
+    await updateShopAction({ shop: "my-shop" }, validInput);
 
     expect(mockPrisma.shopOperatingHours.upsert).toHaveBeenCalledWith({
       where: {
@@ -304,23 +323,28 @@ describe("updateShopAction", () => {
   });
 
   it("returns validation errors for invalid currency", async () => {
-    const result = await updateShopAction({
-      ...validInput,
-      currency: "INVALID" as never,
-    });
+    const result = await updateShopAction(
+      { shop: "my-shop" },
+      {
+        ...validInput,
+        currency: "INVALID" as never,
+      },
+    );
     expect(result.validationErrors?.currency?._errors).toBeDefined();
   });
 
-  it("returns server error when not authenticated", async () => {
+  it("redirects when not authenticated", async () => {
+    setMockAuth(null);
     mockGetSession.mockResolvedValue(null);
-    const result = await updateShopAction(validInput);
-    expect(result.serverError).toBe("Not authenticated");
+    await expect(
+      updateShopAction({ shop: "my-shop" }, validInput),
+    ).rejects.toThrow("NEXT_REDIRECT");
   });
 
   it("returns server error when shop not found", async () => {
     mockGetSession.mockResolvedValue(makeMockSession());
     mockPrisma.shop.findUnique.mockResolvedValue(null);
-    const result = await updateShopAction(validInput);
-    expect(result.serverError).toBe("Shop not found");
+    const result = await updateShopAction({ shop: "my-shop" }, validInput);
+    expect(result.serverError).toBe("Forbidden: you do not own this shop");
   });
 });
