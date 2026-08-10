@@ -2,30 +2,21 @@
 
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Delete02Icon, Add01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
 import { updateShopSchema } from "@/features/shop/validations/edit";
 import { Shop } from "@/generated/prisma/client";
-import { ShopCategoryType } from "@/generated/prisma/enums";
-import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
-
-const SHOP_CATEGORIES = Object.values(ShopCategoryType);
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GeneralSettingsTab } from "@/features/settings/components/general-settings-tab";
+import { ContactSettingsTab } from "@/features/settings/components/contact-settings-tab";
+import { PlaceholderSettingsTab } from "@/features/settings/components/placeholder-settings-tab";
+import { SecuritySettingsTab } from "@/features/settings/components/security-settings-tab";
 
 export function SettingsForm({ shop }: { shop: Shop }) {
+  const isMobile = useIsMobile();
   const ts = useTranslations("Settings");
   const tc = useTranslations("Common");
 
@@ -42,6 +33,10 @@ export function SettingsForm({ shop }: { shop: Shop }) {
           contactEmail: shop.contactEmail ?? "",
           contactPhones:
             shop.contactPhones.length > 0 ? shop.contactPhones : [""],
+          region: shop.region ?? "",
+          division: shop.division ?? "",
+          township: shop.township ?? "",
+          address: shop.address ?? "",
           logoUrl: shop.logoUrl ?? "",
           bannerUrl: shop.bannerUrl ?? "",
         },
@@ -52,184 +47,57 @@ export function SettingsForm({ shop }: { shop: Shop }) {
     },
   );
 
-  // useFieldArray needs a field of objects, but our schema is string[].
-  // Easiest fix: keep the array as strings and manage add/remove manually via form.watch/setValue.
-  const phones = form.watch("contactPhones") ?? [];
-
-  function addPhone() {
-    form.setValue("contactPhones", [...phones, ""]);
-  }
-
-  function removePhone(index: number) {
-    form.setValue(
-      "contactPhones",
-      phones.filter((_, i) => i !== index),
-    );
-  }
-
-  function updatePhone(index: number, value: string) {
-    const next = [...phones];
-    next[index] = value;
-    form.setValue("contactPhones", next, { shouldValidate: true });
-  }
-
   return (
-    <form onSubmit={handleSubmitWithAction} className="flex flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name">{ts("shop_name")}</Label>
-        <Input id="name" {...form.register("name")} />
-        {form.formState.errors.name && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.name.message}
-          </p>
-        )}
-      </div>
+    <form onSubmit={handleSubmitWithAction} className="flex flex-col">
+      <Tabs
+        defaultValue="general"
+        orientation={isMobile ? "horizontal" : "vertical"}
+        className="flex flex-col md:flex-row gap-6"
+      >
+        <TabsList className="flex md:flex-col h-auto justify-start bg-transparent p-0 gap-3 md:gap-2 md:w-48 md:overflow-visible flex-nowrap border-border md:border-none rounded-none md:rounded-lg md:mb-0">
+          <TabsTrigger value="general">{ts("tab_general")}</TabsTrigger>
+          <TabsTrigger value="contact">{ts("tab_contact")}</TabsTrigger>
+          <TabsTrigger value="security">{ts("tab_security")}</TabsTrigger>
+          <TabsTrigger value="advanced">{ts("tab_advanced")}</TabsTrigger>
+        </TabsList>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="currency">{ts("currency")}</Label>
-        <Select
-          value={form.watch("currency")}
-          onValueChange={(value) =>
-            form.setValue(
-              "currency",
-              value as "MMK" | "USD" | "JPY" | "KRW" | "THB",
-              { shouldDirty: true },
-            )
-          }
-        >
-          <SelectTrigger id="currency">
-            <SelectValue placeholder={ts("currency")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="MMK">MMK</SelectItem>
-            <SelectItem value="USD">USD</SelectItem>
-            <SelectItem value="JPY">JPY</SelectItem>
-            <SelectItem value="KRW">KRW</SelectItem>
-            <SelectItem value="THB">THB</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="flex-1 min-w-0">
+          <TabsContent value="general" className="mt-0 outline-none">
+            <GeneralSettingsTab form={form} shopSlug={shop.slug} />
+          </TabsContent>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shopCategory">{ts("category")}</Label>
-        <Select
-          value={form.watch("shopCategory") ?? ""}
-          onValueChange={(value) =>
-            form.setValue("shopCategory", value as ShopCategoryType, {
-              shouldDirty: true,
-            })
-          }
-        >
-          <SelectTrigger id="shopCategory">
-            <SelectValue placeholder={ts("category")} />
-          </SelectTrigger>
-          <SelectContent>
-            {SHOP_CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat.replace(/_/g, " ")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {form.formState.errors.shopCategory && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.shopCategory.message}
-          </p>
-        )}
-      </div>
+          <TabsContent value="contact" className="mt-0 outline-none">
+            <ContactSettingsTab form={form} />
+          </TabsContent>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="description">{ts("description")}</Label>
-        <Textarea id="description" rows={4} {...form.register("description")} />
-      </div>
+          <TabsContent value="security" className="mt-0 outline-none">
+            <SecuritySettingsTab />
+          </TabsContent>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="contactEmail">{ts("contact_email")}</Label>
-        <Input
-          id="contactEmail"
-          type="email"
-          {...form.register("contactEmail")}
-        />
-        {form.formState.errors.contactEmail && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.contactEmail.message}
-          </p>
-        )}
-      </div>
+          <TabsContent value="advanced" className="mt-0 outline-none">
+            <PlaceholderSettingsTab label="Advanced settings coming soon..." />
+          </TabsContent>
 
-      <div className="flex flex-col gap-2">
-        <Label>{ts("contact_phones")}</Label>
-        {phones.map((phone, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <Input
-              value={phone}
-              onChange={(e) => updatePhone(index, e.target.value)}
-              placeholder={ts("phone_placeholder")}
-            />
-            {phones.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removePhone(index)}
-              >
-                <HugeiconsIcon icon={Delete02Icon} size={18} />
-              </Button>
-            )}
+          {action.result.serverError && (
+            <p className="text-sm text-destructive mt-4">
+              {action.result.serverError}
+            </p>
+          )}
+
+          <div className="flex justify-end gap-4 mt-6 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => form.reset()}
+            >
+              {tc("cancel")}
+            </Button>
+            <Button type="submit" disabled={action.isPending}>
+              {action.isPending ? tc("saving") : ts("save_changes")}
+            </Button>
           </div>
-        ))}
-        {form.formState.errors.contactPhones && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.contactPhones.message ??
-              form.formState.errors.contactPhones.root?.message}
-          </p>
-        )}
-        {phones.length < 5 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="w-fit"
-            onClick={addPhone}
-          >
-            <HugeiconsIcon icon={Add01Icon} size={16} className="mr-1" />
-            {ts("add_phone")}
-          </Button>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <ImageUploadField
-          label={tc("logo")}
-          folder={`${shop.slug}/shops/logos`}
-          value={form.watch("logoUrl") ?? ""}
-          onUploaded={(asset) =>
-            form.setValue("logoUrl", asset.url, { shouldDirty: true })
-          }
-          onRemoved={() => form.setValue("logoUrl", "", { shouldDirty: true })}
-          shape="square"
-        />
-        <ImageUploadField
-          label={tc("banner")}
-          folder={`${shop.slug}/shops/banners`}
-          value={form.watch("bannerUrl") ?? ""}
-          onUploaded={(asset) =>
-            form.setValue("bannerUrl", asset.url, { shouldDirty: true })
-          }
-          onRemoved={() =>
-            form.setValue("bannerUrl", "", { shouldDirty: true })
-          }
-          shape="wide"
-        />
-      </div>
-
-      {action.result.serverError && (
-        <p className="text-sm text-destructive">{action.result.serverError}</p>
-      )}
-
-      <Button type="submit" disabled={action.isPending} className="w-fit">
-        {action.isPending ? tc("saving") : ts("save_changes")}
-      </Button>
+        </div>
+      </Tabs>
     </form>
   );
 }

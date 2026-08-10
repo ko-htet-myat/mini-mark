@@ -1,6 +1,6 @@
 # Progress Tracker � Mini Market Myanmar
 
-_Last updated: 2026-08-06_
+_Last updated: 2026-08-10_
 
 ---
 
@@ -34,6 +34,7 @@ The authentication, onboarding, and product/category/brand/attribute management 
 - [x] Disposable email domain blocking
 - [x] Email verification requirement
 - [x] Session cookie caching
+- [x] Better Auth multi-session browser account switching in settings security tab
 
 ### Onboarding
 
@@ -124,6 +125,9 @@ The authentication, onboarding, and product/category/brand/attribute management 
 
 | Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-10 | Fixed shop settings contact location persistence by saving `region`, `division`, `township`, and `address` in `updateShopAction`, revalidating the settings route, and adding a regression test for the location fields.                                                                                                                                                                                                                                                                                         |
+| 2026-08-10 | Added Better Auth multi-session support with a shop settings security tab for listing browser account sessions, switching the active account, and revoking inactive sessions.                                                                                                                                                                                                                                                                                                                                    |
+| 2026-08-10 | Refactored dashboard settings form into separate tab components and changed contact address fields to cascading Myanmar region, division, and township selects backed by `src/constants/myanmar-region-division-township.json`.                                                                                                                                                                                                                                                                                  |
 | 2026-08-06 | Aligned storefront product detail UI to dashboard `shopCategory` engine flow: extended `ProductDetailData` type with `specifications` and `addons`; updated `product-detail.query.ts` to select both JSON fields; created `ProductSpecs` (read-only spec table) and `ProductAddons` (interactive restaurant modifier selector with Option B price totalling); rewired `ProductPurchasePanel` to conditionally render by `shopCategory`; updated `ProductDetail` to show full-width spec table below description. |
 | 2026-08-06 | Refactored product creation flow into a 3-step wizard with category-specific forms (Base Info, Product Details, Review), added image and YouTube links, implemented atomic transactions for product saves, and fixed Next.js safe action test mocking types.                                                                                                                                                                                                                                                     |
 | 2026-07-31 | Implemented public product list page (`/{shop}/products`): replaced stub with full Server Component, added `ProductFilterBar` (category + brand chip filters with active state), fixed `ProductGrid` pagination `basePath` prop, added `Storefront` i18n namespace to `en.json` and `mm.json`                                                                                                                                                                                                                    |

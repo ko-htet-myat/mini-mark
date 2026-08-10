@@ -2,6 +2,7 @@ import { APIError, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
 import { nextCookies } from "better-auth/next-js";
+import { multiSession } from "better-auth/plugins";
 import { env } from "@/env";
 
 import disposableDomains from "disposable-email-domains";
@@ -50,5 +51,5 @@ export const auth = betterAuth({
     max: 5,
   },
   trustedOrigins: [env.NEXT_PUBLIC_BASE_URL],
-  plugins: [nextCookies()],
+  plugins: [multiSession({ maximumSessions: 5 }), nextCookies()],
 });

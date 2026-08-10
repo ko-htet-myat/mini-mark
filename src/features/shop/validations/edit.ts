@@ -22,6 +22,10 @@ export const updateShopSchema = z.object({
     )
     .max(5, "You can add up to 5 phone numbers")
     .default([]),
+  region: z.string().optional().or(z.literal("")),
+  division: z.string().optional().or(z.literal("")),
+  township: z.string().optional().or(z.literal("")),
+  address: z.string().optional().or(z.literal("")),
   logoUrl: z.string().url().optional().or(z.literal("")),
   bannerUrl: z.string().url().optional().or(z.literal("")),
 });

@@ -28,6 +28,10 @@ export const updateShopAction = actionClient
           description: parsedInput.description || null,
           contactEmail: parsedInput.contactEmail || null,
           contactPhones: parsedInput.contactPhones.filter(Boolean), // drop empty strings from dynamic fields
+          region: parsedInput.region || null,
+          division: parsedInput.division || null,
+          township: parsedInput.township || null,
+          address: parsedInput.address || null,
           logoUrl: parsedInput.logoUrl || null,
           bannerUrl: parsedInput.bannerUrl || null,
         },
@@ -48,6 +52,7 @@ export const updateShopAction = actionClient
 
     revalidatePath(`/${updated.slug}`);
     revalidatePath(`/${updated.slug}/dashboard`);
+    revalidatePath(`/${updated.slug}/dashboard/settings`);
 
     return { shop: updated };
   });

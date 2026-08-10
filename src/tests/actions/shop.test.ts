@@ -159,6 +159,10 @@ describe("updateShopAction", () => {
     shopCategory: "FASHION" as const,
     description: "A great shop",
     contactPhones: [],
+    region: "Yangon Region",
+    division: "Yangon East District",
+    township: "Thingangyun Township",
+    address: "No. 12, Main Road",
   };
   const mockShop = {
     id: "shop-1",
@@ -186,6 +190,28 @@ describe("updateShopAction", () => {
     const result = await updateShopAction(validInput);
     expect(result.data?.shop.name).toBe("Updated Shop");
     expect(result.serverError).toBeUndefined();
+  });
+
+  it("persists contact location fields", async () => {
+    mockGetSession.mockResolvedValue(makeMockSession());
+    mockPrisma.shop.findUnique.mockResolvedValue(mockShop);
+    mockPrisma.shop.update.mockResolvedValue({
+      ...mockShop,
+      ...validInput,
+    });
+
+    await updateShopAction(validInput);
+
+    expect(mockPrisma.shop.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          region: "Yangon Region",
+          division: "Yangon East District",
+          township: "Thingangyun Township",
+          address: "No. 12, Main Road",
+        }),
+      }),
+    );
   });
 
   it("returns validation errors for invalid currency", async () => {
