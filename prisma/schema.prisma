@@ -106,17 +106,28 @@ enum ShopCategoryType {
   OTHER
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 model Shop {
-  id            String           @id @default(cuid())
-  slug          String           @unique
-  name          String
-  description   String?
-  logoUrl       String?
-  bannerUrl     String?
-  contactEmail  String?
-  currency      Currency         @default(MMK)
-  contactPhones String[]         @default([])
-  shopCategory  ShopCategoryType
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  name           String
+  description    String?
+  logoUrl        String?
+  bannerUrl      String?
+  contactEmail   String?
+  currency       Currency         @default(MMK)
+  contactPhones  String[]         @default([])
+  shopCategory   ShopCategoryType
+  isShowInPublic Boolean          @default(true)
 
   // 📍 Location
   region   String?
@@ -136,6 +147,26 @@ model Shop {
   subscription         Subscription?
   subscriptionRequests SubscriptionRequest[]
   orders               Order[]
+  operatingHours       ShopOperatingHours[]
+}
+
+model ShopOperatingHours {
+  id        String    @id @default(cuid())
+  dayOfWeek DayOfWeek
+
+  isClosed  Boolean @default(false) // true = shop closed all day
+  openTime  String? // "09:00" (24hr, stored as string to avoid timezone issues)
+  closeTime String? // "22:00"
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([shopId, dayOfWeek])
+  @@index([shopId])
+  @@map("shop_operating_hours")
 }
 
 model Category {
@@ -204,6 +235,11 @@ model Product {
   specifications Json?
   addons         Json?
   // ⛔ removed: sku, stock, status — now on ProductVariant
+
+  // 👇 new category-specific flags
+  isSpecialMenu    Boolean @default(false) // RESTAURANT only
+  isBestSellerItem Boolean @default(false) // FASHION, BOOKS, ELECTRONICS, BEAUTY only
+  isCollection     Boolean @default(false) // FASHION only
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
