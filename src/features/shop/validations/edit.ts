@@ -54,6 +54,7 @@ export const updateShopSchema = z.object({
   address: z.string().optional().or(z.literal("")),
   logoUrl: z.string().url().optional().or(z.literal("")),
   bannerUrl: z.string().url().optional().or(z.literal("")),
+  isShowInPublic: z.boolean().default(true),
   operatingHours: z.array(operatingHourSchema).default([]),
 });
 

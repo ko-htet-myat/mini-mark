@@ -10,15 +10,24 @@ import {
   RefreshIcon,
   UserSwitchIcon,
 } from "@hugeicons/core-free-icons";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type DeviceSession = {
-  sessionToken?: string;
-  token?: string;
   user?: {
     name?: string | null;
     email?: string | null;
@@ -30,17 +39,10 @@ type DeviceSession = {
     updatedAt?: Date | string | null;
     expiresAt?: Date | string | null;
   } | null;
-  isActive?: boolean;
-  active?: boolean;
 };
 
 function getSessionToken(deviceSession: DeviceSession) {
-  return (
-    deviceSession.sessionToken ??
-    deviceSession.token ??
-    deviceSession.session?.token ??
-    ""
-  );
+  return deviceSession.session?.token ?? "";
 }
 
 function getInitials(name?: string | null, email?: string | null) {
@@ -73,6 +75,8 @@ function formatDate(value?: Date | string | null) {
 export function SecuritySettingsTab() {
   const t = useTranslations("Settings");
   const router = useRouter();
+  const { data: sessionData } = useSession();
+  const activeSessionToken = sessionData?.session?.token ?? null;
   const [sessions, setSessions] = useState<DeviceSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,6 +129,7 @@ export function SecuritySettingsTab() {
   }
 
   async function handleRevoke(sessionToken: string) {
+    const isCurrentSession = sessionToken === activeSessionToken;
     setPendingToken(sessionToken);
     const result = await authClient.multiSession.revoke({ sessionToken });
 
@@ -135,6 +140,15 @@ export function SecuritySettingsTab() {
     }
 
     toast.success(t("security_revoke_success"));
+
+    if (isCurrentSession) {
+      startTransition(() => {
+        router.replace("/sign-in");
+        router.refresh();
+      });
+      return;
+    }
+
     await loadSessions();
     setPendingToken(null);
   }
@@ -184,8 +198,7 @@ export function SecuritySettingsTab() {
         <div className="space-y-3">
           {sessions.map((deviceSession, index) => {
             const token = getSessionToken(deviceSession);
-            const isActive =
-              deviceSession.isActive ?? deviceSession.active ?? false;
+            const isActive = !!token && token === activeSessionToken;
             const user = deviceSession.user;
             const date =
               formatDate(deviceSession.session?.updatedAt) ??
@@ -231,36 +244,60 @@ export function SecuritySettingsTab() {
                 </div>
 
                 <div className="flex shrink-0 gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={isActive || !token || isBusy}
-                    onClick={() => handleSetActive(token)}
-                  >
-                    <HugeiconsIcon
-                      icon={UserSwitchIcon}
-                      size={16}
-                      className="mr-1"
-                    />
-                    {isBusy && !isActive
-                      ? t("security_working")
-                      : t("security_switch")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    disabled={isActive || !token || isBusy}
-                    onClick={() => handleRevoke(token)}
-                  >
-                    <HugeiconsIcon
-                      icon={Delete02Icon}
-                      size={16}
-                      className="mr-1"
-                    />
-                    {t("security_revoke")}
-                  </Button>
+                  {!isActive && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={!token || isBusy}
+                      onClick={() => handleSetActive(token)}
+                    >
+                      <HugeiconsIcon
+                        icon={UserSwitchIcon}
+                        size={16}
+                        className="mr-1"
+                      />
+                      {isBusy ? t("security_working") : t("security_switch")}
+                    </Button>
+                  )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        disabled={!token || isBusy}
+                      >
+                        <HugeiconsIcon
+                          icon={Delete02Icon}
+                          size={16}
+                          className="mr-1"
+                        />
+                        {t("security_revoke")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {t("security_revoke_confirm_title")}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t("security_revoke_confirm_description")}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          {t("security_revoke_confirm_cancel")}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          variant="destructive"
+                          onClick={() => handleRevoke(token)}
+                        >
+                          {t("security_revoke_confirm_action")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             );

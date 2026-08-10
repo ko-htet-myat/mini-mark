@@ -160,6 +160,7 @@ describe("updateShopAction", () => {
     shopCategory: "FASHION" as const,
     description: "A great shop",
     contactPhones: [],
+    isShowInPublic: false,
     region: "Yangon Region",
     division: "Yangon East District",
     township: "Thingangyun Township",
@@ -190,6 +191,7 @@ describe("updateShopAction", () => {
     contactPhones: [],
     logoUrl: null,
     bannerUrl: null,
+    isShowInPublic: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -224,6 +226,25 @@ describe("updateShopAction", () => {
           division: "Yangon East District",
           township: "Thingangyun Township",
           address: "No. 12, Main Road",
+        }),
+      }),
+    );
+  });
+
+  it("persists public visibility setting", async () => {
+    mockGetSession.mockResolvedValue(makeMockSession());
+    mockPrisma.shop.findUnique.mockResolvedValue(mockShop);
+    mockPrisma.shop.update.mockResolvedValue({
+      ...mockShop,
+      ...validInput,
+    });
+
+    await updateShopAction(validInput);
+
+    expect(mockPrisma.shop.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          isShowInPublic: false,
         }),
       }),
     );

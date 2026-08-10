@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 import type { SettingsFormApi } from "@/features/settings/components/settings-tab-types";
@@ -124,6 +125,25 @@ export function GeneralSettingsTab({
             form.setValue("bannerUrl", "", { shouldDirty: true })
           }
           shape="wide"
+        />
+      </div>
+
+      <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="isShowInPublic">{ts("show_in_public")}</Label>
+          <p className="text-sm text-muted-foreground">
+            {ts("show_in_public_description")}
+          </p>
+        </div>
+        <Switch
+          id="isShowInPublic"
+          checked={form.watch("isShowInPublic")}
+          onCheckedChange={(checked) =>
+            form.setValue("isShowInPublic", checked, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
         />
       </div>
     </div>

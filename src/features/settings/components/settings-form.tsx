@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -60,6 +62,7 @@ export function SettingsForm({ shop }: { shop: SettingsShop }) {
           address: shop.address ?? "",
           logoUrl: shop.logoUrl ?? "",
           bannerUrl: shop.bannerUrl ?? "",
+          isShowInPublic: shop.isShowInPublic,
           operatingHours: getOperatingHoursDefaults(shop),
         },
       },
@@ -69,12 +72,15 @@ export function SettingsForm({ shop }: { shop: SettingsShop }) {
     },
   );
 
+  const [activeTab, setActiveTab] = useState("general");
+
   return (
     <form onSubmit={handleSubmitWithAction} className="flex flex-col">
       <Tabs
         defaultValue="general"
         orientation={isMobile ? "horizontal" : "vertical"}
         className="flex flex-col md:flex-row gap-6"
+        onValueChange={setActiveTab}
       >
         <TabsList className="flex md:flex-col h-auto justify-start bg-transparent p-0 gap-3 md:gap-2 md:w-48 md:overflow-visible flex-nowrap border-border md:border-none rounded-none md:rounded-lg md:mb-0">
           <TabsTrigger value="general">{ts("tab_general")}</TabsTrigger>
@@ -106,18 +112,20 @@ export function SettingsForm({ shop }: { shop: SettingsShop }) {
             </p>
           )}
 
-          <div className="flex justify-end gap-4 mt-6 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-            >
-              {tc("cancel")}
-            </Button>
-            <Button type="submit" disabled={action.isPending}>
-              {action.isPending ? tc("saving") : ts("save_changes")}
-            </Button>
-          </div>
+          {activeTab !== "security" && (
+            <div className="flex justify-end gap-4 mt-6 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+              >
+                {tc("cancel")}
+              </Button>
+              <Button type="submit" disabled={action.isPending}>
+                {action.isPending ? tc("saving") : ts("save_changes")}
+              </Button>
+            </div>
+          )}
         </div>
       </Tabs>
     </form>

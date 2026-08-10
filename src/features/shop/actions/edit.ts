@@ -34,6 +34,7 @@ export const updateShopAction = actionClient
           address: parsedInput.address || null,
           logoUrl: parsedInput.logoUrl || null,
           bannerUrl: parsedInput.bannerUrl || null,
+          isShowInPublic: parsedInput.isShowInPublic,
         },
       });
 
