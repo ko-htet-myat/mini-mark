@@ -8,6 +8,7 @@ import { CategoryList } from "@/features/storefront-categories/components/catego
 // import { BrandList } from "@/features/storefront-brands/components/brand-list";
 import { FashionHero } from "@/features/shop/components/fashion-hero";
 import { ProductGrid } from "@/features/storefront-products/components/product-grid";
+import { NewArrivals } from "@/features/storefront-products/components/new-arrivals";
 
 type PageProps = {
   params: Promise<{ shop: string }>;
@@ -24,7 +25,7 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const [categories, productsResult] = await Promise.all([
+  const [categories, productsResult, newArrivalsResult] = await Promise.all([
     getShopCategories(shop.id),
     // getShopBrands(shop.id),
     getShopProducts({
@@ -32,6 +33,10 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
       page,
       categorySlug: category,
       brandSlug: brand,
+    }),
+    getShopProducts({
+      shopId: shop.id,
+      pageSize: 10,
     }),
   ]);
 
@@ -48,6 +53,20 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
       <section className=" container">
         <CategoryList shopSlug={shop.slug} categories={categories} />
         {/* <BrandList shopSlug={shop.slug} brands={brands} /> */}
+        {shop.shopCategory !== "RESTAURANT" && (
+          <>
+            <NewArrivals
+              shopSlug={shop.slug}
+              products={newArrivalsResult.products}
+              currency={shop.currency}
+            />
+            <FashionHero
+              shopSlug={shop.slug}
+              shopCategory={shop.shopCategory}
+            />
+          </>
+        )}
+
         <ProductGrid
           shopSlug={shop.slug}
           products={productsResult.products}
@@ -56,7 +75,6 @@ export default async function ShopPage({ params, searchParams }: PageProps) {
           searchParams={{ category, brand }}
           currency={shop.currency}
         />
-        <FashionHero shopSlug={shop.slug} shopCategory={shop.shopCategory} />
       </section>
     </main>
   );
