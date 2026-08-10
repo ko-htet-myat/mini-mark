@@ -47,6 +47,31 @@ export const updateShopAction = actionClient
         shopName: result.name,
       });
 
+      await Promise.all(
+        parsedInput.operatingHours.map((hours) =>
+          tx.shopOperatingHours.upsert({
+            where: {
+              shopId_dayOfWeek: {
+                shopId: shop.id,
+                dayOfWeek: hours.dayOfWeek,
+              },
+            },
+            create: {
+              shopId: shop.id,
+              dayOfWeek: hours.dayOfWeek,
+              isClosed: hours.isClosed,
+              openTime: hours.isClosed ? null : hours.openTime,
+              closeTime: hours.isClosed ? null : hours.closeTime,
+            },
+            update: {
+              isClosed: hours.isClosed,
+              openTime: hours.isClosed ? null : hours.openTime,
+              closeTime: hours.isClosed ? null : hours.closeTime,
+            },
+          }),
+        ),
+      );
+
       return result;
     });
 

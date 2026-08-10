@@ -11,6 +11,7 @@ const { mockGetSession, mockPrisma, setMockAuth, getMockAuth } = vi.hoisted(
     let __auth: MockAuth = null;
     const _mockPrisma = {
       shop: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+      shopOperatingHours: { upsert: vi.fn() },
       auditLog: { create: vi.fn() },
       $transaction: vi.fn(),
     };
@@ -163,6 +164,20 @@ describe("updateShopAction", () => {
     division: "Yangon East District",
     township: "Thingangyun Township",
     address: "No. 12, Main Road",
+    operatingHours: [
+      {
+        dayOfWeek: "MONDAY" as const,
+        isClosed: false,
+        openTime: "09:00",
+        closeTime: "18:00",
+      },
+      {
+        dayOfWeek: "TUESDAY" as const,
+        isClosed: true,
+        openTime: "",
+        closeTime: "",
+      },
+    ],
   };
   const mockShop = {
     id: "shop-1",
@@ -210,6 +225,59 @@ describe("updateShopAction", () => {
           township: "Thingangyun Township",
           address: "No. 12, Main Road",
         }),
+      }),
+    );
+  });
+
+  it("upserts shop operating hours", async () => {
+    mockGetSession.mockResolvedValue(makeMockSession());
+    mockPrisma.shop.findUnique.mockResolvedValue(mockShop);
+    mockPrisma.shop.update.mockResolvedValue({
+      ...mockShop,
+      ...validInput,
+    });
+    mockPrisma.shopOperatingHours.upsert.mockResolvedValue({});
+
+    await updateShopAction(validInput);
+
+    expect(mockPrisma.shopOperatingHours.upsert).toHaveBeenCalledWith({
+      where: {
+        shopId_dayOfWeek: {
+          shopId: "shop-1",
+          dayOfWeek: "MONDAY",
+        },
+      },
+      create: {
+        shopId: "shop-1",
+        dayOfWeek: "MONDAY",
+        isClosed: false,
+        openTime: "09:00",
+        closeTime: "18:00",
+      },
+      update: {
+        isClosed: false,
+        openTime: "09:00",
+        closeTime: "18:00",
+      },
+    });
+    expect(mockPrisma.shopOperatingHours.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          shopId_dayOfWeek: {
+            shopId: "shop-1",
+            dayOfWeek: "TUESDAY",
+          },
+        },
+        create: expect.objectContaining({
+          isClosed: true,
+          openTime: null,
+          closeTime: null,
+        }),
+        update: {
+          isClosed: true,
+          openTime: null,
+          closeTime: null,
+        },
       }),
     );
   });

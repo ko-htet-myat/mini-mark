@@ -1,5 +1,31 @@
 import { z } from "zod";
-import { Currency, ShopCategoryType } from "@/generated/prisma/enums";
+import {
+  Currency,
+  DayOfWeek,
+  ShopCategoryType,
+} from "@/generated/prisma/enums";
+
+const timeSchema = z
+  .string()
+  .refine((value) => value === "" || /^([01]\d|2[0-3]):[0-5]\d$/.test(value), {
+    message: "Use HH:mm time format",
+  });
+
+const operatingHourSchema = z
+  .object({
+    dayOfWeek: z.nativeEnum(DayOfWeek),
+    isClosed: z.boolean(),
+    openTime: timeSchema,
+    closeTime: timeSchema,
+  })
+  .refine(
+    (value) =>
+      value.isClosed || (value.openTime !== "" && value.closeTime !== ""),
+    {
+      message: "Open and close times are required unless the shop is closed",
+      path: ["openTime"],
+    },
+  );
 
 export const updateShopSchema = z.object({
   name: z.string().min(2, "Shop name must be at least 2 characters").max(50),
@@ -28,6 +54,7 @@ export const updateShopSchema = z.object({
   address: z.string().optional().or(z.literal("")),
   logoUrl: z.string().url().optional().or(z.literal("")),
   bannerUrl: z.string().url().optional().or(z.literal("")),
+  operatingHours: z.array(operatingHourSchema).default([]),
 });
 
 export type UpdateShopInput = z.infer<typeof updateShopSchema>;

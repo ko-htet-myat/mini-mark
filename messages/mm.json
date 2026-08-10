@@ -314,7 +314,22 @@
     "security_switch_success": "Active session switched",
     "security_switch_error": "Could not switch active session.",
     "security_revoke_success": "Session revoked",
-    "security_revoke_error": "Could not revoke session."
+    "security_revoke_error": "Could not revoke session.",
+    "operating_hours": "Shop operating hours",
+    "operating_hours_description": "Set the weekly opening schedule shown to customers.",
+    "open": "Open",
+    "closed": "Closed",
+    "open_time": "Open time",
+    "close_time": "Close time",
+    "days": {
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    }
   },
   "Onboarding": {
     "create_shop": "ဆိုင်ဖန်တီးပါ",

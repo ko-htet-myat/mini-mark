@@ -8,14 +8,35 @@ import { toast } from "sonner";
 import { updateShopAction } from "@/features/shop/actions/edit";
 import { updateShopSchema } from "@/features/shop/validations/edit";
 import { Shop } from "@/generated/prisma/client";
+import type { ShopOperatingHours } from "@/generated/prisma/client";
+import { DayOfWeek } from "@/generated/prisma/enums";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GeneralSettingsTab } from "@/features/settings/components/general-settings-tab";
 import { ContactSettingsTab } from "@/features/settings/components/contact-settings-tab";
-import { PlaceholderSettingsTab } from "@/features/settings/components/placeholder-settings-tab";
 import { SecuritySettingsTab } from "@/features/settings/components/security-settings-tab";
+import { AdvancedSettingsTab } from "@/features/settings/components/advanced-settings-tab";
 
-export function SettingsForm({ shop }: { shop: Shop }) {
+const DAYS = Object.values(DayOfWeek);
+
+type SettingsShop = Shop & {
+  operatingHours: ShopOperatingHours[];
+};
+
+function getOperatingHoursDefaults(shop: SettingsShop) {
+  return DAYS.map((day) => {
+    const existing = shop.operatingHours.find((item) => item.dayOfWeek === day);
+
+    return {
+      dayOfWeek: day,
+      isClosed: existing?.isClosed ?? false,
+      openTime: existing?.openTime ?? "09:00",
+      closeTime: existing?.closeTime ?? "18:00",
+    };
+  });
+}
+
+export function SettingsForm({ shop }: { shop: SettingsShop }) {
   const isMobile = useIsMobile();
   const ts = useTranslations("Settings");
   const tc = useTranslations("Common");
@@ -39,6 +60,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
           address: shop.address ?? "",
           logoUrl: shop.logoUrl ?? "",
           bannerUrl: shop.bannerUrl ?? "",
+          operatingHours: getOperatingHoursDefaults(shop),
         },
       },
       actionProps: {
@@ -75,7 +97,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
           </TabsContent>
 
           <TabsContent value="advanced" className="mt-0 outline-none">
-            <PlaceholderSettingsTab label="Advanced settings coming soon..." />
+            <AdvancedSettingsTab form={form} />
           </TabsContent>
 
           {action.result.serverError && (
