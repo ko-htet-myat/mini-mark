@@ -119,11 +119,16 @@ export function getProductColumns({
       id: "stock",
       header: tp.stock,
       cell: ({ row }) => {
+        const hasVariants = row.original.hasVariants;
         const stock = getAggregateStock(row.original.variants);
         return (
           <>
             {stock === 0 ? (
-              <span className={"text-destructive"}>{tp.out_of_stock}</span>
+              hasVariants ? (
+                <span className={"text-destructive"}>{tp.out_of_stock}</span>
+              ) : (
+                <span>—</span>
+              )
             ) : (
               <>
                 <span

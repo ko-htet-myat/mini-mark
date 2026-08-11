@@ -8,7 +8,7 @@ export async function getShopCategories(shopId: string) {
       name: true,
       slug: true,
       imageUrl: true,
-      _count: { select: { products: true } },
+      _count: { select: { products: { where: { isActive: true } } } },
     },
     orderBy: { name: "asc" },
   });

@@ -134,7 +134,7 @@ export default function ProductFormWizard({
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmitWithAction} className="max-w-3xl mx-auto">
+      <div className="">
         {/* ── Step indicator ─────────────────────────────────────────── */}
         <nav className="mb-8">
           <ol className="flex items-center gap-0">
@@ -254,7 +254,11 @@ export default function ProductFormWizard({
               />
             </Button>
           ) : (
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => void handleSubmitWithAction()}
+            >
               <HugeiconsIcon
                 icon={CheckmarkCircle01Icon}
                 size={16}
@@ -268,7 +272,7 @@ export default function ProductFormWizard({
             </Button>
           )}
         </div>
-      </form>
+      </div>
     </FormProvider>
   );
 }

@@ -81,7 +81,7 @@ export function ImageUploadField({
       <div
         className={
           shape === "square"
-            ? "relative h-24 w-24 overflow-hidden rounded-md border bg-muted"
+            ? "relative h-40 w-40 overflow-hidden rounded-md border bg-muted"
             : "relative h-24 w-full overflow-hidden rounded-md border bg-muted sm:w-56"
         }
       >

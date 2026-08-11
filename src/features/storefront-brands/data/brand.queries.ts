@@ -8,7 +8,7 @@ export async function getShopBrands(shopId: string) {
       name: true,
       slug: true,
       logoUrl: true,
-      _count: { select: { products: true } },
+      _count: { select: { products: { where: { isActive: true } } } },
     },
     orderBy: { name: "asc" },
   });
