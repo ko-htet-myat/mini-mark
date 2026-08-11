@@ -151,9 +151,14 @@ const baseProduct = {
   description: null,
   price: makeMockDecimal(29.99),
   compareAtPrice: null,
+  costPrice: null,
   imageUrl: null,
   youtubeUrl: null,
+  noticeText: null,
   isActive: true,
+  isFeatured: false,
+  metaTitle: null,
+  metaDescription: null,
   hasVariants: false,
   categoryId: null,
   brandId: null,
@@ -184,6 +189,41 @@ describe("createProduct", () => {
     expect(result.data?.product.name).toBe("Test Product");
     expect(result.data?.product.price).toBe(29.99);
     expect(result.serverError).toBeUndefined();
+  });
+
+  it("persists product merchandising and SEO fields", async () => {
+    mockPrisma.product.create.mockResolvedValue({
+      ...baseProduct,
+      costPrice: makeMockDecimal(12.5),
+      isFeatured: true,
+      noticeText: "Ships in 3 days",
+      metaTitle: "New Product SEO",
+      metaDescription: "Short search preview.",
+    });
+    const result = await createProduct.bind(
+      null,
+      BIND,
+    )({
+      ...validInput,
+      costPrice: 12.5,
+      isFeatured: true,
+      noticeText: "Ships in 3 days",
+      metaTitle: "New Product SEO",
+      metaDescription: "Short search preview.",
+    });
+    expect(result.data?.product.costPrice).toBe(12.5);
+    expect(result.data?.product.isFeatured).toBe(true);
+    expect(mockPrisma.product.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          costPrice: 12.5,
+          isFeatured: true,
+          noticeText: "Ships in 3 days",
+          metaTitle: "New Product SEO",
+          metaDescription: "Short search preview.",
+        }),
+      }),
+    );
   });
 
   it("creates a product with variants", async () => {
@@ -256,6 +296,43 @@ describe("updateProduct", () => {
     const result = await updateProduct.bind(null, BIND)(validInput);
     expect(result.data?.product.name).toBe("Updated");
     expect(result.data?.product.price).toBe(39.99);
+  });
+
+  it("updates product merchandising and SEO fields", async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ shopId: "test-shop-id" });
+    mockPrisma.productVariant.deleteMany.mockResolvedValue({ count: 0 });
+    mockPrisma.product.update.mockResolvedValue({
+      ...baseProduct,
+      costPrice: makeMockDecimal(18),
+      isFeatured: true,
+      noticeText: "Limited stock",
+      metaTitle: "Updated SEO",
+      metaDescription: "Updated preview.",
+    });
+    const result = await updateProduct.bind(
+      null,
+      BIND,
+    )({
+      ...validInput,
+      costPrice: 18,
+      isFeatured: true,
+      noticeText: "Limited stock",
+      metaTitle: "Updated SEO",
+      metaDescription: "Updated preview.",
+    });
+    expect(result.data?.product.costPrice).toBe(18);
+    expect(result.data?.product.isFeatured).toBe(true);
+    expect(mockPrisma.product.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          costPrice: 18,
+          isFeatured: true,
+          noticeText: "Limited stock",
+          metaTitle: "Updated SEO",
+          metaDescription: "Updated preview.",
+        }),
+      }),
+    );
   });
 
   it("syncs variants during update", async () => {

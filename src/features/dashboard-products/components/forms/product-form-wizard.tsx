@@ -76,9 +76,14 @@ export default function ProductFormWizard({
     description: "",
     price: undefined as unknown as number,
     compareAtPrice: undefined as unknown as number,
+    costPrice: undefined as unknown as number,
     imageUrl: "",
     youtubeUrl: "",
+    noticeText: "",
     isActive: true,
+    isFeatured: false,
+    metaTitle: "",
+    metaDescription: "",
     categoryId: "",
     brandId: "",
     hasVariants: false,
@@ -316,8 +321,21 @@ function ReviewStep({
         {values.compareAtPrice && (
           <ReviewRow label="Compare-at" value={String(values.compareAtPrice)} />
         )}
+        {values.costPrice != null && (
+          <ReviewRow label="Cost price" value={String(values.costPrice)} />
+        )}
         <ReviewRow label="Category" value={categoryName} />
         <ReviewRow label="Brand" value={brandName} />
+        <ReviewRow label="Featured" value={values.isFeatured ? "Yes" : "No"} />
+        {values.noticeText && (
+          <ReviewRow label="Notice" value={values.noticeText} />
+        )}
+        {values.metaTitle && (
+          <ReviewRow label="Meta title" value={values.metaTitle} />
+        )}
+        {values.metaDescription && (
+          <ReviewRow label="Meta description" value={values.metaDescription} />
+        )}
         {values.youtubeUrl && (
           <ReviewRow label="YouTube URL" value={values.youtubeUrl} />
         )}

@@ -17,13 +17,18 @@ const serializeDecimal = (value: Prisma.Decimal | null): number | null =>
   value != null ? Number(value) : null;
 
 const serializeProduct = <
-  T extends { price: Prisma.Decimal; compareAtPrice: Prisma.Decimal | null },
+  T extends {
+    price: Prisma.Decimal;
+    compareAtPrice: Prisma.Decimal | null;
+    costPrice: Prisma.Decimal | null;
+  },
 >(
   product: T,
 ) => ({
   ...product,
   price: Number(product.price),
   compareAtPrice: serializeDecimal(product.compareAtPrice),
+  costPrice: serializeDecimal(product.costPrice),
 });
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -302,9 +307,14 @@ export const duplicateProduct = shopOwnerActionClient
             description: original.description,
             price: original.price,
             compareAtPrice: original.compareAtPrice,
+            costPrice: original.costPrice,
             imageUrl: original.imageUrl,
             youtubeUrl: original.youtubeUrl,
+            noticeText: original.noticeText,
             isActive: false,
+            isFeatured: original.isFeatured,
+            metaTitle: original.metaTitle,
+            metaDescription: original.metaDescription,
             hasVariants: original.hasVariants,
             categoryId: original.categoryId,
             brandId: original.brandId,

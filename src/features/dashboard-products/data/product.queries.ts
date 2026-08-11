@@ -77,9 +77,14 @@ export async function getProductsPage({
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
+    costPrice: product.costPrice ? Number(product.costPrice) : null,
     imageUrl: product.imageUrl,
     youtubeUrl: product.youtubeUrl,
+    noticeText: product.noticeText,
     isActive: product.isActive,
+    isFeatured: product.isFeatured,
+    metaTitle: product.metaTitle,
+    metaDescription: product.metaDescription,
     hasVariants: product.hasVariants,
     shopId: product.shopId,
     categoryId: product.categoryId,
@@ -139,6 +144,7 @@ export async function getProductById(id: string, shopId: string) {
     compareAtPrice: product.compareAtPrice
       ? Number(product.compareAtPrice)
       : null,
+    costPrice: product.costPrice ? Number(product.costPrice) : null,
     // specifications and addons come through as-is (Json | null → unknown)
     specifications: product.specifications as Record<string, string> | null,
     addons: product.addons as

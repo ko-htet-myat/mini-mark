@@ -87,6 +87,7 @@ export const createProductSchema = z.object({
     .positive("Price must be greater than 0"),
 
   compareAtPrice: optionalNumber(z.number().positive("Must be greater than 0")),
+  costPrice: optionalNumber(z.number().min(0, "Cost price can't be negative")),
 
   imageUrl: z
     .string()
@@ -103,6 +104,28 @@ export const createProductSchema = z.object({
     .or(z.literal("")),
 
   isActive: z.boolean().default(true),
+  isFeatured: z.boolean().default(false),
+
+  noticeText: z
+    .string()
+    .trim()
+    .max(500, "Notice text is too long")
+    .optional()
+    .or(z.literal("")),
+
+  metaTitle: z
+    .string()
+    .trim()
+    .max(120, "Meta title is too long")
+    .optional()
+    .or(z.literal("")),
+
+  metaDescription: z
+    .string()
+    .trim()
+    .max(300, "Meta description is too long")
+    .optional()
+    .or(z.literal("")),
 
   categoryId: z.string().optional().or(z.literal("")),
   brandId: z.string().optional().or(z.literal("")),

@@ -220,7 +220,6 @@ enum ProductStatus {
   IN_STOCK
   OUT_OF_STOCK
 }
-
 model Product {
   id             String   @id @default(cuid())
   name           String
@@ -228,18 +227,25 @@ model Product {
   description    String?
   price          Decimal  @db.Decimal(10, 2) // base/"from" price
   compareAtPrice Decimal? @db.Decimal(10, 2)
+  costPrice      Decimal? @db.Decimal(10, 2)
   imageUrl       String?
   youtubeUrl     String?
   isActive       Boolean  @default(true)
   hasVariants    Boolean  @default(false) // 👈 new: drives simple-vs-variant UI branch
   specifications Json?
   addons         Json?
+  noticeText String?
   // ⛔ removed: sku, stock, status — now on ProductVariant
 
   // 👇 new category-specific flags
   isSpecialMenu    Boolean @default(false) // RESTAURANT only
   isBestSellerItem Boolean @default(false) // FASHION, BOOKS, ELECTRONICS, BEAUTY only
   isCollection     Boolean @default(false) // FASHION only
+  isFeatured       Boolean @default(false)
+
+  // seo
+  metaTitle       String?
+  metaDescription String?
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
@@ -306,10 +312,12 @@ model ProductVariant {
   sku            String?
   price          Decimal?      @db.Decimal(10, 2) // null = inherit Product.price
   compareAtPrice Decimal?      @db.Decimal(10, 2)
+  costPrice      Decimal?      @db.Decimal(10, 2)
   stock          Int           @default(0)
   status         ProductStatus @default(IN_STOCK)
   imageUrl       String?
   isActive       Boolean       @default(true)
+  allowBackorder Boolean       @default(false)
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -354,6 +362,10 @@ model Promotion {
   startsAt      DateTime?
   endsAt        DateTime?
   isActive      Boolean      @default(true)
+
+  isFlashSale     Boolean @default(false)
+  maxRedemptions  Int?
+  redemptionCount Int     @default(0)
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
@@ -583,6 +595,7 @@ model OrderItem {
   price        Decimal @db.Decimal(10, 2) // unit price at time of order
   quantity     Int
   subtotal     Decimal @db.Decimal(10, 2) // price * quantity
+  isBackorder  Boolean @default(false)
 
   createdAt DateTime @default(now())
 
