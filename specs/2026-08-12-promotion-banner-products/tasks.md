@@ -1,0 +1,10 @@
+- [x] Add promotion validation and action support for banner images and product IDs.
+  - [x] Create persists banner image and connects selected shop products.
+  - [x] Update persists banner image and replaces selected shop products.
+- [x] Add promotion data queries for product options and edit hydration.
+- [x] Add banner upload and multi-product selection to create/edit promotion forms.
+- [x] Show promotion banners in the dashboard promotions table.
+- [x] Add/update i18n labels for the promotion banner and products UI.
+- [x] Add regression coverage for promotion banner and product relation persistence.
+- [x] Run associated tests and lint/type checks as appropriate.
+- [x] Update `docs/progress-tracker.md`.

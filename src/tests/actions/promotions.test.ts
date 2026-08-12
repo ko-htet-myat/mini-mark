@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { makeMockSession, makeMockShop } from "./setup";
 
 type MockAuth = { user: { id: string } } | null;
-type MockShop = { slug: string; ownerId: string } | null;
+type MockShop = { id: string; slug: string; ownerId: string } | null;
 type SafeActionMiddlewareArgs = {
   next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
@@ -22,6 +22,7 @@ const {
   let __shop: MockShop = null;
   const mockPrisma = {
     promotion: { create: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    product: { count: vi.fn() },
   };
   class PrismaClientKnownRequestError extends Error {
     code: string;
@@ -157,6 +158,64 @@ describe("createPromotion", () => {
     expect(result.data?.promotion.discountValue).toBe(20);
   });
 
+  it("persists banner image and connects selected products", async () => {
+    const created = {
+      id: "promo-1",
+      name: "Summer Sale",
+      slug: "summer-sale",
+      discountType: "PERCENTAGE",
+      discountValue: { toNumber: () => 20 },
+    };
+    mockPrisma.product.count.mockResolvedValue(2);
+    mockPrisma.promotion.create.mockResolvedValue(created);
+
+    const result = await createPromotion.bind(
+      null,
+      BIND,
+    )({
+      ...validInput,
+      bannerImage: "https://res.cloudinary.com/demo/image/upload/banner.jpg",
+      productIds: ["product-1", "product-2"],
+    });
+
+    expect(result.data?.promotion.discountValue).toBe(20);
+    expect(mockPrisma.product.count).toHaveBeenCalledWith({
+      where: {
+        id: { in: ["product-1", "product-2"] },
+        shopId: "test-shop-id",
+      },
+    });
+    expect(mockPrisma.promotion.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          shopId: "test-shop-id",
+          bannerImage:
+            "https://res.cloudinary.com/demo/image/upload/banner.jpg",
+          products: {
+            connect: [{ id: "product-1" }, { id: "product-2" }],
+          },
+        }),
+      }),
+    );
+  });
+
+  it("rejects product IDs outside the shop", async () => {
+    mockPrisma.product.count.mockResolvedValue(1);
+
+    const result = await createPromotion.bind(
+      null,
+      BIND,
+    )({
+      ...validInput,
+      productIds: ["product-1", "other-shop-product"],
+    });
+
+    expect(result.serverError).toBe(
+      "One or more selected products were not found.",
+    );
+    expect(mockPrisma.promotion.create).not.toHaveBeenCalled();
+  });
+
   it("returns validation errors for negative discount", async () => {
     const result = await createPromotion.bind(
       null,
@@ -194,6 +253,41 @@ describe("updatePromotion", () => {
     mockPrisma.promotion.update.mockResolvedValue(updated);
     const result = await updatePromotion.bind(null, BIND)(validInput);
     expect(result.data?.promotion.discountValue).toBe(30);
+  });
+
+  it("persists banner image and replaces selected products", async () => {
+    const updated = {
+      id: "promo-1",
+      name: "Winter Sale",
+      slug: "winter-sale",
+      discountType: "PERCENTAGE",
+      discountValue: { toNumber: () => 30 },
+    };
+    mockPrisma.product.count.mockResolvedValue(1);
+    mockPrisma.promotion.update.mockResolvedValue(updated);
+
+    const result = await updatePromotion.bind(
+      null,
+      BIND,
+    )({
+      ...validInput,
+      bannerImage: "https://res.cloudinary.com/demo/image/upload/winter.jpg",
+      productIds: ["product-3"],
+    });
+
+    expect(result.data?.promotion.discountValue).toBe(30);
+    expect(mockPrisma.promotion.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "promo-1", shopId: "test-shop-id" },
+        data: expect.objectContaining({
+          bannerImage:
+            "https://res.cloudinary.com/demo/image/upload/winter.jpg",
+          products: {
+            set: [{ id: "product-3" }],
+          },
+        }),
+      }),
+    );
   });
 
   it("returns server error when not found", async () => {

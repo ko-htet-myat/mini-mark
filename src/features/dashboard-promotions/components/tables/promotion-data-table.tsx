@@ -81,6 +81,7 @@ export function PromotionDataTable({
           serial: tc("serial"),
           name: tc("name"),
           slug: tc("slug"),
+          banner: tc("banner"),
           discount: tp("discount"),
           status: tp("status"),
           created: tc("created"),

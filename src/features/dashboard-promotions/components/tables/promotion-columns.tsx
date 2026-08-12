@@ -4,11 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PromotionRowActions } from "./promotion-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { formatAmount } from "@/lib/format";
+import Image from "next/image";
 
 export type PromotionRow = {
   id: string;
   name: string;
   slug: string;
+  bannerImage: string | null;
   discountType: string;
   discountValue: number;
   isActive: boolean;
@@ -24,6 +26,7 @@ interface GetPromotionColumnsParams {
     name: string;
     slug: string;
     discount: string;
+    banner: string;
     status: string;
     created: string;
   };
@@ -47,6 +50,24 @@ export function getPromotionColumns({
         </span>
       ),
       size: 48,
+    },
+    {
+      accessorKey: "bannerImage",
+      header: tc.banner,
+      cell: ({ row }) =>
+        row.original.bannerImage ? (
+          <div className="relative h-10 w-20 overflow-hidden rounded-md border bg-muted">
+            <Image
+              src={row.original.bannerImage}
+              alt={row.original.name}
+              fill
+              sizes="80px"
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <span className="text-sm text-muted-foreground">-</span>
+        ),
     },
     { accessorKey: "name", header: tc.name },
     {

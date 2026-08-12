@@ -32,3 +32,30 @@ export async function getPromotionsPage({
 
   return { data, total, pageCount: Math.ceil(total / pageSize) };
 }
+
+export async function getPromotionById(id: string, shopId: string) {
+  return prisma.promotion.findFirst({
+    where: { id, shopId },
+    include: {
+      products: {
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+}
+
+export async function getPromotionProductOptions(shopId: string) {
+  return prisma.product.findMany({
+    where: { shopId },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+    },
+    orderBy: { name: "asc" },
+  });
+}

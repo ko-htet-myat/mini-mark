@@ -1,4 +1,5 @@
 import { CreatePromotionForm } from "@/features/dashboard-promotions/components/forms/create-promotion-form";
+import { getPromotionProductOptions } from "@/features/dashboard-promotions/data/promotion.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
 export default async function CreatePromotionPage({
@@ -8,10 +9,12 @@ export default async function CreatePromotionPage({
 }) {
   const { shop: slug } = await params;
   const shop = await getShopBySlug(slug);
+  const productOptions = await getPromotionProductOptions(shop.id);
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Create promotion</h1>
-      <CreatePromotionForm shopId={shop.id} />
+      <CreatePromotionForm shopId={shop.id} productOptions={productOptions} />
     </div>
   );
 }

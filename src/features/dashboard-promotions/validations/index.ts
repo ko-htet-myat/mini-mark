@@ -11,12 +11,18 @@ export const promotionFormSchema = z.object({
       "Lowercase letters, numbers, and hyphens only",
     ),
   description: z.string().max(500).optional().or(z.literal("")),
+  bannerImage: z
+    .string()
+    .url("Banner image must be a valid URL")
+    .optional()
+    .or(z.literal("")),
   discountType: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
   discountValue: z.coerce.number().min(0, "Discount value must be positive"),
   code: z.string().max(50).optional().or(z.literal("")),
   startsAt: z.date().optional().nullable(),
   endsAt: z.date().optional().nullable(),
   isActive: z.boolean().default(true),
+  productIds: z.array(z.string()).default([]),
 });
 
 export type PromotionFormValues = z.infer<typeof promotionFormSchema>;
