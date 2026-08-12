@@ -220,7 +220,9 @@ export function ProductDataTable({
             />
 
             <Button asChild>
-              <Link href="products/create">{tp("create_product")}</Link>
+              <Link href={`/${shop.slug}/dashboard/products/create`}>
+                {tp("create_product")}
+              </Link>
             </Button>
           </div>
         </div>
