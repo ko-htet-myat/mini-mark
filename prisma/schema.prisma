@@ -220,6 +220,20 @@ enum ProductStatus {
   IN_STOCK
   OUT_OF_STOCK
 }
+
+enum UnitOfMeasure {
+  PCS      // piece / each
+  KG
+  G
+  L
+  ML
+  PACK
+  BOX
+  DOZEN
+  METER
+  CM
+  SET
+}
 model Product {
   id             String   @id @default(cuid())
   name           String
@@ -232,6 +246,7 @@ model Product {
   youtubeUrl     String?
   isActive       Boolean  @default(true)
   hasVariants    Boolean  @default(false) // 👈 new: drives simple-vs-variant UI branch
+  uom            UnitOfMeasure @default(PCS)
   specifications Json?
   addons         Json?
   noticeText String?
@@ -318,6 +333,8 @@ model ProductVariant {
   imageUrl       String?
   isActive       Boolean       @default(true)
   allowBackorder Boolean       @default(false)
+  uom            UnitOfMeasure?              // 👈 overrides Product.uom when set, e.g. G, ML
+  uomValue       Decimal?      @db.Decimal(10, 3) // 👈 e.g. 500 (for "500g"), 1 (for "1kg")
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
