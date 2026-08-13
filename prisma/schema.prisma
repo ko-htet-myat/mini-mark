@@ -28,6 +28,7 @@ model User {
   reviewedRequests       SubscriptionRequest[] @relation("SubscriptionRequestReviewedBy")
   recordedPayments       PaymentRecord[]       @relation("PaymentRecordRecordedBy")
   activatedSubscriptions Subscription[]        @relation("SubscriptionActivatedBy")
+  stockMovementsCreated  StockMovement[]       @relation("StockMovementCreatedBy")
 
   @@unique([email])
   @@map("user")
@@ -148,6 +149,7 @@ model Shop {
   subscriptionRequests SubscriptionRequest[]
   orders               Order[]
   operatingHours       ShopOperatingHours[]
+  stockMovements       StockMovement[]
 }
 
 model ShopOperatingHours {
@@ -222,7 +224,7 @@ enum ProductStatus {
 }
 
 enum UnitOfMeasure {
-  PCS      // piece / each
+  PCS // piece / each
   KG
   G
   L
@@ -234,23 +236,29 @@ enum UnitOfMeasure {
   CM
   SET
 }
+
 model Product {
-  id             String   @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
   slug           String
   description    String?
-  price          Decimal  @db.Decimal(10, 2) // base/"from" price
-  compareAtPrice Decimal? @db.Decimal(10, 2)
-  costPrice      Decimal? @db.Decimal(10, 2)
+  price          Decimal       @db.Decimal(10, 2) // base/"from" price
+  compareAtPrice Decimal?      @db.Decimal(10, 2)
+  costPrice      Decimal?      @db.Decimal(10, 2)
   imageUrl       String?
   youtubeUrl     String?
-  isActive       Boolean  @default(true)
-  hasVariants    Boolean  @default(false) // 👈 new: drives simple-vs-variant UI branch
+  isActive       Boolean       @default(true)
+  hasVariants    Boolean       @default(false) // 👈 new: drives simple-vs-variant UI branch
   uom            UnitOfMeasure @default(PCS)
   specifications Json?
   addons         Json?
-  noticeText String?
+  noticeText     String?
   // ⛔ removed: sku, stock, status — now on ProductVariant
+
+  barcode          String? // 👈 new
+  minOrderQuantity Int? // 👈 new — null = no minimum
+  maxOrderQuantity Int? // 👈 new — null = no maximum
+  isOutOfStock     Boolean @default(false) // 👈 new — manual override, independent of variant stock
 
   // 👇 new category-specific flags
   isSpecialMenu    Boolean @default(false) // RESTAURANT only
@@ -271,14 +279,18 @@ model Product {
   brandId String?
   brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
 
-  variants   ProductVariant[] // 👈 replaces attributeValues
-  promotions Promotion[]
+  variants      ProductVariant[] // 👈 replaces attributeValues
+  promotions    Promotion[]      @relation("PromotionTargetProducts") // 👈 named — this is your existing implicit m2m field
+  buyPromotions Promotion[]      @relation("PromotionBuyProduct")
+  getPromotions Promotion[]      @relation("PromotionGetProduct")
 
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  orderItems OrderItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orderItems     OrderItem[]
+  stockMovements StockMovement[]
 
   @@unique([shopId, slug])
+  @@unique([shopId, barcode])
   @@index([shopId, isActive, categoryId])
   @@index([shopId, isActive, brandId])
   @@index([shopId])
@@ -323,27 +335,28 @@ model AttributeValue {
 }
 
 model ProductVariant {
-  id             String        @id @default(cuid())
+  id             String         @id @default(cuid())
   sku            String?
-  price          Decimal?      @db.Decimal(10, 2) // null = inherit Product.price
-  compareAtPrice Decimal?      @db.Decimal(10, 2)
-  costPrice      Decimal?      @db.Decimal(10, 2)
-  stock          Int           @default(0)
-  status         ProductStatus @default(IN_STOCK)
+  price          Decimal?       @db.Decimal(10, 2) // null = inherit Product.price
+  compareAtPrice Decimal?       @db.Decimal(10, 2)
+  costPrice      Decimal?       @db.Decimal(10, 2)
+  stock          Int            @default(0)
+  status         ProductStatus  @default(IN_STOCK)
   imageUrl       String?
-  isActive       Boolean       @default(true)
-  allowBackorder Boolean       @default(false)
-  uom            UnitOfMeasure?              // 👈 overrides Product.uom when set, e.g. G, ML
-  uomValue       Decimal?      @db.Decimal(10, 3) // 👈 e.g. 500 (for "500g"), 1 (for "1kg")
+  isActive       Boolean        @default(true)
+  allowBackorder Boolean        @default(false)
+  uom            UnitOfMeasure? // 👈 overrides Product.uom when set, e.g. G, ML
+  uomValue       Decimal?       @db.Decimal(10, 3) // 👈 e.g. 500 (for "500g"), 1 (for "1kg")
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   attributeValues ProductVariantAttributeValue[]
 
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  orderItems OrderItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orderItems     OrderItem[]
+  stockMovements StockMovement[]
 
   @@unique([productId, sku])
   @@index([productId])
@@ -366,6 +379,7 @@ model ProductVariantAttributeValue {
 enum DiscountType {
   PERCENTAGE
   FIXED_AMOUNT
+  BUY_X_GET_Y
 }
 
 model Promotion {
@@ -373,9 +387,9 @@ model Promotion {
   name          String
   slug          String
   description   String?
-  bannerImage   String? 
+  bannerImage   String?
   discountType  DiscountType
-  discountValue Decimal      @db.Decimal(10, 2)
+  discountValue Decimal?     @db.Decimal(10, 2)
   code          String?
   startsAt      DateTime?
   endsAt        DateTime?
@@ -385,11 +399,20 @@ model Promotion {
   maxRedemptions  Int?
   redemptionCount Int     @default(0)
 
+  buyProductId String?
+  buyProduct   Product? @relation("PromotionBuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
+  buyQuantity  Decimal? @db.Decimal(10, 3)
+
+  getProductId       String?
+  getProduct         Product? @relation("PromotionGetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  getQuantity        Decimal? @db.Decimal(10, 3)
+  getDiscountPercent Decimal? @db.Decimal(5, 2)
+
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
   // Optional targeting — empty means shop-wide
-  products   Product[]
+  products   Product[]  @relation("PromotionTargetProducts") // 👈 named
   categories Category[]
   brands     Brand[]
 
@@ -400,6 +423,8 @@ model Promotion {
   @@unique([shopId, slug])
   @@unique([shopId, code])
   @@index([shopId])
+  @@index([buyProductId])
+  @@index([getProductId])
   @@map("promotion")
 }
 
@@ -610,10 +635,11 @@ model OrderItem {
   productName  String
   variantLabel String? // e.g. "Red / L"
   sku          String?
-  price        Decimal @db.Decimal(10, 2) // unit price at time of order
+  price        Decimal  @db.Decimal(10, 2) // unit price at time of order
+  costPrice    Decimal? @db.Decimal(10, 2) // 👈 new — unit cost at time of order, for accurate historical profit
   quantity     Int
-  subtotal     Decimal @db.Decimal(10, 2) // price * quantity
-  isBackorder  Boolean @default(false)
+  subtotal     Decimal  @db.Decimal(10, 2) // price * quantity
+  isBackorder  Boolean  @default(false)
 
   createdAt DateTime @default(now())
 
@@ -634,6 +660,52 @@ model Invoice {
 
   @@unique([orderId, invoiceNumber])
   @@map("invoice")
+}
+
+// 
+
+enum StockMovementType {
+  PURCHASE_IN // supplier ဆီက ဝယ်လာတာ
+  SALE_OUT // order ဖြစ်လို့ ထွက်တာ
+  RETURN_IN // customer ပြန်ပို့တာ (stock ပြန်တက်)
+  DAMAGED_OUT // ပျက်စီး/သက်တမ်းကုန် (stock ဆုံးရှုံး)
+  ADJUSTMENT_IN // manual count correction (stock တက်)
+  ADJUSTMENT_OUT // manual count correction (stock ကျ)
+  TRANSFER_OUT // (မလိုအပ်သေးရင် skip လုပ်လို့ရ — future multi-branch)
+}
+
+model StockMovement {
+  id       String            @id @default(cuid())
+  type     StockMovementType
+  quantity Int // always positive — direction decided by `type`
+
+  // stock level snapshot after this movement (fast history reads, no need to replay)
+  stockAfter Int
+
+  unitCostPrice Decimal? @db.Decimal(10, 2) // cost per unit for this movement (esp. PURCHASE_IN)
+  note          String?
+  referenceType String? // e.g. "ORDER", "MANUAL", "SUPPLIER" — free text or make an enum later
+  referenceId   String? // e.g. orderId when type = SALE_OUT/RETURN_IN
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  createdById String? // shop owner/staff who performed it (null = system-generated, e.g. auto from order)
+  createdBy   User?   @relation("StockMovementCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([variantId, createdAt])
+  @@index([productId])
+  @@index([shopId])
+  @@index([referenceType, referenceId])
+  @@map("stock_movement")
 }
 
 // ─── Audit Log ────────────────────────────────────────────────────────────────
