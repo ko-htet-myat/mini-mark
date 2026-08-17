@@ -6,6 +6,12 @@ import {
 } from "@/features/dashboard-promotions/data/promotion.queries";
 import { getShopBySlug } from "@/features/shop/data/get-shop";
 
+function isEditableDiscountType(
+  discountType: string,
+): discountType is "PERCENTAGE" | "FIXED_AMOUNT" {
+  return discountType === "PERCENTAGE" || discountType === "FIXED_AMOUNT";
+}
+
 export default async function EditPromotionPage({
   params,
 }: {
@@ -19,6 +25,8 @@ export default async function EditPromotionPage({
   ]);
 
   if (!promotion) notFound();
+  if (!isEditableDiscountType(promotion.discountType)) notFound();
+  if (!promotion.discountValue) notFound();
 
   return (
     <div className="space-y-4">

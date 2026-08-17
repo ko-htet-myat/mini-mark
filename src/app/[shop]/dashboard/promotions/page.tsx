@@ -31,7 +31,7 @@ export default async function PromotionsPage({
   // Serialize Prisma Decimal to number to avoid Next.js Server Component serialization error
   const serializedData = data.map((p) => ({
     ...p,
-    discountValue: p.discountValue.toNumber(),
+    discountValue: p.discountValue?.toNumber() ?? null,
   }));
 
   return (

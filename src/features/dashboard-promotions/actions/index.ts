@@ -61,7 +61,7 @@ export const createPromotion = shopOwnerActionClient
       return {
         promotion: {
           ...promotion,
-          discountValue: promotion.discountValue.toNumber(),
+          discountValue: promotion.discountValue?.toNumber() ?? null,
         },
       };
     } catch (err) {
@@ -112,7 +112,7 @@ export const updatePromotion = shopOwnerActionClient
       return {
         promotion: {
           ...updated,
-          discountValue: updated.discountValue.toNumber(),
+          discountValue: updated.discountValue?.toNumber() ?? null,
         },
       };
     } catch (err) {

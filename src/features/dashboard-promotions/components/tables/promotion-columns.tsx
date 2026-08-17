@@ -12,7 +12,7 @@ export type PromotionRow = {
   slug: string;
   bannerImage: string | null;
   discountType: string;
-  discountValue: number;
+  discountValue: number | null;
   isActive: boolean;
   createdAt: Date;
 };
@@ -80,13 +80,19 @@ export function getPromotionColumns({
     {
       id: "discount",
       header: tc.discount,
-      cell: ({ row }) => (
-        <span>
-          {row.original.discountType === "PERCENTAGE"
-            ? `${row.original.discountValue.toString()}%`
-            : formatAmount(row.original.discountValue, currency)}
-        </span>
-      ),
+      cell: ({ row }) => {
+        if (row.original.discountValue === null) {
+          return <span>{row.original.discountType.replaceAll("_", " ")}</span>;
+        }
+
+        return (
+          <span>
+            {row.original.discountType === "PERCENTAGE"
+              ? `${row.original.discountValue.toString()}%`
+              : formatAmount(row.original.discountValue, currency)}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "isActive",
