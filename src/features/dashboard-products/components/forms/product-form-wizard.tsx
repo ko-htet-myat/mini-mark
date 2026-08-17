@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, type UseFormReturn } from "react-hook-form";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ import {
 import { createProduct, updateProduct } from "../../actions";
 import { BaseInfoStep } from "../steps/base-info-step";
 import { EngineRouter } from "../steps/engine-router";
+import { PricingInventoryStep } from "../steps/pricing-inventory-step";
+import { MerchandisingSeoStep } from "../steps/merchandising-seo-step";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -29,13 +31,19 @@ import {
 
 type ShopCategoryType = $Enums.ShopCategoryType;
 
-// Fields validated at Step 1 before advancing
-const STEP1_FIELDS: (keyof CreateProductInput)[] = ["name", "slug", "price"];
+const STEP_FIELDS = {
+  0: ["basicInfo.name", "basicInfo.slug"] as const,
+  1: ["pricingInventory.price", "pricingInventory.maxOrderQuantity"] as const,
+  2: ["categoryEngine"] as const,
+  3: ["merchandisingSeo"] as const,
+};
 
 const STEPS = [
-  { label: "Base Info", description: "Name, price, category & media" },
-  { label: "Product Details", description: "Variants, specs, or add-ons" },
-  { label: "Review & Save", description: "Confirm and publish" },
+  { label: "Basic info", description: "Name, category, brand & media" },
+  { label: "Pricing", description: "Price, units, barcode & order limits" },
+  { label: "Variants", description: "Variants, specs, or add-ons" },
+  { label: "SEO", description: "Merchandising, visibility & search metadata" },
+  { label: "Review", description: "Confirm and publish" },
 ];
 
 interface ProductFormWizardProps {
@@ -65,31 +73,47 @@ export default function ProductFormWizard({
 }: ProductFormWizardProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
-
   const isEdit = mode === "edit";
 
-  // Shared default values
   const defaultValues: Partial<CreateProductInput & { id?: string }> = {
     shopId,
-    name: "",
-    slug: "",
-    description: "",
-    price: undefined as unknown as number,
-    compareAtPrice: undefined as unknown as number,
-    costPrice: undefined as unknown as number,
-    imageUrl: "",
-    youtubeUrl: "",
-    noticeText: "",
-    isActive: true,
-    isFeatured: false,
-    metaTitle: "",
-    metaDescription: "",
-    categoryId: "",
-    brandId: "",
-    hasVariants: false,
-    variants: [],
-    specifications: {},
-    addons: [],
+    basicInfo: {
+      name: "",
+      slug: "",
+      description: "",
+      categoryId: "",
+      brandId: "",
+      imageUrl: "",
+      youtubeUrl: "",
+    },
+    pricingInventory: {
+      price: undefined as unknown as number,
+      compareAtPrice: undefined,
+      costPrice: undefined,
+      uom: "PCS",
+      barcode: "",
+      minOrderQuantity: undefined,
+      maxOrderQuantity: undefined,
+      isOutOfStock: false,
+    },
+    categoryEngine: {
+      shopCategory,
+      hasVariants: false,
+      variants: [],
+      selectedAttributeIds: [],
+      specifications: {},
+      addons: [],
+    },
+    merchandisingSeo: {
+      isActive: true,
+      isFeatured: false,
+      isBestSellerItem: false,
+      isCollection: false,
+      isSpecialMenu: false,
+      noticeText: "",
+      metaTitle: "",
+      metaDescription: "",
+    },
     ...initialData,
   };
 
@@ -124,10 +148,12 @@ export default function ProductFormWizard({
   );
 
   async function handleNext() {
-    if (step === 0) {
-      const valid = await form.trigger(STEP1_FIELDS);
+    const fields = STEP_FIELDS[step as keyof typeof STEP_FIELDS];
+    if (fields) {
+      const valid = await form.trigger(fields);
       if (!valid) return;
     }
+
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   }
 
@@ -139,8 +165,7 @@ export default function ProductFormWizard({
 
   return (
     <FormProvider {...form}>
-      <div className="">
-        {/* ── Step indicator ─────────────────────────────────────────── */}
+      <div>
         <nav className="mb-8">
           <ol className="flex items-center gap-0">
             {STEPS.map((s, i) => {
@@ -149,17 +174,17 @@ export default function ProductFormWizard({
               return (
                 <li
                   key={s.label}
-                  className="flex items-center flex-1 last:flex-none"
+                  className="flex flex-1 items-center last:flex-none"
                 >
-                  <div className="flex flex-col items-center gap-1 min-w-0">
+                  <div className="flex min-w-0 flex-col items-center gap-1">
                     <div
                       className={cn(
-                        "w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold transition-colors",
+                        "flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
                         isDone
-                          ? "bg-primary border-primary text-primary-foreground"
+                          ? "border-primary bg-primary text-primary-foreground"
                           : isCurrent
-                            ? "border-primary text-primary bg-background"
-                            : "border-border text-muted-foreground bg-background",
+                            ? "border-primary bg-background text-primary"
+                            : "border-border bg-background text-muted-foreground",
                       )}
                     >
                       {isDone ? (
@@ -170,7 +195,7 @@ export default function ProductFormWizard({
                     </div>
                     <span
                       className={cn(
-                        "text-xs font-medium text-center leading-tight",
+                        "text-center text-xs font-medium leading-tight",
                         isCurrent ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
@@ -180,7 +205,7 @@ export default function ProductFormWizard({
                   {i < STEPS.length - 1 && (
                     <div
                       className={cn(
-                        "flex-1 h-0.5 mx-2 mb-5 transition-colors",
+                        "mx-2 mb-5 h-0.5 flex-1 transition-colors",
                         isDone ? "bg-primary" : "bg-border",
                       )}
                     />
@@ -191,7 +216,6 @@ export default function ProductFormWizard({
           </ol>
         </nav>
 
-        {/* ── Step content ───────────────────────────────────────────── */}
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <div className="mb-6">
             <h2 className="text-lg font-semibold">{STEPS[step].label}</h2>
@@ -208,16 +232,15 @@ export default function ProductFormWizard({
             />
           )}
 
-          {step === 1 && (
-            <div className="space-y-6">
-              <EngineRouter
-                shopCategory={shopCategory}
-                attributes={attributes}
-              />
-            </div>
-          )}
+          {step === 1 && <PricingInventoryStep />}
 
           {step === 2 && (
+            <EngineRouter shopCategory={shopCategory} attributes={attributes} />
+          )}
+
+          {step === 3 && <MerchandisingSeoStep shopCategory={shopCategory} />}
+
+          {step === 4 && (
             <ReviewStep
               form={form}
               categories={categories}
@@ -227,14 +250,12 @@ export default function ProductFormWizard({
           )}
         </div>
 
-        {/* ── Server error ───────────────────────────────────────────── */}
         {!!action.result.serverError && (
-          <p className="mt-4 text-sm text-destructive text-center">
+          <p className="mt-4 text-center text-sm text-destructive">
             {String(action.result.serverError)}
           </p>
         )}
 
-        {/* ── Navigation ─────────────────────────────────────────────── */}
         <div className="mt-6 flex items-center justify-between">
           <Button
             type="button"
@@ -270,7 +291,7 @@ export default function ProductFormWizard({
                 className="mr-2"
               />
               {isSubmitting
-                ? "Saving…"
+                ? "Saving..."
                 : isEdit
                   ? "Update product"
                   : "Save & publish"}
@@ -282,11 +303,8 @@ export default function ProductFormWizard({
   );
 }
 
-// ─── Review step ──────────────────────────────────────────────────────────────
-
 interface ReviewStepProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  form: any;
+  form: UseFormReturn<CreateProductInput>;
   categories: { id: string; name: string }[];
   brands: { id: string; name: string }[];
   shopCategory: ShopCategoryType;
@@ -298,56 +316,69 @@ function ReviewStep({
   brands,
   shopCategory,
 }: ReviewStepProps) {
-  const values = form.watch() as CreateProductInput & { id?: string };
-  const isActive = values.isActive;
+  const values = form.watch();
+  const { basicInfo, pricingInventory, categoryEngine, merchandisingSeo } =
+    values;
+  const isActive = merchandisingSeo.isActive;
 
   const categoryName =
-    categories.find((c) => c.id === values.categoryId)?.name ?? "—";
-  const brandName = brands.find((b) => b.id === values.brandId)?.name ?? "—";
-
-  const specEntries = Object.entries(values.specifications ?? {});
-  const addonGroups = values.addons ?? [];
+    categories.find((c) => c.id === basicInfo.categoryId)?.name ?? "-";
+  const brandName = brands.find((b) => b.id === basicInfo.brandId)?.name ?? "-";
+  const specEntries = Object.entries(categoryEngine.specifications ?? {});
+  const addonGroups = categoryEngine.addons ?? [];
 
   return (
     <div className="space-y-6">
-      {/* Basic info summary */}
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <ReviewRow label="Name" value={values.name} />
-        <ReviewRow label="Slug" value={values.slug} mono />
-        <ReviewRow
-          label="Base price"
-          value={values.price ? String(values.price) : "—"}
-        />
-        {values.compareAtPrice && (
-          <ReviewRow label="Compare-at" value={String(values.compareAtPrice)} />
-        )}
-        {values.costPrice != null && (
-          <ReviewRow label="Cost price" value={String(values.costPrice)} />
-        )}
+      <ReviewSection title="Basic info">
+        <ReviewRow label="Name" value={basicInfo.name} />
+        <ReviewRow label="Slug" value={basicInfo.slug} mono />
         <ReviewRow label="Category" value={categoryName} />
         <ReviewRow label="Brand" value={brandName} />
-        <ReviewRow label="Featured" value={values.isFeatured ? "Yes" : "No"} />
-        {values.noticeText && (
-          <ReviewRow label="Notice" value={values.noticeText} />
-        )}
-        {values.metaTitle && (
-          <ReviewRow label="Meta title" value={values.metaTitle} />
-        )}
-        {values.metaDescription && (
-          <ReviewRow label="Meta description" value={values.metaDescription} />
-        )}
-        {values.youtubeUrl && (
-          <ReviewRow label="YouTube URL" value={values.youtubeUrl} />
-        )}
-      </div>
+        <ReviewRow label="YouTube URL" value={basicInfo.youtubeUrl ?? ""} />
+      </ReviewSection>
 
-      {/* Specifications */}
-      {specEntries.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Specifications
-          </p>
-          <ul className="space-y-1 text-sm">
+      <ReviewSection title="Pricing & inventory">
+        <ReviewRow label="Base price" value={String(pricingInventory.price)} />
+        <ReviewRow label="UOM" value={pricingInventory.uom} />
+        <ReviewRow
+          label="Compare-at"
+          value={String(pricingInventory.compareAtPrice ?? "-")}
+        />
+        <ReviewRow
+          label="Cost price"
+          value={String(pricingInventory.costPrice ?? "-")}
+        />
+        <ReviewRow label="Barcode" value={pricingInventory.barcode ?? ""} />
+        <ReviewRow
+          label="Order limits"
+          value={`${pricingInventory.minOrderQuantity ?? "none"} / ${
+            pricingInventory.maxOrderQuantity ?? "none"
+          }`}
+        />
+        <ReviewRow
+          label="Out of stock"
+          value={pricingInventory.isOutOfStock ? "Yes" : "No"}
+        />
+      </ReviewSection>
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Category engine
+        </p>
+        <ReviewSection>
+          <ReviewRow label="Shop category" value={shopCategory} />
+          <ReviewRow
+            label="Has variants"
+            value={categoryEngine.hasVariants ? "Yes" : "No"}
+          />
+          <ReviewRow
+            label="Variant count"
+            value={String(categoryEngine.variants?.length ?? 0)}
+          />
+        </ReviewSection>
+
+        {specEntries.length > 0 && (
+          <ul className="mt-3 space-y-1 text-sm">
             {specEntries.map(([k, v]) => (
               <li key={k} className="flex gap-2">
                 <span className="font-medium">{k}:</span>
@@ -355,70 +386,75 @@ function ReviewStep({
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        )}
 
-      {/* Add-ons summary */}
-      {shopCategory === "RESTAURANT" && addonGroups.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Add-on groups ({addonGroups.length})
-          </p>
-          <ul className="space-y-1 text-sm">
-            {addonGroups.map(
-              (
-                g: { groupName: string; options: { name: string }[] },
-                i: number,
-              ) => (
-                <li key={i}>
-                  <span className="font-medium">{g.groupName}</span>
-                  <span className="text-muted-foreground ml-2">
-                    {g.options.length} option(s)
-                  </span>
-                </li>
-              ),
+        {shopCategory === "RESTAURANT" && addonGroups.length > 0 && (
+          <ul className="mt-3 space-y-1 text-sm">
+            {addonGroups.map((g, i) => (
+              <li key={i}>
+                <span className="font-medium">{g.groupName}</span>
+                <span className="ml-2 text-muted-foreground">
+                  {g.options.length} option(s)
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {categoryEngine.hasVariants && (
+          <ul className="mt-3 space-y-1 text-sm">
+            {(categoryEngine.variants ?? []).slice(0, 5).map((v, i) => (
+              <li key={i} className="text-muted-foreground">
+                {v.sku || `Variant #${i + 1}`}
+                {v.price ? ` - ${v.price}` : ""}
+                {` - stock: ${v.stock ?? 0}`}
+              </li>
+            ))}
+            {(categoryEngine.variants?.length ?? 0) > 5 && (
+              <li className="text-muted-foreground">
+                ...and {(categoryEngine.variants?.length ?? 0) - 5} more
+              </li>
             )}
           </ul>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Variants summary */}
-      {values.hasVariants && (
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Variants ({values.variants?.length ?? 0})
-          </p>
-          {(values.variants?.length ?? 0) === 0 ? (
-            <p className="text-sm text-amber-600 dark:text-amber-400">
-              ⚠ No variants generated. Go back to Step 2 to generate the variant
-              matrix.
-            </p>
-          ) : (
-            <ul className="space-y-1 text-sm">
-              {(values.variants ?? []).slice(0, 5).map((v, i) => (
-                <li key={i} className="text-muted-foreground">
-                  {v.sku || `Variant #${i + 1}`}
-                  {v.price ? ` — ${v.price}` : ""}
-                  {` — stock: ${v.stock ?? 0}`}
-                </li>
-              ))}
-              {(values.variants?.length ?? 0) > 5 && (
-                <li className="text-muted-foreground">
-                  …and {(values.variants?.length ?? 0) - 5} more
-                </li>
-              )}
-            </ul>
-          )}
-        </div>
-      )}
+      <ReviewSection title="Merchandising & SEO">
+        <ReviewRow
+          label="Featured"
+          value={merchandisingSeo.isFeatured ? "Yes" : "No"}
+        />
+        <ReviewRow
+          label="Best seller"
+          value={merchandisingSeo.isBestSellerItem ? "Yes" : "No"}
+        />
+        <ReviewRow
+          label="Collection"
+          value={merchandisingSeo.isCollection ? "Yes" : "No"}
+        />
+        <ReviewRow
+          label="Special menu"
+          value={merchandisingSeo.isSpecialMenu ? "Yes" : "No"}
+        />
+        <ReviewRow label="Notice" value={merchandisingSeo.noticeText ?? ""} />
+        <ReviewRow
+          label="Meta title"
+          value={merchandisingSeo.metaTitle || basicInfo.name}
+        />
+        <ReviewRow
+          label="Meta description"
+          value={
+            merchandisingSeo.metaDescription || basicInfo.description || ""
+          }
+        />
+      </ReviewSection>
 
-      {/* Active toggle */}
       <div className="flex items-center justify-between rounded-lg border p-4">
         <div>
           <Label htmlFor="isActive" className="text-sm font-medium">
             Publish product
           </Label>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Active products are visible in your storefront.
           </p>
         </div>
@@ -426,9 +462,32 @@ function ReviewStep({
           id="isActive"
           checked={isActive}
           onCheckedChange={(checked) =>
-            form.setValue("isActive", checked, { shouldDirty: true })
+            form.setValue("merchandisingSeo.isActive", checked, {
+              shouldDirty: true,
+            })
           }
         />
+      </div>
+    </div>
+  );
+}
+
+function ReviewSection({
+  title,
+  children,
+}: {
+  title?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      {title && (
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </p>
+      )}
+      <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+        {children}
       </div>
     </div>
   );
@@ -446,8 +505,8 @@ function ReviewRow({
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={cn("font-medium truncate", mono && "font-mono text-xs")}>
-        {value || "—"}
+      <span className={cn("truncate font-medium", mono && "font-mono text-xs")}>
+        {value || "-"}
       </span>
     </div>
   );

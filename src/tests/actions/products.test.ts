@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { makeMockSession, makeMockShop } from "./setup";
 
 type MockAuth = { user: { id: string } } | null;
-type MockShop = { slug: string; ownerId: string } | null;
+type MockShop = {
+  id: string;
+  slug: string;
+  ownerId: string;
+  shopCategory: string;
+} | null;
 type SafeActionMiddlewareArgs = {
   next: (args: { ctx: Record<string, unknown> }) => Promise<unknown>;
   ctx: Record<string, unknown>;
@@ -157,9 +162,17 @@ const baseProduct = {
   noticeText: null,
   isActive: true,
   isFeatured: false,
+  isBestSellerItem: false,
+  isCollection: false,
+  isSpecialMenu: false,
   metaTitle: null,
   metaDescription: null,
   hasVariants: false,
+  uom: "PCS",
+  barcode: null,
+  minOrderQuantity: null,
+  maxOrderQuantity: null,
+  isOutOfStock: false,
   categoryId: null,
   brandId: null,
   createdAt: new Date(),
@@ -169,7 +182,10 @@ const baseProduct = {
 beforeEach(() => {
   vi.clearAllMocks();
   setMockAuth(makeMockSession());
-  setMockShop(makeMockShop());
+  setMockShop({
+    ...makeMockShop(),
+    shopCategory: "FASHION",
+  });
   mockPrisma.$transaction.mockImplementation(
     (cb: (tx: typeof mockPrisma) => unknown) => cb(mockPrisma),
   );
@@ -178,9 +194,38 @@ beforeEach(() => {
 describe("createProduct", () => {
   const validInput = {
     shopId: "test-shop-id",
-    name: "New Product",
-    slug: "new-product",
-    price: 19.99,
+    basicInfo: {
+      name: "New Product",
+      slug: "new-product",
+      description: "",
+      categoryId: "",
+      brandId: "",
+      imageUrl: "",
+      youtubeUrl: "",
+    },
+    pricingInventory: {
+      price: 19.99,
+      uom: "PCS" as const,
+      isOutOfStock: false,
+    },
+    categoryEngine: {
+      shopCategory: "FASHION",
+      hasVariants: false,
+      variants: [],
+      selectedAttributeIds: [],
+      specifications: {},
+      addons: [],
+    },
+    merchandisingSeo: {
+      isActive: true,
+      isFeatured: false,
+      isBestSellerItem: false,
+      isCollection: false,
+      isSpecialMenu: false,
+      noticeText: "",
+      metaTitle: "",
+      metaDescription: "",
+    },
   };
 
   it("creates a simple product (no variants)", async () => {
@@ -205,11 +250,23 @@ describe("createProduct", () => {
       BIND,
     )({
       ...validInput,
-      costPrice: 12.5,
-      isFeatured: true,
-      noticeText: "Ships in 3 days",
-      metaTitle: "New Product SEO",
-      metaDescription: "Short search preview.",
+      pricingInventory: {
+        ...validInput.pricingInventory,
+        costPrice: 12.5,
+        barcode: "123456789",
+        minOrderQuantity: 2,
+        maxOrderQuantity: 10,
+        isOutOfStock: true,
+      },
+      merchandisingSeo: {
+        ...validInput.merchandisingSeo,
+        isFeatured: true,
+        isBestSellerItem: true,
+        isCollection: true,
+        noticeText: "Ships in 3 days",
+        metaTitle: "New Product SEO",
+        metaDescription: "Short search preview.",
+      },
     });
     expect(result.data?.product.costPrice).toBe(12.5);
     expect(result.data?.product.isFeatured).toBe(true);
@@ -217,7 +274,13 @@ describe("createProduct", () => {
       expect.objectContaining({
         data: expect.objectContaining({
           costPrice: 12.5,
+          barcode: "123456789",
+          minOrderQuantity: 2,
+          maxOrderQuantity: 10,
+          isOutOfStock: true,
           isFeatured: true,
+          isBestSellerItem: true,
+          isCollection: true,
           noticeText: "Ships in 3 days",
           metaTitle: "New Product SEO",
           metaDescription: "Short search preview.",
@@ -236,16 +299,25 @@ describe("createProduct", () => {
       BIND,
     )({
       ...validInput,
-      hasVariants: true,
-      variants: [
-        {
-          sku: "NP-RED",
-          price: 24.99,
-          stock: 10,
-          isActive: true,
-          attributeValues: [{ attributeValueId: "av-1" }],
-        },
-      ],
+      categoryEngine: {
+        ...validInput.categoryEngine,
+        hasVariants: true,
+        variants: [
+          {
+            sku: "NP-RED",
+            price: 24.99,
+            compareAtPrice: 29.99,
+            costPrice: 12.5,
+            stock: 10,
+            allowBackorder: true,
+            uom: "G" as const,
+            uomValue: 500,
+            imageUrl: "",
+            isActive: true,
+            attributeValueIds: ["av-1"],
+          },
+        ],
+      },
     });
     expect(result.data?.product.hasVariants).toBe(true);
     expect(mockPrisma.product.create).toHaveBeenCalledWith(
@@ -253,7 +325,18 @@ describe("createProduct", () => {
         data: expect.objectContaining({
           variants: expect.objectContaining({
             create: expect.arrayContaining([
-              expect.objectContaining({ sku: "NP-RED", stock: 10 }),
+              expect.objectContaining({
+                sku: "NP-RED",
+                stock: 10,
+                compareAtPrice: 29.99,
+                costPrice: 12.5,
+                allowBackorder: true,
+                uom: "G",
+                uomValue: 500,
+                attributeValues: {
+                  create: [{ attributeValueId: "av-1" }],
+                },
+              }),
             ]),
           }),
         }),
@@ -265,8 +348,11 @@ describe("createProduct", () => {
     const result = await createProduct.bind(
       null,
       BIND,
-    )({ ...validInput, name: "X" });
-    expect(result.validationErrors?.name?._errors).toBeDefined();
+    )({
+      ...validInput,
+      basicInfo: { ...validInput.basicInfo, name: "X" },
+    });
+    expect(result.validationErrors?.basicInfo?.name?._errors).toBeDefined();
   });
 
   it("returns server error on duplicate slug", async () => {
@@ -280,9 +366,38 @@ describe("updateProduct", () => {
   const validInput = {
     id: "prod-1",
     shopId: "test-shop-id",
-    name: "Updated",
-    slug: "updated-product",
-    price: 39.99,
+    basicInfo: {
+      name: "Updated",
+      slug: "updated-product",
+      description: "",
+      categoryId: "",
+      brandId: "",
+      imageUrl: "",
+      youtubeUrl: "",
+    },
+    pricingInventory: {
+      price: 39.99,
+      uom: "PCS" as const,
+      isOutOfStock: false,
+    },
+    categoryEngine: {
+      shopCategory: "FASHION",
+      hasVariants: false,
+      variants: [],
+      selectedAttributeIds: [],
+      specifications: {},
+      addons: [],
+    },
+    merchandisingSeo: {
+      isActive: true,
+      isFeatured: false,
+      isBestSellerItem: false,
+      isCollection: false,
+      isSpecialMenu: false,
+      noticeText: "",
+      metaTitle: "",
+      metaDescription: "",
+    },
   };
 
   it("updates a product", async () => {
@@ -314,11 +429,21 @@ describe("updateProduct", () => {
       BIND,
     )({
       ...validInput,
-      costPrice: 18,
-      isFeatured: true,
-      noticeText: "Limited stock",
-      metaTitle: "Updated SEO",
-      metaDescription: "Updated preview.",
+      pricingInventory: {
+        ...validInput.pricingInventory,
+        costPrice: 18,
+        barcode: "987654321",
+        minOrderQuantity: 1,
+        maxOrderQuantity: 5,
+      },
+      merchandisingSeo: {
+        ...validInput.merchandisingSeo,
+        isFeatured: true,
+        isBestSellerItem: true,
+        noticeText: "Limited stock",
+        metaTitle: "Updated SEO",
+        metaDescription: "Updated preview.",
+      },
     });
     expect(result.data?.product.costPrice).toBe(18);
     expect(result.data?.product.isFeatured).toBe(true);
@@ -326,7 +451,11 @@ describe("updateProduct", () => {
       expect.objectContaining({
         data: expect.objectContaining({
           costPrice: 18,
+          barcode: "987654321",
+          minOrderQuantity: 1,
+          maxOrderQuantity: 5,
           isFeatured: true,
+          isBestSellerItem: true,
           noticeText: "Limited stock",
           metaTitle: "Updated SEO",
           metaDescription: "Updated preview.",
@@ -347,16 +476,22 @@ describe("updateProduct", () => {
       BIND,
     )({
       ...validInput,
-      hasVariants: true,
-      variants: [
-        {
-          sku: "UP-BLUE",
-          price: 34.99,
-          stock: 5,
-          isActive: true,
-          attributeValues: [],
-        },
-      ],
+      categoryEngine: {
+        ...validInput.categoryEngine,
+        hasVariants: true,
+        variants: [
+          {
+            sku: "UP-BLUE",
+            price: 34.99,
+            costPrice: 20,
+            stock: 5,
+            allowBackorder: false,
+            imageUrl: "",
+            isActive: true,
+            attributeValueIds: [],
+          },
+        ],
+      },
     });
     expect(result.data?.product.hasVariants).toBe(true);
     expect(mockPrisma.productVariant.deleteMany).toHaveBeenCalledWith({
@@ -455,8 +590,12 @@ describe("duplicateProduct", () => {
           sku: "OG-SKU",
           price: makeMockDecimal(15),
           compareAtPrice: null,
+          costPrice: makeMockDecimal(8),
           stock: 10,
           imageUrl: null,
+          allowBackorder: true,
+          uom: "G",
+          uomValue: makeMockDecimal(500),
           isActive: true,
           attributeValues: [{ attributeValueId: "av-1" }],
         },
@@ -476,6 +615,10 @@ describe("duplicateProduct", () => {
             create: expect.arrayContaining([
               expect.objectContaining({
                 sku: expect.stringContaining("-copy-"),
+                costPrice: 8,
+                allowBackorder: true,
+                uom: "G",
+                uomValue: 500,
               }),
             ]),
           }),

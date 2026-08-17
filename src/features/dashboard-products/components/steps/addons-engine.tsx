@@ -17,7 +17,7 @@ export function AddonsEngine() {
     fields: groups,
     append: appendGroup,
     remove: removeGroup,
-  } = useFieldArray({ control, name: "addons" });
+  } = useFieldArray({ control, name: "categoryEngine.addons" });
 
   return (
     <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
@@ -68,14 +68,19 @@ function AddonGroupFields({
     fields: options,
     append: appendOption,
     remove: removeOption,
-  } = useFieldArray({ control, name: `addons.${groupIndex}.options` });
+  } = useFieldArray({
+    control,
+    name: `categoryEngine.addons.${groupIndex}.options`,
+  });
 
   return (
     <div className="rounded-md border bg-background p-3 space-y-3">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Group name (e.g. Choice of Cheese)"
-          {...register(`addons.${groupIndex}.groupName` as const)}
+          {...register(
+            `categoryEngine.addons.${groupIndex}.groupName` as const,
+          )}
         />
         <Button
           type="button"
@@ -93,7 +98,9 @@ function AddonGroupFields({
           <Input
             type="number"
             min={0}
-            {...register(`addons.${groupIndex}.minSelect` as const)}
+            {...register(
+              `categoryEngine.addons.${groupIndex}.minSelect` as const,
+            )}
           />
         </div>
         <div className="space-y-1">
@@ -101,7 +108,9 @@ function AddonGroupFields({
           <Input
             type="number"
             min={1}
-            {...register(`addons.${groupIndex}.maxSelect` as const)}
+            {...register(
+              `categoryEngine.addons.${groupIndex}.maxSelect` as const,
+            )}
           />
         </div>
       </div>
@@ -112,7 +121,7 @@ function AddonGroupFields({
             <Input
               placeholder="Option name (e.g. Cheddar)"
               {...register(
-                `addons.${groupIndex}.options.${optIndex}.name` as const,
+                `categoryEngine.addons.${groupIndex}.options.${optIndex}.name` as const,
               )}
             />
             <Input
@@ -121,7 +130,7 @@ function AddonGroupFields({
               placeholder="Extra price"
               className="w-32"
               {...register(
-                `addons.${groupIndex}.options.${optIndex}.price` as const,
+                `categoryEngine.addons.${groupIndex}.options.${optIndex}.price` as const,
               )}
             />
             <Button

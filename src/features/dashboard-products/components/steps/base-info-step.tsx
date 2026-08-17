@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { ImageUploadField } from "@/features/cloudinary/image-upload-field";
 
 interface BaseInfoStepProps {
@@ -33,11 +32,11 @@ export function BaseInfoStep({
     formState: { errors },
   } = useFormContext<CreateProductInput>();
 
-  const imageUrl = watch("imageUrl") ?? "";
+  const imageUrl = watch("basicInfo.imageUrl") ?? "";
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setValue(
-      "slug",
+      "basicInfo.slug",
       e.target.value
         .toLowerCase()
         .trim()
@@ -58,19 +57,27 @@ export function BaseInfoStep({
           <Input
             id="name"
             placeholder="e.g. Cotton T-Shirt"
-            {...register("name", { onChange: handleNameChange })}
+            {...register("basicInfo.name", { onChange: handleNameChange })}
           />
-          {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+          {errors.basicInfo?.name && (
+            <p className="text-sm text-destructive">
+              {errors.basicInfo.name.message}
+            </p>
           )}
         </div>
 
         {/* Slug */}
         <div className="space-y-1.5">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" placeholder="cotton-t-shirt" {...register("slug")} />
-          {errors.slug && (
-            <p className="text-sm text-destructive">{errors.slug.message}</p>
+          <Input
+            id="slug"
+            placeholder="cotton-t-shirt"
+            {...register("basicInfo.slug")}
+          />
+          {errors.basicInfo?.slug && (
+            <p className="text-sm text-destructive">
+              {errors.basicInfo.slug.message}
+            </p>
           )}
         </div>
 
@@ -80,168 +87,26 @@ export function BaseInfoStep({
           <Textarea
             id="description"
             rows={4}
-            {...register("description")}
+            {...register("basicInfo.description")}
             className=" resize-none"
           />
-          {errors.description && (
+          {errors.basicInfo?.description && (
             <p className="text-sm text-destructive">
-              {errors.description.message}
+              {errors.basicInfo.description.message}
             </p>
           )}
         </div>
-
-        {/* Price fields */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="price">
-              Base price <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              {...register("price")}
-            />
-            {errors.price && (
-              <p className="text-sm text-destructive">{errors.price.message}</p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="costPrice">Cost price</Label>
-            <Input
-              id="costPrice"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              {...register("costPrice")}
-            />
-            {errors.costPrice && (
-              <p className="text-sm text-destructive">
-                {errors.costPrice.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="compareAtPrice">Compare-at price</Label>
-            <Input
-              id="compareAtPrice"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              {...register("compareAtPrice")}
-            />
-            {errors.compareAtPrice && (
-              <p className="text-sm text-destructive">
-                {errors.compareAtPrice.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Storefront notice */}
-        <div className="space-y-1.5">
-          <Label htmlFor="noticeText">Notice text</Label>
-          <Textarea
-            id="noticeText"
-            rows={3}
-            placeholder="e.g. Preorder item, ships within 3 days"
-            {...register("noticeText")}
-            className="resize-none"
-          />
-          {errors.noticeText && (
-            <p className="text-sm text-destructive">
-              {errors.noticeText.message}
-            </p>
-          )}
-        </div>
-
-        {/* SEO */}
-        <div className="space-y-4 rounded-lg border p-4">
-          <div>
-            <h3 className="text-sm font-medium">SEO metadata</h3>
-            <p className="text-xs text-muted-foreground">
-              Optional title and description for search previews.
-            </p>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="metaTitle">Meta title</Label>
-            <Input
-              id="metaTitle"
-              placeholder="Search result title"
-              {...register("metaTitle")}
-            />
-            {errors.metaTitle && (
-              <p className="text-sm text-destructive">
-                {errors.metaTitle.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="metaDescription">Meta description</Label>
-            <Textarea
-              id="metaDescription"
-              rows={3}
-              placeholder="Short search result description"
-              {...register("metaDescription")}
-              className="resize-none"
-            />
-            {errors.metaDescription && (
-              <p className="text-sm text-destructive">
-                {errors.metaDescription.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-5">
-        {/* Product image */}
-        <div className="space-y-1.5">
-          <Label>Product image</Label>
-          {imageUrl ? (
-            <div className="relative w-40 aspect-square">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imageUrl}
-                alt="Product"
-                className="w-full h-full object-cover rounded-md border"
-              />
-              <button
-                type="button"
-                onClick={() => setValue("imageUrl", "")}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
-              >
-                ×
-              </button>
-            </div>
-          ) : (
-            <ImageUploadField
-              label="Upload image"
-              folder={`${shopSlug}/products/images`}
-              value=""
-              onUploaded={(asset) => setValue("imageUrl", asset.url)}
-              onRemoved={() => setValue("imageUrl", "")}
-            />
-          )}
-          {errors.imageUrl && (
-            <p className="text-sm text-destructive">
-              {errors.imageUrl.message}
-            </p>
-          )}
-        </div>
-
         {/* Category + Brand */}
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label>Category</Label>
             <Select
-              value={watch("categoryId") || "__none__"}
+              value={watch("basicInfo.categoryId") || "__none__"}
               onValueChange={(value) =>
-                setValue("categoryId", value === "__none__" ? "" : value)
+                setValue(
+                  "basicInfo.categoryId",
+                  value === "__none__" ? "" : value,
+                )
               }
             >
               <SelectTrigger className="w-full">
@@ -261,9 +126,9 @@ export function BaseInfoStep({
           <div className="space-y-1.5">
             <Label>Brand</Label>
             <Select
-              value={watch("brandId") || "__none__"}
+              value={watch("basicInfo.brandId") || "__none__"}
               onValueChange={(value) =>
-                setValue("brandId", value === "__none__" ? "" : value)
+                setValue("basicInfo.brandId", value === "__none__" ? "" : value)
               }
             >
               <SelectTrigger className="w-full">
@@ -280,6 +145,43 @@ export function BaseInfoStep({
             </Select>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-5">
+        {/* Product image */}
+        <div className="space-y-1.5">
+          <Label>Product image</Label>
+          {imageUrl ? (
+            <div className="relative w-40 aspect-square">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt="Product"
+                className="w-full h-full object-cover rounded-md border"
+              />
+              <button
+                type="button"
+                onClick={() => setValue("basicInfo.imageUrl", "")}
+                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+          ) : (
+            <ImageUploadField
+              label="Upload image"
+              folder={`${shopSlug}/products/images`}
+              value=""
+              onUploaded={(asset) => setValue("basicInfo.imageUrl", asset.url)}
+              onRemoved={() => setValue("basicInfo.imageUrl", "")}
+            />
+          )}
+          {errors.basicInfo?.imageUrl && (
+            <p className="text-sm text-destructive">
+              {errors.basicInfo.imageUrl.message}
+            </p>
+          )}
+        </div>
 
         {/* YouTube URL */}
         <div className="space-y-1.5">
@@ -287,32 +189,13 @@ export function BaseInfoStep({
           <Input
             id="youtubeUrl"
             placeholder="https://youtube.com/watch?v=..."
-            {...register("youtubeUrl")}
+            {...register("basicInfo.youtubeUrl")}
           />
-          {errors.youtubeUrl && (
+          {errors.basicInfo?.youtubeUrl && (
             <p className="text-sm text-destructive">
-              {errors.youtubeUrl.message}
+              {errors.basicInfo.youtubeUrl.message}
             </p>
           )}
-        </div>
-
-        {/* Featured toggle */}
-        <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
-          <div>
-            <Label htmlFor="isFeatured" className="text-sm font-medium">
-              Featured product
-            </Label>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Highlight this product in storefront featured sections.
-            </p>
-          </div>
-          <Switch
-            id="isFeatured"
-            checked={watch("isFeatured")}
-            onCheckedChange={(checked) =>
-              setValue("isFeatured", checked, { shouldDirty: true })
-            }
-          />
         </div>
       </div>
     </section>

@@ -14,10 +14,8 @@ import { Delete02Icon, Add01Icon } from "@hugeicons/core-free-icons";
  */
 export function SpecsEngine() {
   const { watch, setValue } = useFormContext<CreateProductInput>();
-  const specifications = (watch("specifications") ?? {}) as Record<
-    string,
-    string
-  >;
+  const specifications = (watch("categoryEngine.specifications") ??
+    {}) as Record<string, string>;
   const [key, setKey] = useState("");
   const [value, setValue_] = useState("");
 
@@ -25,10 +23,14 @@ export function SpecsEngine() {
 
   function addSpec() {
     if (!key.trim() || !value.trim()) return;
-    setValue("specifications", {
-      ...specifications,
-      [key.trim()]: value.trim(),
-    });
+    setValue(
+      "categoryEngine.specifications",
+      {
+        ...specifications,
+        [key.trim()]: value.trim(),
+      },
+      { shouldDirty: true },
+    );
     setKey("");
     setValue_("");
   }
@@ -36,7 +38,7 @@ export function SpecsEngine() {
   function removeSpec(k: string) {
     const next = { ...specifications };
     delete next[k];
-    setValue("specifications", next);
+    setValue("categoryEngine.specifications", next, { shouldDirty: true });
   }
 
   return (

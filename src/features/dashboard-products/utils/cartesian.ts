@@ -6,8 +6,7 @@ export interface AttributeInput {
 
 export interface GeneratedVariant {
   combinationName: string;
-  /** Matches Zod schema: `variants[].attributeValues[].attributeValueId` */
-  attributeValues: { attributeValueId: string }[];
+  attributeValueIds: string[];
   sku: string;
   price: number;
   stock: number;
@@ -52,7 +51,7 @@ export function generateVariantMatrix(
 
   return combinations.map((combo) => {
     const combinationName = combo.map((c) => c.valueName).join(" / ");
-    const attributeValues = combo.map((c) => ({ attributeValueId: c.valueId }));
+    const attributeValueIds = combo.map((c) => c.valueId);
 
     const skuSuffix = combo
       .map((c) => c.valueName.toUpperCase().replace(/\s+/g, ""))
@@ -61,7 +60,7 @@ export function generateVariantMatrix(
 
     return {
       combinationName,
-      attributeValues,
+      attributeValueIds,
       sku,
       price: basePrice,
       stock: 0,

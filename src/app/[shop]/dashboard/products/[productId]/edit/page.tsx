@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import ProductFormWizard from "@/features/dashboard-products/components/forms/product-form-wizard";
+import type { CreateProductInput } from "@/features/dashboard-products/validations";
 import {
   getProductById,
   getShopProductFormData,
@@ -28,46 +29,66 @@ export default async function EditProductPage({
   const initialData = {
     id: product.id,
     shopId: shop.id,
-    name: product.name,
-    slug: product.slug,
-    description: product.description ?? "",
-    price: product.price,
-    compareAtPrice: product.compareAtPrice ?? undefined,
-    costPrice: product.costPrice ?? undefined,
-    imageUrl: product.imageUrl ?? "",
-    youtubeUrl: product.youtubeUrl ?? "",
-    noticeText: product.noticeText ?? "",
-    isActive: product.isActive,
-    isFeatured: product.isFeatured,
-    metaTitle: product.metaTitle ?? "",
-    metaDescription: product.metaDescription ?? "",
-    hasVariants: product.hasVariants,
-    categoryId: product.categoryId ?? "",
-    brandId: product.brandId ?? "",
-    // Pre-populate specs and addons from DB
-    specifications:
-      (product.specifications as Record<string, string> | null) ?? {},
-    addons:
-      (product.addons as
-        | {
-            groupName: string;
-            minSelect: number;
-            maxSelect: number;
-            options: { name: string; price: number }[];
-          }[]
-        | null) ?? [],
-    variants: product.variants.map((v) => ({
-      id: v.id,
-      sku: v.sku ?? "",
-      price: v.price ?? undefined,
-      compareAtPrice: v.compareAtPrice ?? undefined,
-      stock: v.stock,
-      imageUrl: v.imageUrl ?? "",
-      isActive: v.isActive,
-      attributeValues: v.attributeValues.map((av) => ({
-        attributeValueId: av.attributeValueId,
+    basicInfo: {
+      name: product.name,
+      slug: product.slug,
+      description: product.description ?? "",
+      categoryId: product.categoryId ?? "",
+      brandId: product.brandId ?? "",
+      imageUrl: product.imageUrl ?? "",
+      youtubeUrl: product.youtubeUrl ?? "",
+    },
+    pricingInventory: {
+      price: product.price,
+      compareAtPrice: product.compareAtPrice ?? undefined,
+      costPrice: product.costPrice ?? undefined,
+      uom: product.uom,
+      barcode: product.barcode ?? "",
+      minOrderQuantity: product.minOrderQuantity ?? undefined,
+      maxOrderQuantity: product.maxOrderQuantity ?? undefined,
+      isOutOfStock: product.isOutOfStock,
+    },
+    categoryEngine: {
+      shopCategory: shop.shopCategory,
+      hasVariants: product.hasVariants,
+      selectedAttributeIds: [],
+      specifications:
+        (product.specifications as Record<string, string> | null) ?? {},
+      addons:
+        (product.addons as
+          | {
+              groupName: string;
+              minSelect: number;
+              maxSelect: number;
+              options: { name: string; price: number }[];
+            }[]
+          | null) ?? [],
+      variants: product.variants.map((v) => ({
+        id: v.id,
+        sku: v.sku ?? "",
+        price: v.price ?? undefined,
+        compareAtPrice: v.compareAtPrice ?? undefined,
+        costPrice: v.costPrice ?? undefined,
+        stock: v.stock,
+        imageUrl: v.imageUrl ?? "",
+        allowBackorder: v.allowBackorder,
+        uom: (v.uom ??
+          "") as CreateProductInput["categoryEngine"]["variants"][number]["uom"],
+        uomValue: v.uomValue ?? undefined,
+        isActive: v.isActive,
+        attributeValueIds: v.attributeValues.map((av) => av.attributeValueId),
       })),
-    })),
+    },
+    merchandisingSeo: {
+      isActive: product.isActive,
+      isFeatured: product.isFeatured,
+      isBestSellerItem: product.isBestSellerItem,
+      isCollection: product.isCollection,
+      isSpecialMenu: product.isSpecialMenu,
+      noticeText: product.noticeText ?? "",
+      metaTitle: product.metaTitle ?? "",
+      metaDescription: product.metaDescription ?? "",
+    },
   };
 
   return (

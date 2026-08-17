@@ -50,12 +50,46 @@ function usesSpecifications(shopCategory: string) {
   );
 }
 
+function productDataFromInput(input: CreateProductInput, shopCategory: string) {
+  const { basicInfo, pricingInventory, merchandisingSeo } = input;
+
+  return {
+    name: basicInfo.name,
+    slug: basicInfo.slug,
+    description: basicInfo.description || null,
+    price: pricingInventory.price,
+    compareAtPrice: pricingInventory.compareAtPrice ?? null,
+    costPrice: pricingInventory.costPrice ?? null,
+    uom: pricingInventory.uom,
+    barcode: pricingInventory.barcode || null,
+    minOrderQuantity: pricingInventory.minOrderQuantity ?? null,
+    maxOrderQuantity: pricingInventory.maxOrderQuantity ?? null,
+    isOutOfStock: pricingInventory.isOutOfStock,
+    imageUrl: basicInfo.imageUrl || null,
+    youtubeUrl: basicInfo.youtubeUrl || null,
+    noticeText: merchandisingSeo.noticeText || null,
+    isActive: merchandisingSeo.isActive,
+    isFeatured: merchandisingSeo.isFeatured,
+    isBestSellerItem:
+      ["FASHION", "BOOKS_STATIONERY", "ELECTRONICS", "BEAUTY"].includes(
+        shopCategory,
+      ) && merchandisingSeo.isBestSellerItem,
+    isCollection: shopCategory === "FASHION" && merchandisingSeo.isCollection,
+    isSpecialMenu:
+      shopCategory === "RESTAURANT" && merchandisingSeo.isSpecialMenu,
+    metaTitle: merchandisingSeo.metaTitle || null,
+    metaDescription: merchandisingSeo.metaDescription || null,
+    categoryId: basicInfo.categoryId || null,
+    brandId: basicInfo.brandId || null,
+  };
+}
+
 /**
  * Build the variant creation payload for a prisma.$transaction.
  * If the shop is RESTAURANT or hasVariants is false, creates a single default variant.
  */
 function buildVariantCreates(
-  input: Pick<CreateProductInput, "hasVariants" | "variants">,
+  input: Pick<CreateProductInput["categoryEngine"], "hasVariants" | "variants">,
   shopCategory: string,
 ): Prisma.ProductVariantCreateWithoutProductInput[] {
   const isRestaurant = isRestaurantCategory(shopCategory);
@@ -73,15 +107,31 @@ function buildVariantCreates(
     sku: v.sku || null,
     price: v.price != null ? v.price : null,
     compareAtPrice: v.compareAtPrice != null ? v.compareAtPrice : null,
+    costPrice: v.costPrice != null ? v.costPrice : null,
     stock: v.stock ?? 0,
     imageUrl: v.imageUrl || null,
+    allowBackorder: v.allowBackorder ?? false,
+    uom: v.uom || null,
+    uomValue: v.uomValue != null ? v.uomValue : null,
     isActive: v.isActive ?? true,
     attributeValues: {
-      create: (v.attributeValues ?? []).map((av) => ({
-        attributeValueId: av.attributeValueId,
+      create: (v.attributeValueIds ?? []).map((attributeValueId) => ({
+        attributeValueId,
       })),
     },
   }));
+}
+
+function uniqueErrorMessage(err: Prisma.PrismaClientKnownRequestError) {
+  const target = Array.isArray(err.meta?.target)
+    ? err.meta.target.join(",")
+    : String(err.meta?.target ?? "");
+
+  if (target.includes("barcode")) {
+    return "A product with this barcode already exists.";
+  }
+
+  return "A product with this slug already exists.";
 }
 
 // ─── createProduct ────────────────────────────────────────────────────────────
@@ -89,42 +139,36 @@ function buildVariantCreates(
 export const createProduct = shopOwnerActionClient
   .inputSchema(createProductSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const {
-      shopId,
-      categoryId,
-      brandId,
-      hasVariants,
-      variants = [],
-      specifications,
-      addons,
-      ...data
-    } = parsedInput;
-
     const shopCategory = ctx.shop.shopCategory;
     const isRestaurant = isRestaurantCategory(shopCategory);
-    const effectiveHasVariants = isRestaurant ? false : hasVariants;
+    const { categoryEngine } = parsedInput;
+    const effectiveHasVariants = isRestaurant
+      ? false
+      : categoryEngine.hasVariants;
 
     try {
       const product = await prisma.$transaction(async (tx) => {
         const created = await tx.product.create({
           data: {
-            ...data,
-            shopId,
+            ...productDataFromInput(parsedInput, shopCategory),
+            shopId: parsedInput.shopId,
             hasVariants: effectiveHasVariants,
-            categoryId: categoryId || null,
-            brandId: brandId || null,
-            // Only persist specs for relevant categories
             specifications:
               !isRestaurant &&
               usesSpecifications(shopCategory) &&
-              specifications
-                ? specifications
+              Object.keys(categoryEngine.specifications ?? {}).length > 0
+                ? categoryEngine.specifications
                 : undefined,
-            // Only persist addons for RESTAURANT
-            addons: isRestaurant && addons?.length ? addons : undefined,
+            addons:
+              isRestaurant && categoryEngine.addons?.length
+                ? categoryEngine.addons
+                : undefined,
             variants: {
               create: buildVariantCreates(
-                { hasVariants: effectiveHasVariants, variants },
+                {
+                  hasVariants: effectiveHasVariants,
+                  variants: categoryEngine.variants,
+                },
                 shopCategory,
               ),
             },
@@ -140,7 +184,7 @@ export const createProduct = shopOwnerActionClient
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === "P2002"
       ) {
-        throw new Error("A product with this slug already exists.");
+        throw new Error(uniqueErrorMessage(err));
       }
       throw err;
     }
@@ -151,21 +195,12 @@ export const createProduct = shopOwnerActionClient
 export const updateProduct = shopOwnerActionClient
   .inputSchema(updateProductSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const {
-      id,
-      shopId,
-      categoryId,
-      brandId,
-      hasVariants,
-      variants = [],
-      specifications,
-      addons,
-      ...data
-    } = parsedInput;
-
+    const { id, categoryEngine } = parsedInput;
     const shopCategory = ctx.shop.shopCategory;
     const isRestaurant = isRestaurantCategory(shopCategory);
-    const effectiveHasVariants = isRestaurant ? false : hasVariants;
+    const effectiveHasVariants = isRestaurant
+      ? false
+      : categoryEngine.hasVariants;
 
     try {
       const updated = await prisma.$transaction(async (tx) => {
@@ -182,22 +217,26 @@ export const updateProduct = shopOwnerActionClient
         await tx.productVariant.deleteMany({ where: { productId: id } });
 
         const product = await tx.product.update({
-          where: { id, shopId },
+          where: { id, shopId: parsedInput.shopId },
           data: {
-            ...data,
+            ...productDataFromInput(parsedInput, shopCategory),
             hasVariants: effectiveHasVariants,
-            categoryId: categoryId || null,
-            brandId: brandId || null,
             specifications:
               !isRestaurant &&
               usesSpecifications(shopCategory) &&
-              specifications
-                ? specifications
+              Object.keys(categoryEngine.specifications ?? {}).length > 0
+                ? categoryEngine.specifications
                 : Prisma.DbNull,
-            addons: isRestaurant && addons?.length ? addons : Prisma.DbNull,
+            addons:
+              isRestaurant && categoryEngine.addons?.length
+                ? categoryEngine.addons
+                : Prisma.DbNull,
             variants: {
               create: buildVariantCreates(
-                { hasVariants: effectiveHasVariants, variants },
+                {
+                  hasVariants: effectiveHasVariants,
+                  variants: categoryEngine.variants,
+                },
                 shopCategory,
               ),
             },
@@ -213,7 +252,7 @@ export const updateProduct = shopOwnerActionClient
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
-          throw new Error("A product with this slug already exists.");
+          throw new Error(uniqueErrorMessage(err));
         }
         if (err.code === "P2025") {
           throw new Error("Product not found.");
@@ -308,11 +347,21 @@ export const duplicateProduct = shopOwnerActionClient
             price: original.price,
             compareAtPrice: original.compareAtPrice,
             costPrice: original.costPrice,
+            uom: original.uom,
+            barcode: original.barcode
+              ? `${original.barcode}-copy-${timestamp}`
+              : null,
+            minOrderQuantity: original.minOrderQuantity,
+            maxOrderQuantity: original.maxOrderQuantity,
+            isOutOfStock: original.isOutOfStock,
             imageUrl: original.imageUrl,
             youtubeUrl: original.youtubeUrl,
             noticeText: original.noticeText,
             isActive: false,
             isFeatured: original.isFeatured,
+            isBestSellerItem: original.isBestSellerItem,
+            isCollection: original.isCollection,
+            isSpecialMenu: original.isSpecialMenu,
             metaTitle: original.metaTitle,
             metaDescription: original.metaDescription,
             hasVariants: original.hasVariants,
@@ -330,12 +379,16 @@ export const duplicateProduct = shopOwnerActionClient
                     compareAtPrice: v.compareAtPrice
                       ? Number(v.compareAtPrice)
                       : undefined,
+                    costPrice: v.costPrice ? Number(v.costPrice) : undefined,
                     stock: v.stock,
                     imageUrl: v.imageUrl ?? undefined,
+                    allowBackorder: v.allowBackorder,
+                    uom: v.uom ?? undefined,
+                    uomValue: v.uomValue ? Number(v.uomValue) : undefined,
                     isActive: v.isActive,
-                    attributeValues: v.attributeValues.map((av) => ({
-                      attributeValueId: av.attributeValueId,
-                    })),
+                    attributeValueIds: v.attributeValues.map(
+                      (av) => av.attributeValueId,
+                    ),
                   })),
                 },
                 shopCategory,
@@ -360,7 +413,7 @@ export const duplicateProduct = shopOwnerActionClient
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === "P2002"
       ) {
-        throw new Error("A product with this slug already exists.");
+        throw new Error(uniqueErrorMessage(err));
       }
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&

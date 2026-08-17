@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import type { CreateProductInput } from "../../validations";
 import {
@@ -27,11 +27,11 @@ interface VariantMatrixEngineProps {
  */
 export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
   const { watch, setValue } = useFormContext<CreateProductInput>();
-  const hasVariants = watch("hasVariants");
-  const basePrice = watch("price") || 0;
-  const slug = watch("slug") || "";
-
-  const [selectedAttrIds, setSelectedAttrIds] = useState<string[]>([]);
+  const hasVariants = watch("categoryEngine.hasVariants");
+  const basePrice = watch("pricingInventory.price") || 0;
+  const slug = watch("basicInfo.slug") || "";
+  const selectedAttrIds =
+    watch("categoryEngine.selectedAttributeIds") ?? EMPTY_ATTRIBUTE_IDS;
 
   const selectedAttributes: AttributeInput[] = useMemo(
     () =>
@@ -42,8 +42,12 @@ export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
   );
 
   function toggleAttribute(id: string) {
-    setSelectedAttrIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    setValue(
+      "categoryEngine.selectedAttributeIds",
+      selectedAttrIds.includes(id)
+        ? selectedAttrIds.filter((x) => x !== id)
+        : [...selectedAttrIds, id],
+      { shouldDirty: true },
     );
   }
 
@@ -53,16 +57,50 @@ export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
       basePrice,
       selectedAttributes,
     );
+
+    // Snapshot existing variants so we can preserve their data for
+    // combinations that were already edited (e.g. XL with stock=40).
+    const existingVariants = watch("categoryEngine.variants") ?? [];
+
+    // Build a lookup keyed by sorted attributeValueIds for reliable matching.
+    const existingByKey = new Map(
+      existingVariants.map((v) => [
+        [...(v.attributeValueIds ?? [])].sort().join("|"),
+        v,
+      ]),
+    );
+
     setValue(
-      "variants",
-      matrix.map((m) => ({
-        sku: m.sku,
-        price: m.price,
-        stock: m.stock,
-        isActive: true,
-        // attributeValues matches the Zod schema: { attributeValueId: string }[]
-        attributeValues: m.attributeValues,
-      })),
+      "categoryEngine.variants",
+      matrix.map((m) => {
+        const key = [...m.attributeValueIds].sort().join("|");
+        const existing = existingByKey.get(key);
+
+        // Preserve all data from an already-saved variant; only use
+        // generated defaults for combinations that are genuinely new.
+        if (existing) {
+          return {
+            ...existing,
+            // Keep the generated SKU only if the existing one is empty.
+            sku: existing.sku || m.sku,
+            attributeValueIds: m.attributeValueIds,
+          };
+        }
+
+        return {
+          sku: m.sku,
+          price: m.price,
+          stock: m.stock,
+          compareAtPrice: undefined,
+          costPrice: undefined,
+          imageUrl: "",
+          allowBackorder: false,
+          uom: "",
+          uomValue: undefined,
+          isActive: true,
+          attributeValueIds: m.attributeValueIds,
+        };
+      }),
       { shouldDirty: true },
     );
   }
@@ -74,7 +112,9 @@ export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
           id="hasVariants"
           checked={hasVariants}
           onCheckedChange={(checked) =>
-            setValue("hasVariants", checked, { shouldDirty: true })
+            setValue("categoryEngine.hasVariants", checked, {
+              shouldDirty: true,
+            })
           }
         />
         <Label htmlFor="hasVariants">
@@ -115,7 +155,7 @@ export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
 
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             disabled={selectedAttributes.length === 0 || !basePrice}
             onClick={generateMatrix}
@@ -129,3 +169,5 @@ export function VariantMatrixEngine({ attributes }: VariantMatrixEngineProps) {
     </div>
   );
 }
+
+const EMPTY_ATTRIBUTE_IDS: string[] = [];
